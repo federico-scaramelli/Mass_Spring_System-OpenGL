@@ -1,10 +1,10 @@
 #include <iostream>
 #include "Window.hpp"
+#include "GraphicsShader.h"
 
 GLFWwindow* window = nullptr;
 GLuint vaoHandle;
 GLuint vboHandles[2];
-GLuint shaderProgram;
 
 bool init()
 {
@@ -20,7 +20,6 @@ void cleanup()
 	glDeleteVertexArrays(1, &vaoHandle);
 	glDeleteBuffers(1, &vboHandles[0]);
 	glDeleteBuffers(1, &vboHandles[1]);
-	glDeleteProgram(shaderProgram);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -40,27 +39,7 @@ void run()
 		0.0f, 0.0f, 1.0f
 	};
 
-	//Vertex shader
-	auto vertexShaderCode = utils::readFile("shaders/shader.vert");
-	const GLchar* vertexShaderSource[] = { vertexShaderCode.c_str() };
-	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	//Fragment shader
-	auto fragmentShaderCode = utils::readFile("shaders/shader.frag");
-	const GLchar* fragmentShaderSource[] = { fragmentShaderCode.c_str() };
-	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
+	GraphicsShader basicShader("shaders/shader.vert", "shaders/shader.frag");
 
 	//Create and populate the buffer objects
 	glGenBuffers(2, vboHandles);
@@ -74,6 +53,7 @@ void run()
 	//Populate the color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColors), vertexColors, GL_STATIC_DRAW);
+
 
 	//Create and setup the vertex array object
 	glGenVertexArrays(1, &vaoHandle);
@@ -97,9 +77,10 @@ void run()
 	while(!glfwWindowShouldClose(window)) 
 	{
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		//Clear the color buffer
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
+		basicShader.Use();
 
 		glBindVertexArray(vaoHandle);
 		glDrawArrays(GL_TRIANGLES, 0, 3);

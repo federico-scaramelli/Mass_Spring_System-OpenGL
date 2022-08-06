@@ -163,6 +163,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\ComputeShader.cpp" />
+    <ClCompile Include="src\GraphicsShader.cpp" />
     <ClCompile Include="libraries\glad.c" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
@@ -170,6 +172,8 @@
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\ComputeShader.h" />
+    <ClInclude Include="src\GraphicsShader.h" />
     <ClInclude Include="libraries\include\glad\glad.h" />
     <ClInclude Include="libraries\include\GLFW\glfw3.h" />
     <ClInclude Include="libraries\include\GLFW\glfw3native.h" />

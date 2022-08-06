@@ -21,6 +21,12 @@
     <ClCompile Include="libraries\glad.c">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsShader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ComputeShader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -42,6 +48,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GraphicsShader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ComputeShader.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
