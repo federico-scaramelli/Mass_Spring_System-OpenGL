@@ -18,5 +18,35 @@
     <ClCompile Include="src\main.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="libraries\glad.c">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="libraries\lib\glfw3.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libraries\include\glad\glad.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\include\GLFW\glfw3.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\include\GLFW\glfw3native.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\include\KHR\khrplatform.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Window.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shaders\shader.vert" />
+    <None Include="src\shaders\shader.frag" />
   </ItemGroup>
 </Project>
