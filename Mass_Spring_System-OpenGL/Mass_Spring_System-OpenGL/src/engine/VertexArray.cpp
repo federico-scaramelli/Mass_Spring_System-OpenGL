@@ -20,18 +20,28 @@ void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& la
 
 	const auto& elements = layout.GetElements();
 	GLuint offset = 0;
-	for (unsigned int i = 0; i < elements.size(); i++) 
+
+	GLuint i = layout.GetElements().size() - 1;
+	const auto& element = elements[i];
+	GLCall(glEnableVertexAttribArray(i));
+	vb.Bind(i, offset, VertexBufferElement::GetSizeOfType(GL_FLOAT) * element.count);
+
+	GLCall(glVertexAttribFormat(i, element.count, element.type, element.normalized, 
+	  VertexBufferElement::GetSizeOfType(GL_FLOAT) * element.count));
+	GLCall(glVertexAttribBinding(i, i));
+
+	/*for (unsigned int i = 0; i < elements.size(); i++) 
 	{
 		const auto& element = elements[i];
 
 		GLCall(glEnableVertexAttribArray(i));
 		vb.Bind(i, offset, layout.GetStride());
 
-		GLCall(glVertexAttribFormat(i, element.count, element.type, element.normalized, offset));
+		GLCall(glVertexAttribFormat(i, element.count, element.type, element.normalized, layout.GetStride()));
 		GLCall(glVertexAttribBinding(i, i));
 
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
-	}
+	}*/
 }
 
 void VertexArray::Bind() const

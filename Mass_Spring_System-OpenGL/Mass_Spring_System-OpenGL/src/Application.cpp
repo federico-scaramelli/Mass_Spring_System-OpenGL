@@ -1,6 +1,6 @@
 #include <iostream>
 #include "engine/Window.hpp"
-#include "engine/GraphicsShader.h"
+ #include "engine/GraphicsShader.h"
 
 #include "engine/Renderer.h"
 #include "engine/VertexBuffer.h"
@@ -48,10 +48,9 @@ void run()
 	VertexBufferLayout layout;
 
 	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions));
+	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
 	layout.Push<GLfloat>(3);
 	va.AddBuffer(vbPositions, layout);
-
-	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
 	layout.Push<GLfloat>(3);
 	va.AddBuffer(vbColors, layout);
 

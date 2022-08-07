@@ -11,7 +11,7 @@ public:
 	VertexBuffer(const void* data, GLuint size);
 	~VertexBuffer();
 
-	void Bind(GLuint ID, GLuint offset, GLuint stride) const; 
+	void Bind(GLuint bindingIdx, GLuint offset, GLuint stride) const; 
 	void Unbind() const;
 };
 
