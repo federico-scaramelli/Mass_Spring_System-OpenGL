@@ -45,14 +45,18 @@ void run()
 	};
 
 	VertexArray va;
-	VertexBufferLayout layout;
+	// VertexBufferLayout layout;
+	VertexBufferFormat vbPositionsFormat{GL_FLOAT, 3, GL_FALSE};
+	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions), vbPositionsFormat);
 
-	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions));
-	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
-	layout.Push<GLfloat>(3);
-	va.AddBuffer(vbPositions, layout);
-	layout.Push<GLfloat>(3);
-	va.AddBuffer(vbColors, layout);
+	VertexBufferFormat vbColorsFormat{GL_FLOAT, 3, GL_FALSE};
+	VertexBuffer vbColors(vertexColors, sizeof(vertexColors), vbColorsFormat);
+
+	// layout.Push<GLfloat>(3);
+	// layout.Push<GLfloat>(3);
+
+	va.AddBuffer(vbPositions);
+	va.AddBuffer(vbColors);
 
 	GraphicsShader basicShader("res/shaders/shader.vert", "res/shaders/shader.frag");
 

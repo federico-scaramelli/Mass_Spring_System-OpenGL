@@ -6,8 +6,10 @@
 
 struct VertexBufferElement
 {
+	//Type ov values conteined
 	GLuint type;
-	GLuint count;
+	//Count of values contained, for a vec3 is 3
+	GLuint count; 
 	GLboolean normalized;
 
 	static GLuint GetSizeOfType(GLuint type)
@@ -46,7 +48,7 @@ public:
 	void Push<GLfloat>(GLuint count)
 	{
 		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
-		m_Stride = count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
+		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
 	}
 
 	template<>
