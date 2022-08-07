@@ -52,7 +52,9 @@ void run()
 	vbPositions.SetFormat(floatVec3);
 
 	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
-	vbColors.SetFormat(GL_FLOAT, 3, GL_FALSE);
+	// vbColors.SetFormat(GL_FLOAT, 3, GL_FALSE);
+	vbColors.SetFormat<GLfloat>(3);
+
 
 	// layout.Push<GLfloat>(3);
 	// layout.Push<GLfloat>(3);

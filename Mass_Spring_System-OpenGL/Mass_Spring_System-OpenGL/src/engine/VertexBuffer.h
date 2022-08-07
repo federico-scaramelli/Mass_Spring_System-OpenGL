@@ -2,6 +2,9 @@
 #include "Renderer.h"
 #include "glad/glad.h"
 
+template <class... E>
+constexpr bool falseTemplate = false;
+
 struct VertexBufferFormat
 {
 	//Type ov values conteined
@@ -42,6 +45,9 @@ public:
 	~VertexBuffer();
 
 	VertexBufferFormat& GetFormat();
+
+	template <class T>
+	void SetFormat(GLuint count);
 	void SetFormat(VertexBufferFormat& format);
 	void SetFormat(GLuint type, GLuint count, GLboolean normalized);
 
