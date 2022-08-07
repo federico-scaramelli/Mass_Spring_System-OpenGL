@@ -46,11 +46,13 @@ void run()
 
 	VertexArray va;
 	// VertexBufferLayout layout;
-	VertexBufferFormat vbPositionsFormat{GL_FLOAT, 3, GL_FALSE};
-	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions), vbPositionsFormat);
+	VertexBufferFormat floatVec3{GL_FLOAT, 3, GL_FALSE};
 
-	VertexBufferFormat vbColorsFormat{GL_FLOAT, 3, GL_FALSE};
-	VertexBuffer vbColors(vertexColors, sizeof(vertexColors), vbColorsFormat);
+	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions));
+	vbPositions.SetFormat(floatVec3);
+
+	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
+	vbColors.SetFormat(GL_FLOAT, 3, GL_FALSE);
 
 	// layout.Push<GLfloat>(3);
 	// layout.Push<GLfloat>(3);

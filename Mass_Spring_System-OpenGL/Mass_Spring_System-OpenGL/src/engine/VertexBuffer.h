@@ -38,10 +38,12 @@ private:
 
 public:
 	//Need size cause void* locks the sizeof call
-	VertexBuffer(const void* data, const GLuint size, const VertexBufferFormat& format);
+	VertexBuffer(const void* data, const GLuint size);
 	~VertexBuffer();
 
 	VertexBufferFormat& GetFormat();
+	void SetFormat(VertexBufferFormat& format);
+	void SetFormat(GLuint type, GLuint count, GLboolean normalized);
 
 	void Bind(GLuint bindingIdx, GLuint offset, GLuint stride) const; 
 	void Unbind() const;
