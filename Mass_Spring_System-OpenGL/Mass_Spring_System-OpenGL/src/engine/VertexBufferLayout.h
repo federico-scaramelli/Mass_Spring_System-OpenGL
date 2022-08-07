@@ -46,7 +46,7 @@ public:
 	void Push<GLfloat>(GLuint count)
 	{
 		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
-		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
+		m_Stride = count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
 	}
 
 	template<>
