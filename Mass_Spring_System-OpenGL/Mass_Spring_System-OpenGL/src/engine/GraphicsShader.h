@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "Utils.h"
+#include "../Utils.h"
 #include "glad/glad.h"
 
 class GraphicsShader

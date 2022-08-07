@@ -15,16 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
+    <ClCompile Include="src\Application.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="libraries\glad.c">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsShader.cpp">
+    <ClCompile Include="src\engine\GraphicsShader.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\ComputeShader.cpp">
+    <ClCompile Include="src\engine\ComputeShader.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\Renderer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\VertexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\IndexBuffer.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\VertexArray.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\VertexBufferLayout.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,21 +59,36 @@
     <ClInclude Include="libraries\include\KHR\khrplatform.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Window.hpp">
+    <ClInclude Include="src\engine\Window.hpp">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\GraphicsShader.h">
+    <ClInclude Include="src\engine\GraphicsShader.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\ComputeShader.h">
+    <ClInclude Include="src\engine\ComputeShader.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Renderer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\VertexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\IndexBuffer.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\VertexArray.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\VertexBufferLayout.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\shader.vert" />
-    <None Include="src\shaders\shader.frag" />
+    <None Include="res\shaders\shader.frag" />
+    <None Include="res\shaders\shader.vert" />
   </ItemGroup>
 </Project>

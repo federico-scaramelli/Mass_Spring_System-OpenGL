@@ -11,7 +11,7 @@
 #define WINDOW_HEIGHT 600
 #define WINDOW_TITLE "Mass Spring System"
 
-GLFWwindow* CreateWindow()
+inline GLFWwindow* CreateWindow()
 {
 	glfwInit();
 

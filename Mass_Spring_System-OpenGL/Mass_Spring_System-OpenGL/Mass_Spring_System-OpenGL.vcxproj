@@ -163,27 +163,37 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\ComputeShader.cpp" />
-    <ClCompile Include="src\GraphicsShader.cpp" />
+    <ClCompile Include="src\engine\IndexBuffer.cpp" />
+    <ClCompile Include="src\engine\Renderer.cpp" />
+    <ClCompile Include="src\engine\ComputeShader.cpp" />
+    <ClCompile Include="src\engine\GraphicsShader.cpp" />
     <ClCompile Include="libraries\glad.c" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\engine\VertexBuffer.cpp" />
+    <ClCompile Include="src\engine\VertexArray.cpp" />
+    <ClCompile Include="src\engine\VertexBufferLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\ComputeShader.h" />
-    <ClInclude Include="src\GraphicsShader.h" />
+    <ClInclude Include="src\engine\IndexBuffer.h" />
+    <ClInclude Include="src\engine\Renderer.h" />
+    <ClInclude Include="src\engine\ComputeShader.h" />
+    <ClInclude Include="src\engine\GraphicsShader.h" />
     <ClInclude Include="libraries\include\glad\glad.h" />
     <ClInclude Include="libraries\include\GLFW\glfw3.h" />
     <ClInclude Include="libraries\include\GLFW\glfw3native.h" />
     <ClInclude Include="libraries\include\KHR\khrplatform.h" />
     <ClInclude Include="src\Utils.h" />
-    <ClInclude Include="src\Window.hpp" />
+    <ClInclude Include="src\engine\Window.hpp" />
+    <ClInclude Include="src\engine\VertexBuffer.h" />
+    <ClInclude Include="src\engine\VertexArray.h" />
+    <ClInclude Include="src\engine\VertexBufferLayout.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\shaders\shader.frag" />
-    <None Include="src\shaders\shader.vert" />
+    <None Include="res\shaders\shader.frag" />
+    <None Include="res\shaders\shader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

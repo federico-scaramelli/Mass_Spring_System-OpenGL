@@ -9,7 +9,7 @@
   #ifdef NDEBUG
 	  #define ENGINE_DIR "../../../src/"
 	#else
-	  #define ENGINE_DIR "src/"
+	  #define ENGINE_DIR ""
   #endif
 #endif
 

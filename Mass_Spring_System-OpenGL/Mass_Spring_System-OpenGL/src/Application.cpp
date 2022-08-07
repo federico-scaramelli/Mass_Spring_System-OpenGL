@@ -1,6 +1,11 @@
 #include <iostream>
-#include "Window.hpp"
-#include "GraphicsShader.h"
+#include "engine/Window.hpp"
+#include "engine/GraphicsShader.h"
+
+#include "engine/Renderer.h"
+#include "engine/VertexBuffer.h"
+#include "engine/IndexBuffer.h"
+#include "engine/VertexArray.h"
 
 GLFWwindow* window = nullptr;
 GLuint vaoHandle;
@@ -17,9 +22,9 @@ bool init()
 
 void cleanup()
 {
-	glDeleteVertexArrays(1, &vaoHandle);
+	/*glDeleteVertexArrays(1, &vaoHandle);
 	glDeleteBuffers(1, &vboHandles[0]);
-	glDeleteBuffers(1, &vboHandles[1]);
+	glDeleteBuffers(1, &vboHandles[1]);*/
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -27,10 +32,10 @@ void cleanup()
 
 void run()
 {
-	GLfloat vertices[] = {
-		-0.8f, -0.8f, 0.0f,
-		0.8f, -0.8f, 0.0f,
-		0.0f, 0.8f, 0.0f
+	GLfloat vertexPositions[] = {
+	  -0.8f, -0.8f, 0.0f,
+	  0.8f, -0.8f, 0.0f,
+	  0.0f, 0.8f, 0.0f
 	};
 
 	GLfloat vertexColors[] = {
@@ -39,25 +44,32 @@ void run()
 		0.0f, 0.0f, 1.0f
 	};
 
-	GraphicsShader basicShader("shaders/shader.vert", "shaders/shader.frag");
+	VertexArray va;
+	VertexBufferLayout layout;
 
-	//Create and populate the buffer objects
+	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions));
+	layout.Push<GLfloat>(3);
+	va.AddBuffer(vbPositions, layout);
+
+	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
+	layout.Push<GLfloat>(3);
+	va.AddBuffer(vbColors, layout);
+
+	GraphicsShader basicShader("res/shaders/shader.vert", "res/shaders/shader.frag");
+
+
+	/*//Create and populate the buffer objects
 	glGenBuffers(2, vboHandles);
 	GLuint verticesBufferHandle = vboHandles[0];
 	GLuint colorBufferHandle = vboHandles[1];
 
 	//Populate the position buffer
 	glBindBuffer(GL_ARRAY_BUFFER, verticesBufferHandle);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); 
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW); 
 
 	//Populate the color buffer
 	glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertexColors), vertexColors, GL_STATIC_DRAW);
-
-
-	//Create and setup the vertex array object
-	glGenVertexArrays(1, &vaoHandle);
-	glBindVertexArray(vaoHandle);
 
 	//Enable the vertex attribute arrays
 	glEnableVertexAttribArray(0);
@@ -71,7 +83,7 @@ void run()
 	// Map index 1 to the color buffer
 	glBindVertexBuffer(1, colorBufferHandle, 0, sizeof(GLfloat) * 3);
 	glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 0);
-	glVertexAttribBinding(1, 1);
+	glVertexAttribBinding(1, 1);*/
 
 	
 	while(!glfwWindowShouldClose(window)) 
@@ -82,7 +94,10 @@ void run()
 
 		basicShader.Use();
 
-		glBindVertexArray(vaoHandle);
+		//glBindVertexArray(vaoHandle);
+		va.Bind();
+
+		//Draw the bound buffers data
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
