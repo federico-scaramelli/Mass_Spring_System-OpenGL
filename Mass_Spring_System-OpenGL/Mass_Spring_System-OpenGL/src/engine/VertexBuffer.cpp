@@ -1,5 +1,6 @@
 #include "VertexBuffer.h"
 #include "Renderer.h"
+#include "../Utils.h"
 #include "glm/vec3.hpp"
 
 VertexBuffer::VertexBuffer(const void* data, const GLuint size)
@@ -23,7 +24,7 @@ VertexBufferFormat& VertexBuffer::GetFormat()
 template <typename T>
 void VertexBuffer::SetFormat(GLuint count)
 {
-	static_assert(falseTemplate<T>);
+	static_assert(Utils::falseTemplate<T>);
 }
 
 template <>

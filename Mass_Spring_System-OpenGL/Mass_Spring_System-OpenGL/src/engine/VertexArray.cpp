@@ -5,25 +5,25 @@
 VertexArray::VertexArray()
 {
 	//Create and setup the vertex array object
-	GLCall(glGenVertexArrays(1, &m_bufferID))
-	GLCall(glBindVertexArray(m_bufferID))
+	glGenVertexArrays(1, &m_bufferID);
+	glBindVertexArray(m_bufferID);
 }
 
 VertexArray::~VertexArray()
 {
-	GLCall(glDeleteVertexArrays(1, &m_bufferID))
+	glDeleteVertexArrays(1, &m_bufferID);
 }
 
 void VertexArray::AddBuffer(VertexBuffer& vb)
 {
 	Bind();
-
-	GLCall(glEnableVertexAttribArray(vboCount));
+	
+	glEnableVertexAttribArray(vboCount);
 	auto& format = vb.GetFormat();
 	vb.Bind(vboCount);
 
-	GLCall(glVertexAttribFormat(vboCount, format.count, format.type, format.normalized, 0));
-	GLCall(glVertexAttribBinding(vboCount, vboCount));
+	glVertexAttribFormat(vboCount, format.count, format.type, format.normalized, 0);
+	glVertexAttribBinding(vboCount, vboCount);
 
 	vboCount++;
 
@@ -43,10 +43,10 @@ void VertexArray::AddBuffer(VertexBuffer& vb)
 
 void VertexArray::Bind() const
 {
-	GLCall(glBindVertexArray(m_bufferID))
+	glBindVertexArray(m_bufferID);
 }
 
 void VertexArray::Unbind() const
 {
-	GLCall(glBindVertexArray(0))
+	glBindVertexArray(0);
 }

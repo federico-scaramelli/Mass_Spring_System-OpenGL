@@ -2,9 +2,6 @@
 #include "Renderer.h"
 #include "glad/glad.h"
 
-template <class... E>
-constexpr bool falseTemplate = false;
-
 struct VertexBufferFormat
 {
 	//Type ov values conteined

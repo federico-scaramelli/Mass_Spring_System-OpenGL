@@ -7,14 +7,14 @@
 GraphicsShader::GraphicsShader(const std::string vertexPath, const std::string fragmentPath)
 {
 	//Vertex shader
-	auto vertexShaderCode = utils::readFile(vertexPath);
+	auto vertexShaderCode = Utils::readFile(vertexPath);
 	const GLchar* vertexShaderSource[] = { vertexShaderCode.c_str() };
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	GLCall(glShaderSource(vertexShader, 1, vertexShaderSource, NULL));
 	GLCall(glCompileShader(vertexShader));
 
 	//Fragment shader
-	auto fragmentShaderCode = utils::readFile(fragmentPath);
+	auto fragmentShaderCode = Utils::readFile(fragmentPath);
 	const GLchar* fragmentShaderSource[] = { fragmentShaderCode.c_str() };
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, fragmentShaderSource, NULL);

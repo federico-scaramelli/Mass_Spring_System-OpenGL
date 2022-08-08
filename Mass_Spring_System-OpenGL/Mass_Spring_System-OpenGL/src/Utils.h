@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+//TODO: check NDEBUG path with shaders
 #ifndef ENGINE_DIR
   #ifdef NDEBUG
 	  #define ENGINE_DIR "../../../src/"
@@ -13,8 +14,11 @@
   #endif
 #endif
 
-namespace utils
+namespace Utils
 {
+    template <class... E>
+	constexpr bool falseTemplate = false;
+
 	inline std::string readFile(const std::string& filepath) {
 		std::string content;
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "engine/Window.h"
 #include "engine/GraphicsShader.h"
+#include "engine/ShaderProgram.h"
 
 #include "DebugLogger.h"
 #include "engine/Renderer.h"
@@ -45,29 +46,28 @@ void run()
 	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
 	vbColors.SetFormat<GLfloat>(3);
 
-	vertexArrayObject.AddBuffer(vbPositions);
 	vertexArrayObject.AddBuffer(vbColors);
+	vertexArrayObject.AddBuffer(vbPositions);
 
-	GraphicsShader basicShader("res/shaders/shader.vert", "res/shaders/shader.frag");
-	
+	ShaderProgram basicShader{};
+	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
+	basicShader.CompileShader("shader.frag", ShaderType::FRAGMENT);
+	basicShader.Link();
+	basicShader.Validate();
 	basicShader.Use();
-	
-	while (!glfwWindowShouldClose(glfwWindow)) {
-		GLCall(glClearColor(0.07f, 0.13f, 0.17f, 1.0f));
-		//Clear the color buffer
-		GLCall(glClear(GL_COLOR_BUFFER_BIT));
-		
-		//Rot matrix used in uniform
-		glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), 180.f, glm::vec3(0,0,1));
-		
-		//Location of uniform
-		GLint location = glGetUniformLocation(basicShader.ID, "rotationMatrix");
 
-		if( location < 0 )
-		{
-			throw std::runtime_error("Uniform location invalid!");
-		}
-		glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(rotationMatrix));
+	
+	GLfloat angle = 0;
+	while (!glfwWindowShouldClose(glfwWindow)) {
+		//Clear the color buffer
+		GLCall(glClearColor(0.07f, 0.13f, 0.17f, 1.0f));
+		GLCall(glClear(GL_COLOR_BUFFER_BIT));
+
+		//Rot matrix used in uniform
+		angle += 0.01f;
+		glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0,0,1));
+		basicShader.SetUniform<glm::mat4>("rotationMatrix", rotationMatrix);
+
 		vertexArrayObject.Bind();
 
 		//Draw the bound buffers data
