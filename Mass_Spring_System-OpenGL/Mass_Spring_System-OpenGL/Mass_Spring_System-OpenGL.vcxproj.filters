@@ -48,6 +48,9 @@
     <ClCompile Include="src\engine\Window.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\ShaderProgram.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -948,6 +951,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="libraries\include\glm\detail\type_vec4.hpp">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\ShaderProgram.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\DebugLogger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

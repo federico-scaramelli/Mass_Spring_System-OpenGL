@@ -164,6 +164,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libraries\include\glm\detail\glm.cpp" />
+    <ClCompile Include="src\engine\ShaderProgram.cpp" />
     <ClCompile Include="src\engine\IndexBuffer.cpp" />
     <ClCompile Include="src\engine\Renderer.cpp" />
     <ClCompile Include="src\engine\ComputeShader.cpp" />
@@ -465,6 +466,8 @@
     <ClInclude Include="libraries\include\glm\vec3.hpp" />
     <ClInclude Include="libraries\include\glm\vec4.hpp" />
     <ClInclude Include="libraries\include\glm\vector_relational.hpp" />
+    <ClInclude Include="src\DebugLogger.h" />
+    <ClInclude Include="src\engine\ShaderProgram.h" />
     <ClInclude Include="src\engine\IndexBuffer.h" />
     <ClInclude Include="src\engine\Renderer.h" />
     <ClInclude Include="src\engine\ComputeShader.h" />
