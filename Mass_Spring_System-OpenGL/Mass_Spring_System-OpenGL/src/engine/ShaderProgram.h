@@ -1,7 +1,7 @@
 #pragma once
 
-#include <map>
 #include <stdexcept>
+#include <unordered_map>
 
 #include "glad/glad.h"
 
@@ -32,7 +32,7 @@ class ShaderProgram {
 private:
 	GLint ID;
 	GLboolean linked;
-	std::map<std::string, GLint> uniformLocations;
+	std::unordered_map<std::string, GLint> uniformLocations;
 	GLint GetUniformLocation(const char* name);
 
 

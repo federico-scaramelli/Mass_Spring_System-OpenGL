@@ -196,12 +196,12 @@ void ShaderProgram::SetUniform<GLfloat>(const char* name, GLfloat x, GLfloat y, 
 
 GLint ShaderProgram::GetUniformLocation(const char* name)
 {
-	auto location = uniformLocations.find(name)->second;
-	if( location < 0 )
+	if (uniformLocations.find(name) == uniformLocations.end()) 
 	{
 		throw std::runtime_error("Uniform location invalid!");
 	}
-	return location;
+
+	return uniformLocations[name];
 }
 
 void ShaderProgram::LoadUniformLocations()
