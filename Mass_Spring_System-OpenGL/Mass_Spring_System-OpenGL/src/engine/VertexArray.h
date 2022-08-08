@@ -6,7 +6,8 @@ class VertexArray
 {
 private:
 	GLuint m_bufferID;
-	uint16_t i=0;
+	/* Current binding index */
+	uint16_t vboCount = 0;
 public:
 	VertexArray();
 	~VertexArray();

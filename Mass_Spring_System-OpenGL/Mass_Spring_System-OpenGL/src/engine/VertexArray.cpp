@@ -18,15 +18,14 @@ void VertexArray::AddBuffer(VertexBuffer& vb)
 {
 	Bind();
 
-	GLCall(glEnableVertexAttribArray(i));
+	GLCall(glEnableVertexAttribArray(vboCount));
 	auto& format = vb.GetFormat();
-	vb.Bind(i, 0,  format.GetStride());
+	vb.Bind(vboCount);
 
-	GLCall(glVertexAttribFormat(i, format.count, format.type, format.normalized, 0));
-	GLCall(glVertexAttribBinding(i, i));
+	GLCall(glVertexAttribFormat(vboCount, format.count, format.type, format.normalized, 0));
+	GLCall(glVertexAttribBinding(vboCount, vboCount));
 
-	//i è un attr. di vertexArray
-	i++;
+	vboCount++;
 
 	/*for (unsigned int i = 0; i < elements.size(); i++) 
 	{
