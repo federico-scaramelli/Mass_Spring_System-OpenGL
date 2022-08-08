@@ -1,18 +1,19 @@
 #pragma once
-#include "VertexBuffer.h"
-#include "VertexBufferLayout.h"
+#include "glad/glad.h"
+
+class VertexBufferLayout;
+class VertexBuffer;
 
 class VertexArray
 {
 private:
 	GLuint m_bufferID;
-	/* Current binding index */
-	uint16_t vboCount = 0;
+	// uint16_t vboCount = 0;
 public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffer(VertexBuffer& vb);
+	void AddBuffer(VertexBuffer& vertexBuffer, VertexBufferLayout& layout);
 
 	void Bind() const;
 	void Unbind() const;

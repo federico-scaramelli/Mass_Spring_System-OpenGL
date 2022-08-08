@@ -959,6 +959,9 @@
     <ClInclude Include="src\DebugLogger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="src\VertexStructures.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\shaders\shader.frag" />

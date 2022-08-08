@@ -1,13 +1,16 @@
 #include <iostream>
+
 #include "engine/Window.h"
 #include "engine/GraphicsShader.h"
 #include "engine/ShaderProgram.h"
-
 #include "DebugLogger.h"
 #include "engine/Renderer.h"
 #include "engine/VertexBuffer.h"
 #include "engine/IndexBuffer.h"
 #include "engine/VertexArray.h"
+#include "engine/VertexBufferLayout.h"
+#include "VertexStructures.h"
+
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.inl"
@@ -25,39 +28,32 @@ void init()
 
 void run()
 {
-	GLfloat vertexPositions[] = {
-		-0.5f, -0.5f, 0.0f,	  //0
-		0.5f, -0.5f, 0.0f,	  //1
-		0.5f, 0.5f, 0.0f,	  //2
-		-0.5f, 0.5f, 0.0f,	  //3
-	};
+	std::array<QuadAttributesStruct, 4> datas {{
+		{{-0.5f,-0.5f,0.0f},{1.0f,0.0f,0.0f}},
+		{{0.5f,-0.5f,0.0f},{0.0f,1.0f,0.0f}},
+		{{0.5f,0.5f,0.0f},{0.0f,0.0f,1.0f}},
+		{{-0.5f,0.5f,0.0f},{1.0f,1.0f,1.0f}}
+	}};
 
 	GLuint vertexPosIndices[] = {
 		0, 1, 2,
 		2, 3, 0
 	};
-
-	GLfloat vertexColors[] = {
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f,
-		0.3f, 0.6f, 0.8f,
-	};
-
+	
 	VertexArray vertexArrayObject;
-	VertexBufferFormat floatVec3{GL_FLOAT, 3, GL_FALSE};
+	
+	VertexBufferLayout vertexBufferLayout;
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(3);
 
-	VertexBuffer vbPositions(vertexPositions, sizeof(vertexPositions));
-	vbPositions.SetFormat<GLfloat>(3);
+
+	size_t sizeOfDatasInBytes = datas.size() * sizeof(QuadAttributesStruct);
+	VertexBuffer vertexBuffer{datas.data(), sizeOfDatasInBytes};
+
+	vertexArrayObject.AddBuffer(vertexBuffer, vertexBufferLayout);
 
 	IndexBuffer indexBuffer(vertexPosIndices, sizeof(vertexPosIndices));
-
-	VertexBuffer vbColors(vertexColors, sizeof(vertexColors));
-	vbColors.SetFormat<GLfloat>(3);
-
-	vertexArrayObject.AddBuffer(vbColors);
-	vertexArrayObject.AddBuffer(vbPositions);
-
+	
 	ShaderProgram basicShader{};
 	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
 	basicShader.CompileShader("shader.frag", ShaderType::FRAGMENT);
@@ -74,8 +70,8 @@ void run()
 
 		//Rot matrix used in uniform
 		angle += 0.01f;
-		glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0,0,1));
-		basicShader.SetUniform<glm::mat4>("rotationMatrix", rotationMatrix);
+		// glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0,0,1));
+		// basicShader.SetUniform<glm::mat4>("rotationMatrix", rotationMatrix);
 
 		vertexArrayObject.Bind();
 		indexBuffer.Bind();

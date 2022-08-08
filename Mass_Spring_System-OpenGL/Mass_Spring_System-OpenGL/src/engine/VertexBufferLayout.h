@@ -1,14 +1,13 @@
 #pragma once
 #include <vector>
-
-#include "Renderer.h"
 #include "glad/glad.h"
+#include "glm/glm.hpp"
+#include "Renderer.h"
+#include "../Utils.h"
 
 struct VertexBufferElement
 {
-	//Type ov values conteined
 	GLuint type;
-	//Count of values contained, for a vec3 is 3
 	GLuint count; 
 	GLboolean normalized;
 
@@ -19,14 +18,13 @@ struct VertexBufferElement
 			case GL_FLOAT: return 4;
 			case GL_UNSIGNED_INT: return 4;
 			case GL_UNSIGNED_BYTE: return 1;
+			case GL_FLOAT_VEC3: return 12;
 		}
+
 		ASSERT(false);
 		return 0;
 	}
 };
-
-template <class... E>
-constexpr bool always_false = false;
 
 class VertexBufferLayout
 {
@@ -35,13 +33,15 @@ private:
 	GLuint m_Stride;
 
 public:
-	VertexBufferLayout()
-	  : m_Stride(0) {}
-	
+	VertexBufferLayout() : m_Stride(0) {}
+
+	const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
+	unsigned int GetStride() const { return m_Stride; }
+
 	template<typename T>
 	void Push(GLuint count)
 	{
-		static_assert(always_false<T>);
+		static_assert(Utils::falseTemplate<T>);
 	}
 
 	template<>
@@ -49,6 +49,13 @@ public:
 	{
 		m_Elements.push_back({ GL_FLOAT, count, GL_FALSE });
 		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT);
+	}
+
+	template<>
+	void Push<glm::vec3>(GLuint count)
+	{
+		m_Elements.push_back({ GL_FLOAT_VEC3, count, GL_FALSE });
+		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_FLOAT_VEC3);
 	}
 
 	template<>
@@ -64,8 +71,5 @@ public:
 		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE });
 		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
 	}
-
-	inline const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
-	inline unsigned int GetStride() const { return m_Stride; }
 };
 

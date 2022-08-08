@@ -1245,7 +1245,7 @@ typedef void (* GLFWwindowposfun)(GLFWwindow* window, int xpos, int ypos);
 
 /*! @brief The function pointer type for window size callbacks.
  *
- *  This is the function pointer type for window size callbacks.  A window size
+ *  This is the function pointer type for window vertexBufferSize callbacks.  A window vertexBufferSize
  *  callback function has the following signature:
  *  @code
  *  void callback_name(GLFWwindow* window, int width, int height)
@@ -1370,8 +1370,8 @@ typedef void (* GLFWwindowmaximizefun)(GLFWwindow* window, int maximized);
 
 /*! @brief The function pointer type for framebuffer size callbacks.
  *
- *  This is the function pointer type for framebuffer size callbacks.
- *  A framebuffer size callback function has the following signature:
+ *  This is the function pointer type for framebuffer vertexBufferSize callbacks.
+ *  A framebuffer vertexBufferSize callback function has the following signature:
  *  @code
  *  void function_name(GLFWwindow* window, int width, int height)
  *  @endcode
@@ -2079,13 +2079,13 @@ GLFWAPI void glfwGetMonitorPos(GLFWmonitor* monitor, int* xpos, int* ypos);
  *
  *  This function returns the position, in screen coordinates, of the upper-left
  *  corner of the work area of the specified monitor along with the work area
- *  size in screen coordinates. The work area is defined as the area of the
+ *  vertexBufferSize in screen coordinates. The work area is defined as the area of the
  *  monitor not occluded by the operating system task bar where present. If no
  *  task bar exists then the work area is the monitor resolution in screen
  *  coordinates.
  *
- *  Any or all of the position and size arguments may be `NULL`.  If an error
- *  occurs, all non-`NULL` position and size arguments will be set to zero.
+ *  Any or all of the position and vertexBufferSize arguments may be `NULL`.  If an error
+ *  occurs, all non-`NULL` position and vertexBufferSize arguments will be set to zero.
  *
  *  @param[in] monitor The monitor to query.
  *  @param[out] xpos Where to store the monitor x-coordinate, or `NULL`.
@@ -2108,16 +2108,16 @@ GLFWAPI void glfwGetMonitorWorkarea(GLFWmonitor* monitor, int* xpos, int* ypos, 
 
 /*! @brief Returns the physical size of the monitor.
  *
- *  This function returns the size, in millimetres, of the display area of the
+ *  This function returns the vertexBufferSize, in millimetres, of the display area of the
  *  specified monitor.
  *
- *  Some systems do not provide accurate monitor size information, either
+ *  Some systems do not provide accurate monitor vertexBufferSize information, either
  *  because the monitor
  *  [EDID](https://en.wikipedia.org/wiki/Extended_display_identification_data)
  *  data is incorrect or because the driver does not report it accurately.
  *
- *  Any or all of the size arguments may be `NULL`.  If an error occurs, all
- *  non-`NULL` size arguments will be set to zero.
+ *  Any or all of the vertexBufferSize arguments may be `NULL`.  If an error occurs, all
+ *  non-`NULL` vertexBufferSize arguments will be set to zero.
  *
  *  @param[in] monitor The monitor to query.
  *  @param[out] widthMM Where to store the width, in millimetres, of the
@@ -2146,13 +2146,13 @@ GLFWAPI void glfwGetMonitorPhysicalSize(GLFWmonitor* monitor, int* widthMM, int*
  *  content scale is the ratio between the current DPI and the platform's
  *  default DPI.  This is especially important for text and any UI elements.  If
  *  the pixel dimensions of your UI scaled by this look appropriate on your
- *  machine then it should appear at a reasonable size on other machines
+ *  machine then it should appear at a reasonable vertexBufferSize on other machines
  *  regardless of their DPI and scaling settings.  This relies on the system DPI
  *  and scaling settings being somewhat correct.
  *
  *  The content scale may depend on both the monitor resolution and pixel
  *  density and on user settings.  It may be very different from the raw DPI
- *  calculated from the physical size and current resolution.
+ *  calculated from the physical vertexBufferSize and current resolution.
  *
  *  @param[in] monitor The monitor to query.
  *  @param[out] xscale Where to store the x-axis content scale, or `NULL`.
@@ -2549,7 +2549,7 @@ GLFWAPI void glfwWindowHintString(int hint, const char* value);
  *
  *  The created window, framebuffer and context may differ from what you
  *  requested, as not all parameters and hints are
- *  [hard constraints](@ref window_hints_hard).  This includes the size of the
+ *  [hard constraints](@ref window_hints_hard).  This includes the vertexBufferSize of the
  *  window, especially for full screen windows.  To query the actual attributes
  *  of the created window, framebuffer and context, see @ref
  *  glfwGetWindowAttrib, @ref glfwGetWindowSize and @ref glfwGetFramebufferSize.
@@ -2560,7 +2560,7 @@ GLFWAPI void glfwWindowHintString(int hint, const char* value);
  *  recommended that you pick the primary monitor.  For more information on how
  *  to query connected monitors, see @ref monitor_monitors.
  *
- *  For full screen windows, the specified size becomes the resolution of the
+ *  For full screen windows, the specified vertexBufferSize becomes the resolution of the
  *  window's _desired video mode_.  As long as a full screen window is not
  *  iconified, the supported video mode most closely matching the desired video
  *  mode is set for the specified monitor.  For more information about full
@@ -2582,7 +2582,7 @@ GLFWAPI void glfwWindowHintString(int hint, const char* value);
  *
  *  Window systems put limits on window sizes.  Very large or very small window
  *  dimensions may be overridden by the window system on creation.  Check the
- *  actual [size](@ref window_size) after creation.
+ *  actual [vertexBufferSize](@ref window_size) after creation.
  *
  *  The [swap interval](@ref buffer_swap) is not set during window creation and
  *  the initial value may vary depending on driver settings and defaults.
@@ -2902,12 +2902,12 @@ GLFWAPI void glfwSetWindowPos(GLFWwindow* window, int xpos, int ypos);
 
 /*! @brief Retrieves the size of the content area of the specified window.
  *
- *  This function retrieves the size, in screen coordinates, of the content area
- *  of the specified window.  If you wish to retrieve the size of the
+ *  This function retrieves the vertexBufferSize, in screen coordinates, of the content area
+ *  of the specified window.  If you wish to retrieve the vertexBufferSize of the
  *  framebuffer of the window in pixels, see @ref glfwGetFramebufferSize.
  *
- *  Any or all of the size arguments may be `NULL`.  If an error occurs, all
- *  non-`NULL` size arguments will be set to zero.
+ *  Any or all of the vertexBufferSize arguments may be `NULL`.  If an error occurs, all
+ *  non-`NULL` vertexBufferSize arguments will be set to zero.
  *
  *  @param[in] window The window whose size to retrieve.
  *  @param[out] width Where to store the width, in screen coordinates, of the
@@ -2932,12 +2932,12 @@ GLFWAPI void glfwGetWindowSize(GLFWwindow* window, int* width, int* height);
 
 /*! @brief Sets the size limits of the specified window.
  *
- *  This function sets the size limits of the content area of the specified
- *  window.  If the window is full screen, the size limits only take effect
+ *  This function sets the vertexBufferSize limits of the content area of the specified
+ *  window.  If the window is full screen, the vertexBufferSize limits only take effect
  *  once it is made windowed.  If the window is not resizable, this function
  *  does nothing.
  *
- *  The size limits are applied immediately to a windowed mode window and may
+ *  The vertexBufferSize limits are applied immediately to a windowed mode window and may
  *  cause it to be resized.
  *
  *  The maximum dimensions must be greater than or equal to the minimum
@@ -3018,7 +3018,7 @@ GLFWAPI void glfwSetWindowAspectRatio(GLFWwindow* window, int numer, int denom);
 
 /*! @brief Sets the size of the content area of the specified window.
  *
- *  This function sets the size, in screen coordinates, of the content area of
+ *  This function sets the vertexBufferSize, in screen coordinates, of the content area of
  *  the specified window.
  *
  *  For full screen windows, this function updates the resolution of its desired
@@ -3059,12 +3059,12 @@ GLFWAPI void glfwSetWindowSize(GLFWwindow* window, int width, int height);
 
 /*! @brief Retrieves the size of the framebuffer of the specified window.
  *
- *  This function retrieves the size, in pixels, of the framebuffer of the
- *  specified window.  If you wish to retrieve the size of the window in screen
+ *  This function retrieves the vertexBufferSize, in pixels, of the framebuffer of the
+ *  specified window.  If you wish to retrieve the vertexBufferSize of the window in screen
  *  coordinates, see @ref glfwGetWindowSize.
  *
- *  Any or all of the size arguments may be `NULL`.  If an error occurs, all
- *  non-`NULL` size arguments will be set to zero.
+ *  Any or all of the vertexBufferSize arguments may be `NULL`.  If an error occurs, all
+ *  non-`NULL` vertexBufferSize arguments will be set to zero.
  *
  *  @param[in] window The window whose framebuffer to query.
  *  @param[out] width Where to store the width, in pixels, of the framebuffer,
@@ -3088,17 +3088,17 @@ GLFWAPI void glfwGetFramebufferSize(GLFWwindow* window, int* width, int* height)
 
 /*! @brief Retrieves the size of the frame of the window.
  *
- *  This function retrieves the size, in screen coordinates, of each edge of the
- *  frame of the specified window.  This size includes the title bar, if the
- *  window has one.  The size of the frame may vary depending on the
+ *  This function retrieves the vertexBufferSize, in screen coordinates, of each edge of the
+ *  frame of the specified window.  This vertexBufferSize includes the title bar, if the
+ *  window has one.  The vertexBufferSize of the frame may vary depending on the
  *  [window-related hints](@ref window_hints_wnd) used to create it.
  *
- *  Because this function retrieves the size of each window frame edge and not
+ *  Because this function retrieves the vertexBufferSize of each window frame edge and not
  *  the offset along a particular coordinate axis, the retrieved values will
  *  always be zero or positive.
  *
- *  Any or all of the size arguments may be `NULL`.  If an error occurs, all
- *  non-`NULL` size arguments will be set to zero.
+ *  Any or all of the vertexBufferSize arguments may be `NULL`.  If an error occurs, all
+ *  non-`NULL` vertexBufferSize arguments will be set to zero.
  *
  *  @param[in] window The window whose frame size to query.
  *  @param[out] left Where to store the size, in screen coordinates, of the left
@@ -3129,7 +3129,7 @@ GLFWAPI void glfwGetWindowFrameSize(GLFWwindow* window, int* left, int* top, int
  *  content scale is the ratio between the current DPI and the platform's
  *  default DPI.  This is especially important for text and any UI elements.  If
  *  the pixel dimensions of your UI scaled by this look appropriate on your
- *  machine then it should appear at a reasonable size on other machines
+ *  machine then it should appear at a reasonable vertexBufferSize on other machines
  *  regardless of their DPI and scaling settings.  This relies on the system DPI
  *  and scaling settings being somewhat correct.
  *
@@ -3448,11 +3448,11 @@ GLFWAPI GLFWmonitor* glfwGetWindowMonitor(GLFWwindow* window);
  *  is specified.
  *
  *  If you only wish to update the resolution of a full screen window or the
- *  size of a windowed mode window, see @ref glfwSetWindowSize.
+ *  vertexBufferSize of a windowed mode window, see @ref glfwSetWindowSize.
  *
  *  When a window transitions from full screen to windowed mode, this function
  *  restores any previous window settings such as whether it is decorated,
- *  floating, resizable, has size or aspect ratio limits, etc.
+ *  floating, resizable, has vertexBufferSize or aspect ratio limits, etc.
  *
  *  @param[in] window The window whose monitor, size or video mode to set.
  *  @param[in] monitor The desired monitor, or `NULL` to set windowed mode.
@@ -3648,8 +3648,8 @@ GLFWAPI GLFWwindowposfun glfwSetWindowPosCallback(GLFWwindow* window, GLFWwindow
 
 /*! @brief Sets the size callback for the specified window.
  *
- *  This function sets the size callback of the specified window, which is
- *  called when the window is resized.  The callback is provided with the size,
+ *  This function sets the vertexBufferSize callback of the specified window, which is
+ *  called when the window is resized.  The callback is provided with the vertexBufferSize,
  *  in screen coordinates, of the content area of the window.
  *
  *  @param[in] window The window whose callback to set.

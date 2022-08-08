@@ -59,8 +59,8 @@
  *    khronos_uint64_t            unsigned 64 bit
  *    khronos_intptr_t            signed   same number of bits as a pointer
  *    khronos_uintptr_t           unsigned same number of bits as a pointer
- *    khronos_ssize_t             signed   size
- *    khronos_usize_t             unsigned size
+ *    khronos_ssize_t             signed   vertexBufferSize
+ *    khronos_usize_t             unsigned vertexBufferSize
  *    khronos_float_t             signed   32 bit floating point
  *    khronos_time_ns_t           unsigned 64 bit time in nanoseconds
  *    khronos_utime_nanoseconds_t unsigned time interval or absolute time in
@@ -160,7 +160,7 @@ typedef uint64_t                khronos_uint64_t;
  * ABI breakage if khronos_uintptr_t is changed from unsigned long to
  * unsigned long long or similar (this results in different C++ name mangling).
  * To avoid changes for existing platforms, we restrict usage of intptr_t to
- * platforms where the size of a pointer is larger than the size of long.
+ * platforms where the vertexBufferSize of a pointer is larger than the vertexBufferSize of long.
  */
 #if defined(__SIZEOF_LONG__) && defined(__SIZEOF_POINTER__)
 #if __SIZEOF_POINTER__ > __SIZEOF_LONG__

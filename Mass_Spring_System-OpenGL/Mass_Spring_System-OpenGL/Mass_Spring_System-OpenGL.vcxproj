@@ -481,6 +481,7 @@
     <ClInclude Include="src\engine\VertexBuffer.h" />
     <ClInclude Include="src\engine\VertexArray.h" />
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
+    <ClInclude Include="src\VertexStructures.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\glm\detail\func_common.inl" />
