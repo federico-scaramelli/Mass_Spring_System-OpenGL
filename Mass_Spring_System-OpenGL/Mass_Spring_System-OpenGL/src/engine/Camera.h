@@ -18,23 +18,19 @@ private:
 	glm::mat4 m_ViewMatrix{1.f};
 
 public:
-	Camera(GLfloat aspect)
-	{
-		SetPerspectiveProjection (FOV, aspect, NEAR_PLANE, FAR_PLANE);
-		//m_Transform.UpdateDirectionAxis();
-	}
+	Camera(GLfloat aspect);
 
 	void SetPerspectiveProjection (const GLfloat fovy, const GLfloat aspect, const GLfloat near, const GLfloat far);
 
-	void UpdateView();
+	void UpdateViewMatrix();
 
 	const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
 	const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 
-	glm::mat4& GetUpdatedView()
+	glm::mat4& GetUpdatedViewMatrix()
 	{
-		UpdateView();
+		UpdateViewMatrix();
 		return m_ViewMatrix;
 	}
 

@@ -165,7 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\engine\Camera.cpp" />
     <ClCompile Include="libraries\include\glm\detail\glm.cpp" />
     <ClCompile Include="src\DebugLogger.cpp" />
     <ClCompile Include="src\engine\ShaderProgram.cpp" />
@@ -175,15 +175,14 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\engine\VertexBuffer.cpp" />
     <ClCompile Include="src\engine\VertexArray.cpp" />
-    <ClCompile Include="src\engine\VertexBufferLayout.cpp" />
     <ClCompile Include="src\engine\Window.cpp" />
-    <ClCompile Include="src\Transform.cpp" />
+    <ClCompile Include="src\engine\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\engine\Camera.h" />
     <ClInclude Include="libraries\include\glm\common.hpp" />
     <ClInclude Include="libraries\include\glm\detail\compute_common.hpp" />
     <ClInclude Include="libraries\include\glm\detail\compute_vector_relational.hpp" />
@@ -483,8 +482,8 @@
     <ClInclude Include="src\engine\VertexBuffer.h" />
     <ClInclude Include="src\engine\VertexArray.h" />
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
-    <ClInclude Include="src\Vertex.h" />
-    <ClInclude Include="src\Transform.h" />
+    <ClInclude Include="src\engine\Vertex.h" />
+    <ClInclude Include="src\engine\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\glm\detail\func_common.inl" />

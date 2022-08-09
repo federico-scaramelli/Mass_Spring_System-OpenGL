@@ -13,14 +13,3 @@ void Transform::UpdateModelMatrix ()
 
 	modelMatrix = glm::scale (modelMatrix, glm::vec3(scale));
 }
-
-void Transform::UpdateDirectionAxis ()
-{
-    forwardDirection.x = cos(glm::radians(GetYaw())) * cos(glm::radians(GetPitch()));
-    forwardDirection.y = sin(glm::radians(GetPitch()));
-    forwardDirection.z = sin(glm::radians(GetYaw())) * cos(glm::radians(GetPitch()));
-    forwardDirection = glm::normalize(forwardDirection);
-	
-    rightDirection = glm::normalize(glm::cross(forwardDirection, worldUpDirection));
-    upDirection = glm::normalize(glm::cross(rightDirection, forwardDirection));
-}

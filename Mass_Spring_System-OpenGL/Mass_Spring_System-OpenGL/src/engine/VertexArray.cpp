@@ -2,7 +2,7 @@
 
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include "../Vertex.h"
+#include "Vertex.h"
 
 VertexArray::VertexArray()
 {
@@ -15,10 +15,8 @@ VertexArray::~VertexArray()
 	glDeleteVertexArrays(1, &m_vaoID);
 }
 
-void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer, const VertexBufferLayout& layout)
+void VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer, const VertexBufferLayout& layout)
 {
-	//Bind();
-
 	/* The bindingIdx to create a correspondence between
 	 * the VAO binding point and the attribute index.
 	 * We can choose the bindingPoint freely.
@@ -32,7 +30,7 @@ void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer, const VertexBuffer
 	 * first parameter and specifies a binding point to a VBO. */
 	vertexBuffer.BindToVao(m_vaoID, bindingPoint, layout.GetStride());
  
-	/* The distance in byte between different attributes */
+	/* The distance in byte between different attributes of the same vertex*/
 	GLuint offset = 0;
 	const auto& elements = layout.GetElements();
 

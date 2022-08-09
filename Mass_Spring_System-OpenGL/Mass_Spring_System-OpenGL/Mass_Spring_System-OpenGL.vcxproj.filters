@@ -33,9 +33,6 @@
     <ClCompile Include="src\engine\VertexArray.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\VertexBufferLayout.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="libraries\include\glm\detail\glm.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -48,10 +45,10 @@
     <ClCompile Include="src\DebugLogger.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
+    <ClCompile Include="src\engine\Camera.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Transform.cpp">
+    <ClCompile Include="src\engine\Transform.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -956,13 +953,13 @@
     <ClInclude Include="src\DebugLogger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Vertex.h">
+    <ClInclude Include="src\engine\Vertex.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Camera.h">
+    <ClInclude Include="src\engine\Camera.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Transform.h">
+    <ClInclude Include="src\engine\Transform.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

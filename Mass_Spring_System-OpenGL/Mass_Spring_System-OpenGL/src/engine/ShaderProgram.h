@@ -34,8 +34,7 @@ private:
 	GLboolean linked;
 	std::unordered_map<std::string, GLint> uniformLocations;
 	GLint GetUniformLocation(const char* name);
-
-
+	
 public:
 	ShaderProgram();
 	~ShaderProgram();
@@ -61,10 +60,6 @@ public:
 	template<typename T>
 	void SetUniform(const char* name, T v1, T v2, T v3);
 	
-
 	void LoadUniformLocations();
 	void PrintActiveUniforms();
-
-
-
 };
