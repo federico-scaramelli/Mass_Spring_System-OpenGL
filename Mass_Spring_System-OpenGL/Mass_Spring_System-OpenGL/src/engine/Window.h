@@ -19,6 +19,8 @@ public:
 
 	GLFWwindow* GetGLFWWindow() { return window; }
 
+	GLfloat GetAspectRatio() const { return WINDOW_WIDTH / WINDOW_WIDTH; }
+
 private:
 	GLFWwindow* window = nullptr;
 };

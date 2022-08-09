@@ -2,7 +2,7 @@
 
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
-#include "../VertexStructures.h"
+#include "../Vertex.h"
 
 VertexArray::VertexArray()
 {

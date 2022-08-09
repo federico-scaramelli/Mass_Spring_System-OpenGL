@@ -5,13 +5,15 @@ layout(location = 1) in vec3 vertexColor;
 
 out vec3 color;
 
-uniform mat4 rotationMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 modelMatrix;
 
 void main() 
 {
 	color = vertexColor;
 
-	vec4 finalPosition = rotationMatrix * vec4(vertexPosition, 1.0);
-
-	gl_Position = finalPosition;
+	vec4 worldSpacePosition = modelMatrix * vec4(vertexPosition, 1.0);
+	vec4 screenSpacePosition = projectionMatrix * viewMatrix * worldSpacePosition;
+	gl_Position = screenSpacePosition;
 }	

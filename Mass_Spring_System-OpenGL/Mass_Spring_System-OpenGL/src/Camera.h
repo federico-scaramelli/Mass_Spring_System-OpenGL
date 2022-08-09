@@ -1,0 +1,42 @@
+#pragma once
+#include "Transform.h"
+#include "glad/glad.h"
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+
+#define FOV 45.0f
+#define NEAR_PLANE 0.1f
+#define FAR_PLANE 1000.f
+
+class Camera
+{
+private:
+	Transform m_Transform;
+
+	glm::mat4 m_ProjectionMatrix{1.f};
+	glm::mat4 m_ViewMatrix{1.f};
+
+public:
+	Camera(GLfloat aspect)
+	{
+		SetPerspectiveProjection (FOV, aspect, NEAR_PLANE, FAR_PLANE);
+		//m_Transform.UpdateDirectionAxis();
+	}
+
+	void SetPerspectiveProjection (const GLfloat fovy, const GLfloat aspect, const GLfloat near, const GLfloat far);
+
+	void UpdateView();
+
+	const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+
+	const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+
+	glm::mat4& GetUpdatedView()
+	{
+		UpdateView();
+		return m_ViewMatrix;
+	}
+
+	Transform& GetTransform() { return m_Transform; }
+};
