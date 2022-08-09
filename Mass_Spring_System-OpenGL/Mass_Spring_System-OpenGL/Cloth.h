@@ -5,6 +5,8 @@
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
+#define LinearIndex(i,j,rowSize) ((i)*(rowSize) + (j))
+
 struct Vertex;
 
 class Cloth {
@@ -26,10 +28,14 @@ public:
 
 	std::vector<Vertex*>& GetVertices() { return vertices; }
 
+	std::vector<GLuint>& GetIndices() { return indices; }
+
 	float GetSize() const { return vertices.size(); }
 
 	void InitializeVertices();
 
 	void InitializeIndices();
+
+	glm::vec3 GetRandomColor();
 };
 

@@ -34,29 +34,24 @@ void init()
 
 void run()
 {
-	Cloth cloth(10.f, 10.f, 5, 5);
+	Cloth cloth(2.f, 2.f, 2, 2);
 
 	std::vector<Vertex> vecQuadVertices{
-		
-			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
-			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
-			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
-			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-		
+		{{0.f, 0.f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+		{{1.f, 0.f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+		{{0.f, 1.f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+		{{1.f, 1.f, 0.0f}, {0.0f, 0.0f, 1.0f}}
 	};
-
-	std::vector<Vertex*>& vertices=cloth.GetVertices();
-
 	
-	// GLuint vertexPosIndices[] = {
-	// 	0, 1, 2,
-	// 	2, 3, 0
-	// };
-
-	std::vector<GLuint> vertexIndices{
-		0, 1, 2,
-		2, 3, 0
+	std::vector<GLuint> vecQuadIndices{
+		0, 1, 3,
+		3, 2, 0
 	};
+
+	// std::vector<GLuint> vecQuadIndices{
+	// 	1, 2, 3,
+	// 	3, 0, 1
+	// };
 
 	VertexArray vertexArrayObject;
 
@@ -66,18 +61,21 @@ void run()
 	vertexBufferLayout.Push<GLfloat>(3);
 	vertexBufferLayout.Push<GLfloat>(2);
 	
-	
+	std::vector<Vertex*>& vertices=cloth.GetVertices();
 	// GLsizei sizeOfVertices = vertices.size() * sizeof(Vertex);
 	// VertexBuffer vertexBuffer{vertices.data(), sizeOfVertices};
 
-	GLsizei sizeOfVerticesVector = vecQuadVertices.size() * sizeof(Vertex);
-	VertexBuffer vertexBuffer{vecQuadVertices.data(), sizeOfVerticesVector};
+	GLsizei sizeOfVertices = vecQuadVertices.size() * sizeof(Vertex);
+	VertexBuffer vertexBuffer{vecQuadVertices.data(), sizeOfVertices};
 
 	vertexArrayObject.AddVertexBuffer(vertexBuffer, vertexBufferLayout);
+	
+	std::vector<GLuint>& indices = cloth.GetIndices();
+	// auto sizeOfIndices=indices.size() * sizeof(GLuint);
+	// IndexBuffer indexBuffer(indices.data(), sizeOfIndices);
 
-	auto sizeOfIndices=vertexIndices.size() * sizeof(GLuint);
-	IndexBuffer indexBuffer(vertexIndices.data(), sizeOfIndices);
-	// IndexBuffer indexBuffer(vertexPosIndices, sizeof(vertexPosIndices));
+	auto sizeOfIndices=vecQuadIndices.size() * sizeof(GLuint);
+	IndexBuffer indexBuffer(vecQuadIndices.data(), sizeOfIndices);
 
 	ShaderProgram basicShader{};
 	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
@@ -111,7 +109,7 @@ void run()
 		ImGui::NewFrame();
 
 		ImGui::Begin("ImGui Hello World!");
-		ImGui::SliderFloat3("Camera Position", cameraPosition, -20.f, 20.0f);
+		ImGui::SliderFloat3("Camera Position", cameraPosition, -100.f, 100.0f);
 		ImGui::SliderFloat3("Camera Rotation", cameraRotation, -180.f, 180.0f);
 		ImGui::End();
 

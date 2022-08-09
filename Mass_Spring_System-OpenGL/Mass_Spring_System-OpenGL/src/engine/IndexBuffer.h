@@ -6,7 +6,7 @@ class IndexBuffer
 private:
 	/* Renderer ID is the ID related to the renderer, in our case OpenGL */
 	GLuint m_RendererID;
-	GLuint m_Count; 
+	GLuint m_Size; 
 
 public:
 	IndexBuffer(const GLuint* data, GLuint size);
@@ -15,6 +15,6 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	inline GLuint GetCount() const { return m_Count; }
+	inline GLuint GetCount() const { return m_Size; }
 };
 

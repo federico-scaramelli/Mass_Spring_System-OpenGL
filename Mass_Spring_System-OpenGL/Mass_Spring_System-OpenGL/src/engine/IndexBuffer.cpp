@@ -2,7 +2,7 @@
 #include "Renderer.h"
 
 IndexBuffer::IndexBuffer(const GLuint* data, GLuint size)
-	: m_Count(size)
+	: m_Size(size)
 {
 	glGenBuffers(1, &m_RendererID);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
