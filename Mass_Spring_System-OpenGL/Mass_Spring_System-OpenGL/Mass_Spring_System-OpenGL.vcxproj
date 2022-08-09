@@ -135,7 +135,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)Mass_Spring_System-OpenGL\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include\imgui;$(SolutionDir)Mass_Spring_System-OpenGL\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -153,7 +153,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>G:\Progetti\Uni\RTGP\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include\imgui;G:\Progetti\Uni\RTGP\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,6 +165,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cloth.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="libraries\include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\engine\Camera.cpp" />
     <ClCompile Include="libraries\include\glm\detail\glm.cpp" />
     <ClCompile Include="src\DebugLogger.cpp" />
@@ -182,6 +190,16 @@
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cloth.h" />
+    <ClInclude Include="libraries\include\imgui\imconfig.h" />
+    <ClInclude Include="libraries\include\imgui\imgui.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_impl_glfw.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_impl_opengl3.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="libraries\include\imgui\imgui_internal.h" />
+    <ClInclude Include="libraries\include\imgui\imstb_rectpack.h" />
+    <ClInclude Include="libraries\include\imgui\imstb_textedit.h" />
+    <ClInclude Include="libraries\include\imgui\imstb_truetype.h" />
     <ClInclude Include="src\engine\Camera.h" />
     <ClInclude Include="libraries\include\glm\common.hpp" />
     <ClInclude Include="libraries\include\glm\detail\compute_common.hpp" />

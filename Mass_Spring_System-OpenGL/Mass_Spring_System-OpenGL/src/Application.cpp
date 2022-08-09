@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include "engine/Window.h"
 #include "engine/ShaderProgram.h"
 #include "engine/VertexBuffer.h"
@@ -10,6 +14,7 @@
 
 #include "engine/Vertex.h"
 #include "engine/Camera.h"
+#include "../Cloth.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -18,26 +23,37 @@
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
-Camera camera (window.GetAspectRatio());
+Camera camera(window.GetAspectRatio());
 
-void init ()
+
+void init()
 {
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
 }
 
-void run ()
+void run()
 {
-	std::array<Vertex, 4> quadVertices{
-		{
-			{ { -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
-			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
-			{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
-			{ { -0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f } }
-		  }
+	Cloth cloth(10.f, 10.f, 5, 5);
+
+	std::vector<Vertex> vecQuadVertices{
+		
+			{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+			{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+			{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}},
+			{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}}
+		
 	};
 
-	GLuint vertexPosIndices[] = {
+	std::vector<Vertex*>& vertices=cloth.GetVertices();
+
+	
+	// GLuint vertexPosIndices[] = {
+	// 	0, 1, 2,
+	// 	2, 3, 0
+	// };
+
+	std::vector<GLuint> vertexIndices{
 		0, 1, 2,
 		2, 3, 0
 	};
@@ -45,56 +61,92 @@ void run ()
 	VertexArray vertexArrayObject;
 
 	VertexBufferLayout vertexBufferLayout;
-	vertexBufferLayout.Push<GLfloat> (3);
-	vertexBufferLayout.Push<GLfloat> (3);
-	vertexBufferLayout.Push<GLfloat> (3);
-	vertexBufferLayout.Push<GLfloat> (2);
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(2);
 	
-	VertexBuffer vertexBuffer{ quadVertices.data(), sizeof(quadVertices) };
-	vertexArrayObject.AddVertexBuffer (vertexBuffer, vertexBufferLayout);
+	
+	// GLsizei sizeOfVertices = vertices.size() * sizeof(Vertex);
+	// VertexBuffer vertexBuffer{vertices.data(), sizeOfVertices};
 
-	IndexBuffer indexBuffer (vertexPosIndices, sizeof(vertexPosIndices));
+	GLsizei sizeOfVerticesVector = vecQuadVertices.size() * sizeof(Vertex);
+	VertexBuffer vertexBuffer{vecQuadVertices.data(), sizeOfVerticesVector};
+
+	vertexArrayObject.AddVertexBuffer(vertexBuffer, vertexBufferLayout);
+
+	auto sizeOfIndices=vertexIndices.size() * sizeof(GLuint);
+	IndexBuffer indexBuffer(vertexIndices.data(), sizeOfIndices);
+	// IndexBuffer indexBuffer(vertexPosIndices, sizeof(vertexPosIndices));
 
 	ShaderProgram basicShader{};
-	basicShader.CompileShader ("shader.vert", ShaderType::VERTEX);
-	basicShader.CompileShader ("shader.frag", ShaderType::FRAGMENT);
+	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
+	basicShader.CompileShader("shader.frag", ShaderType::FRAGMENT);
 	basicShader.Link();
 	basicShader.Validate();
 
 	basicShader.Use();
+
+	camera.GetTransform().SetPosition({0.f, 0.f, -10.f});
+	basicShader.SetUniform<glm::mat4>("projectionMatrix", camera.GetProjectionMatrix());
+
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(window.GetGLFWWindow(), true);
+	ImGui_ImplOpenGL3_Init("#version 460");
 	
-	camera.GetTransform().SetPosition ({0.f, 0.f, -10.f});
-	basicShader.SetUniform<glm::mat4> ("projectionMatrix", camera.GetProjectionMatrix());
-	
-	while (!glfwWindowShouldClose (glfwWindow)) {
+	float cameraPosition[3]={0,0,-10.f};
+	float cameraRotation[3]={0,0,0};
+
+	while (!glfwWindowShouldClose(glfwWindow))
+	{
 		renderer.Clear();
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::Begin("ImGui Hello World!");
+		ImGui::SliderFloat3("Camera Position", cameraPosition, -20.f, 20.0f);
+		ImGui::SliderFloat3("Camera Rotation", cameraRotation, -180.f, 180.0f);
+		ImGui::End();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		
-		// camera.GetTransform().AddRotation({0.25f, 0.f, 0.f});
-		// camera.GetTransform().AddRotation({0.0f, 0.25f, 0.f});
-		camera.GetTransform().AddRotation({0.0f, 0.f, 0.25f});
+		camera.GetTransform().SetRotation({cameraRotation[0], cameraRotation[1], cameraRotation[2]});
+		camera.GetTransform().SetPosition({cameraPosition[0], cameraPosition[1], cameraPosition[2]});
+		
 
-		// camera.GetTransform().AddPosition({0.025f, 0.f, 0.f});
-		// camera.GetTransform().AddPosition({0.0f, 0.025f, 0.f});
-		camera.GetTransform().AddPosition({0.0f, 0.f, 0.025f});
-
-		basicShader.SetUniform<glm::mat4> ("viewMatrix", camera.GetUpdatedViewMatrix());
-		basicShader.SetUniform<glm::mat4> ("modelMatrix", glm::mat4{1.f});
+		basicShader.SetUniform<glm::mat4>("viewMatrix", camera.GetUpdatedViewMatrix());
+		basicShader.SetUniform<glm::mat4>("modelMatrix", glm::mat4{1.f});
 
 		//Draw the bound buffers data
-		renderer.Draw (vertexArrayObject, indexBuffer, basicShader);
+		renderer.Draw(vertexArrayObject, indexBuffer, basicShader);
 
-		glfwSwapBuffers (glfwWindow);
+		glfwSwapBuffers(glfwWindow);
 		glfwPollEvents();
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
 
-int main ()
+int main()
 {
-	try {
+	try
+	{
 		init();
 		run();
 	}
-	catch (std::runtime_error& e) {
+	catch (std::runtime_error& e)
+	{
 		std::cout << e.what() << std::endl;
 	}
 
