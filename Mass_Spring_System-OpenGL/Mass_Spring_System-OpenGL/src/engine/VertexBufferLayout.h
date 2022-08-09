@@ -2,7 +2,7 @@
 #include <vector>
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "Renderer.h"
+#include "../DebugLogger.h"
 #include "../Utils.h"
 
 struct VertexBufferElement
@@ -30,13 +30,15 @@ class VertexBufferLayout
 {
 private:
 	std::vector<VertexBufferElement> m_Elements;
-	GLuint m_Stride;
+	GLsizei m_Stride;
 
 public:
 	VertexBufferLayout() : m_Stride(0) {}
 
 	const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
-	unsigned int GetStride() const { return m_Stride; }
+	GLsizei GetStride() const { return m_Stride; }
+
+#pragma region Push templates
 
 	template<typename T>
 	void Push(GLuint count)
@@ -71,5 +73,7 @@ public:
 		m_Elements.push_back({ GL_UNSIGNED_BYTE, count, GL_FALSE });
 		m_Stride += count * VertexBufferElement::GetSizeOfType(GL_UNSIGNED_BYTE);
 	}
+
+#pragma endregion
 };
 

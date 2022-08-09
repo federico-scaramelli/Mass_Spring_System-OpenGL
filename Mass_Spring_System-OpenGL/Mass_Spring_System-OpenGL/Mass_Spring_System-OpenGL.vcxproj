@@ -164,11 +164,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libraries\include\glm\detail\glm.cpp" />
+    <ClCompile Include="src\DebugLogger.cpp" />
     <ClCompile Include="src\engine\ShaderProgram.cpp" />
     <ClCompile Include="src\engine\IndexBuffer.cpp" />
     <ClCompile Include="src\engine\Renderer.cpp" />
-    <ClCompile Include="src\engine\ComputeShader.cpp" />
-    <ClCompile Include="src\engine\GraphicsShader.cpp" />
     <ClCompile Include="libraries\glad.c" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\engine\VertexBuffer.cpp" />
@@ -470,8 +469,6 @@
     <ClInclude Include="src\engine\ShaderProgram.h" />
     <ClInclude Include="src\engine\IndexBuffer.h" />
     <ClInclude Include="src\engine\Renderer.h" />
-    <ClInclude Include="src\engine\ComputeShader.h" />
-    <ClInclude Include="src\engine\GraphicsShader.h" />
     <ClInclude Include="libraries\include\glad\glad.h" />
     <ClInclude Include="libraries\include\GLFW\glfw3.h" />
     <ClInclude Include="libraries\include\GLFW\glfw3native.h" />

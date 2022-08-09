@@ -7,13 +7,13 @@ class VertexBuffer;
 class VertexArray
 {
 private:
-	GLuint m_bufferID;
+	GLuint m_vaoID;
 	// uint16_t vboCount = 0;
 public:
 	VertexArray();
 	~VertexArray();
 
-	void AddBuffer(VertexBuffer& vertexBuffer, VertexBufferLayout& layout);
+	void AddBuffer(const VertexBuffer& vertexBuffer, const VertexBufferLayout& layout);
 
 	void Bind() const;
 	void Unbind() const;

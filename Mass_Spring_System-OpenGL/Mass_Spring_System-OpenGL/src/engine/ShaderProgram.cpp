@@ -137,7 +137,7 @@ void ShaderProgram::Validate()
 	}
 }
 
-void ShaderProgram::Use()
+void ShaderProgram::Use() const
 {
 	if (ID <= 0 || (!linked))
 	{

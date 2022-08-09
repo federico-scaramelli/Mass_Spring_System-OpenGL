@@ -1,48 +1,57 @@
 #include "VertexArray.h"
 
-#include "Renderer.h"
 #include "VertexBuffer.h"
 #include "VertexBufferLayout.h"
 #include "../VertexStructures.h"
 
 VertexArray::VertexArray()
 {
-	glGenVertexArrays(1, &m_bufferID);
-	glBindVertexArray(m_bufferID);
+	glGenVertexArrays(1, &m_vaoID);
+	glBindVertexArray(m_vaoID);
 }
 
 VertexArray::~VertexArray()
 {
-	glDeleteVertexArrays(1, &m_bufferID);
+	glDeleteVertexArrays(1, &m_vaoID);
 }
 
-void VertexArray::AddBuffer(VertexBuffer& vertexBuffer, VertexBufferLayout& layout)
+void VertexArray::AddBuffer(const VertexBuffer& vertexBuffer, const VertexBufferLayout& layout)
 {
-	Bind();
-	
-	vertexBuffer.BindToVao(m_bufferID, 0, layout.GetStride());
- //
-	// glEnableVertexAttribArray(0);
-	// glEnableVertexAttribArray(1);
-	//
-	// glVertexArrayAttribBinding(m_bufferID, 0, 0);
- //    glVertexArrayAttribBinding(m_bufferID, 1, 0);
- //
-	// glVertexArrayAttribFormat(m_bufferID, 0, glm::vec3::length(), GL_FLOAT, GL_FALSE,
- //                              offsetof(QuadAttributesStruct, position));
- //    glVertexArrayAttribFormat(m_bufferID, 1, glm::vec3::length(), GL_FLOAT, GL_FALSE,
- //                              offsetof(QuadAttributesStruct, color)); 
+	//Bind();
 
+	/* The bindingIdx to create a correspondence between
+	 * the VAO binding point and the attribute index.
+	 * We can choose the bindingPoint freely.
+	 * It must be only < GL_MAX_VERTEX_ATTRIB_BINDINGS.
+	 * It's suggested to set it equal to the attribute index. */
+	// TODO: check if it's needed to handle it != 0
+	GLuint bindingPoint = 0;
 
+	/* Specifies the ( binding-point <-> buffer ) correspondance.
+	 * NB: The binding point is part of the VAO specififed in the
+	 * first parameter and specifies a binding point to a VBO. */
+	vertexBuffer.BindToVao(m_vaoID, bindingPoint, layout.GetStride());
+ 
+	/* The distance in byte between different attributes */
 	GLuint offset = 0;
 	const auto& elements = layout.GetElements();
-	for (unsigned int i = 0; i < elements.size(); i++)
+
+	for (GLuint attribIdx = 0; attribIdx < elements.size(); attribIdx++)
 	{
-		const auto& element = elements[i];
-		auto t=glm::vec3::length();
-		glEnableVertexAttribArray(i);
-		glVertexArrayAttribBinding(m_bufferID, i, 0);
-		glVertexArrayAttribFormat(m_bufferID, i, element.count, GL_FLOAT, GL_FALSE, offset);
+		const auto& element = elements[attribIdx];
+
+		/* We could use glEnableVertexArrayAttrib(m_vaoID, i);
+		 * exploiting the Direct State Access features of OpenGL 4.
+		 * In that case there is no need to bind the vao,
+		 * we access it directly specifying its ID. */
+		//glEnableVertexAttribArray(attribIdx);
+		glEnableVertexArrayAttrib(m_vaoID, attribIdx);
+		/* Defines the format of an attribute in attribIdx on the VAO. */
+		glVertexArrayAttribFormat(m_vaoID, attribIdx, element.count, GL_FLOAT, GL_FALSE, offset);
+		/* Creates a correspondence between the attribute index and the
+		 * binding point used in glVertexArrayVertexBuffer.
+		 * The third parameter is the bindingIdx used in glVertexArrayVertexBuffer. */
+		glVertexArrayAttribBinding(m_vaoID, attribIdx, bindingPoint);
 
 		offset += element.count * VertexBufferElement::GetSizeOfType(element.type);
 	}
@@ -50,7 +59,7 @@ void VertexArray::AddBuffer(VertexBuffer& vertexBuffer, VertexBufferLayout& layo
 
 void VertexArray::Bind() const
 {
-	glBindVertexArray(m_bufferID);
+	glBindVertexArray(m_vaoID);
 }
 
 void VertexArray::Unbind() const

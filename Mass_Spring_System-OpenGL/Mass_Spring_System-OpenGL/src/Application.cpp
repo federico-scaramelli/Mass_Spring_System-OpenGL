@@ -1,15 +1,15 @@
 #include <iostream>
 
 #include "engine/Window.h"
-#include "engine/GraphicsShader.h"
 #include "engine/ShaderProgram.h"
-#include "DebugLogger.h"
-#include "engine/Renderer.h"
 #include "engine/VertexBuffer.h"
 #include "engine/IndexBuffer.h"
 #include "engine/VertexArray.h"
 #include "engine/VertexBufferLayout.h"
+
+//#include "DebugLogger.h"
 #include "VertexStructures.h"
+#include "engine/Renderer.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -18,80 +18,75 @@
 
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
+Renderer renderer;
 
-void init()
+void init ()
 {
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
-	
 }
 
-void run()
+void run ()
 {
-	std::array<QuadAttributesStruct, 4> datas {{
-		{{-0.5f,-0.5f,0.0f},{1.0f,0.0f,0.0f}},
-		{{0.5f,-0.5f,0.0f},{0.0f,1.0f,0.0f}},
-		{{0.5f,0.5f,0.0f},{0.0f,0.0f,1.0f}},
-		{{-0.5f,0.5f,0.0f},{1.0f,1.0f,1.0f}}
-	}};
+	std::array<Vertex, 4> quadVertices{
+		{
+			{ { -0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f } },
+			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f } },
+			{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f } },
+			{ { -0.5f, 0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f } }
+		}
+	};
 
 	GLuint vertexPosIndices[] = {
 		0, 1, 2,
 		2, 3, 0
 	};
-	
+
 	VertexArray vertexArrayObject;
-	
+
 	VertexBufferLayout vertexBufferLayout;
-	vertexBufferLayout.Push<GLfloat>(3);
-	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat> (3);
+	vertexBufferLayout.Push<GLfloat> (3);
 
 
-	size_t sizeOfDatasInBytes = datas.size() * sizeof(QuadAttributesStruct);
-	VertexBuffer vertexBuffer{datas.data(), sizeOfDatasInBytes};
+	GLsizei sizeOfDatasInBytes = quadVertices.size() * sizeof (Vertex);
+	VertexBuffer vertexBuffer{ quadVertices.data(), sizeOfDatasInBytes };
 
-	vertexArrayObject.AddBuffer(vertexBuffer, vertexBufferLayout);
+	vertexArrayObject.AddBuffer (vertexBuffer, vertexBufferLayout);
 
-	IndexBuffer indexBuffer(vertexPosIndices, sizeof(vertexPosIndices));
-	
+	IndexBuffer indexBuffer (vertexPosIndices, sizeof(vertexPosIndices));
+
 	ShaderProgram basicShader{};
-	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
-	basicShader.CompileShader("shader.frag", ShaderType::FRAGMENT);
+	basicShader.CompileShader ("shader.vert", ShaderType::VERTEX);
+	basicShader.CompileShader ("shader.frag", ShaderType::FRAGMENT);
 	basicShader.Link();
 	basicShader.Validate();
 	basicShader.Use();
 
-	
 	GLfloat angle = 0;
-	while (!glfwWindowShouldClose(glfwWindow)) {
-		//Clear the color buffer
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+	while (!glfwWindowShouldClose (glfwWindow)) {
+		renderer.Clear();
 
 		//Rot matrix used in uniform
 		angle += 0.01f;
-		// glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, glm::vec3(0,0,1));
-		// basicShader.SetUniform<glm::mat4>("rotationMatrix", rotationMatrix);
-
-		vertexArrayObject.Bind();
-		indexBuffer.Bind();
+		glm::mat4 rotationMatrix = glm::rotate (glm::mat4 (1.0f), angle, glm::vec3 (0, 0, 1));
+		basicShader.SetUniform<glm::mat4> ("rotationMatrix", rotationMatrix);
 
 		//Draw the bound buffers data
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, sizeof(vertexPosIndices) / sizeof(GLuint), GL_UNSIGNED_INT, nullptr);
+		renderer.Draw (vertexArrayObject, indexBuffer, basicShader);
 
-		glfwSwapBuffers(glfwWindow);
-
+		glfwSwapBuffers (glfwWindow);
 		glfwPollEvents();
 	}
 }
 
-int main()
+int main ()
 {
 	try {
 		init();
 		run();
-	} catch (std::runtime_error& e) {
+	}
+	catch (std::runtime_error& e) {
 		std::cout << e.what() << std::endl;
 	}
 

@@ -1,17 +1,13 @@
 #pragma once
-#include "glad/glad.h"
 
-
-#define ASSERT(x) if (!(x)) __debugbreak();
-
-#define GLCall(x) GLClearError();\
-  x;\
-  ASSERT(GLLogCall(#x, __FILE__, __LINE__))
-
-void GLClearError();
-bool GLLogCall(const char* function, const char* file, int line);
-
-
+class VertexArray;
+class IndexBuffer;
+class ShaderProgram;
 
 class Renderer
-{};
+{
+public:
+	void Draw (const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const;
+
+	void Clear () const;
+};

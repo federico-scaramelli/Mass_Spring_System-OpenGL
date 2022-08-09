@@ -45,7 +45,7 @@ public:
 
 	void CompileShader (std::string fileName, ShaderType type);
 
-	void Use();
+	void Use() const;
 	void DetachAndDeleteShaderObjects();
 	void Link();
 	void Validate();

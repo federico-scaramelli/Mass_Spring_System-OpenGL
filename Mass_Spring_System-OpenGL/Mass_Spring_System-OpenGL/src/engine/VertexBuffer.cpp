@@ -1,30 +1,33 @@
 #include "VertexBuffer.h"
 
-#include "Renderer.h"
 #include "../Utils.h"
 #include "glm/vec3.hpp"
 
-VertexBuffer::VertexBuffer(const void* data, const size_t size)
+VertexBuffer::VertexBuffer(const void* data, const GLsizei size)
 {
-	vertexBufferSize=size;
+	m_vboSize = size;
 
-	glGenBuffers(1, &m_rendererID);
-	glBindBuffer(GL_ARRAY_BUFFER, m_rendererID);
+	glGenBuffers(1, &m_vboID);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
 	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
 VertexBuffer::~VertexBuffer()
 {
-	glDeleteBuffers(1, &m_rendererID);
+	glDeleteBuffers(1, &m_vboID);
 }
 
-void VertexBuffer::BindToVao(GLuint bindingIdx, GLuint offset, GLuint stride) const
+void VertexBuffer::BindToVao(GLuint vaoID, GLuint bindingPoint, GLsizei stride) const
 {
-	// glBindVertexBuffer(bindingIdx, m_rendererID, offset, stride);
-	glVertexArrayVertexBuffer(bindingIdx, /*slot*/ 0, m_rendererID, /*offset*/ 0, /*stride*/ stride);
+	glVertexArrayVertexBuffer(vaoID, bindingPoint, m_vboID, /* offset */ 0, stride);
 }
 
-void VertexBuffer::Unbind() const
+void VertexBuffer::Unbind(GLuint vaoID, GLuint bindingPoint) const
 {
-	glBindVertexBuffer(0, m_rendererID, 0, 0);
+	throw std::runtime_error("Not implemented function");
+
+	//glVertexArrayVertexBuffer(vaoID, bindingPoint, m_vboID, 0, 0);
+	
+	// TODO: I'm not sure it's unbinding..
+	// glBindVertexBuffer(0, m_vboID, 0, 0);
 }

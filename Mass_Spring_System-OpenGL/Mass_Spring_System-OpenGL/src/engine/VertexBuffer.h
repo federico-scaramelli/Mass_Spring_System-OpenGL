@@ -2,21 +2,20 @@
 #include <array>
 #include <vector>
 
-#include "Renderer.h"
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
 class VertexBuffer
 {
 private:
-	GLuint m_rendererID;
-	GLsizei vertexBufferSize;
+	GLuint m_vboID;
+	GLsizei m_vboSize;
 
 public:
-	VertexBuffer(const void* data, size_t size);
+	VertexBuffer(const void* data, GLsizei size);
 	~VertexBuffer();
 
-	void BindToVao(GLuint bindingIdx, GLuint offset, GLuint stride) const; 
-	void Unbind() const;
+	void BindToVao(GLuint vaoID, GLuint bindingPoint, GLsizei stride) const; 
+	void Unbind(GLuint vaoID, GLuint bindingPoint) const;
 };
 
