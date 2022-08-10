@@ -9,8 +9,11 @@ private:
 	GLuint m_Size; 
 
 public:
+	IndexBuffer() = default;
 	IndexBuffer(const GLuint* data, GLuint size);
 	~IndexBuffer();
+
+	void Set(const GLuint* data, GLuint size);
 
 	void Bind() const;
 	void Unbind() const;

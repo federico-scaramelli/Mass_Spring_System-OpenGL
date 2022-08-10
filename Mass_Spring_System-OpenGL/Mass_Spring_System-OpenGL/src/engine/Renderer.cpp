@@ -13,7 +13,14 @@ void Renderer::Draw (const VertexArray& vao, const IndexBuffer& indexBuffer, con
 	shader.Use();
 	vao.Bind();
 	indexBuffer.Bind();
-	glDrawElements (GL_LINES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+	if (wireframe) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	} else {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);  
+	glDrawElements (GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void Renderer::Clear () const
@@ -33,6 +40,16 @@ void Renderer::DrawFloatSliderUI (const char* label, float* data, float min, flo
 	ImGui::SliderFloat3 (label, data, min, max);
 }
 
+void Renderer::DrawBoolCheckboxUI (const char* label, bool* data)
+{
+	ImGui::Checkbox (label, data);
+}
+
+void Renderer::AddBoolCheckboxUI (const char* label, bool* data)
+{
+	UICheckboxes.push_back ({label, data});
+}
+
 void Renderer::DrawUI ()
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -44,10 +61,11 @@ void Renderer::DrawUI ()
 		DrawFloatSliderUI (slider.label, slider.data, slider.min, slider.max);
 	}
 
+	for (UICheckbox checkbox : UICheckboxes) {
+		DrawBoolCheckboxUI (checkbox.label, checkbox.data);
+	}
+
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData (ImGui::GetDrawData());
 }
-
-void Renderer::ClearUI ()
-{}

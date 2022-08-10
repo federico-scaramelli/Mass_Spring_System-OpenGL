@@ -9,7 +9,7 @@ Camera::Camera(GLfloat aspect)
 
 void Camera::SetPerspectiveProjection (const GLfloat fovy, const GLfloat aspect, const GLfloat near, const GLfloat far)
 {
-	m_ProjectionMatrix = glm::perspective(glm::radians (fovy), aspect, near, far);
+	Camera::m_ProjectionMatrix = glm::perspective(glm::radians (fovy), aspect, near, far);
 }
 
 void Camera::UpdateViewMatrix ()

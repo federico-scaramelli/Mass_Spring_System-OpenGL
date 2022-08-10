@@ -1,3 +1,5 @@
+#pragma region Includes
+
 #include <iostream>
 
 #include "engine/Window.h"
@@ -16,6 +18,8 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.inl"
 
+#pragma endregion
+
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
@@ -29,6 +33,8 @@ void init ()
 
 void run ()
 {
+#pragma region Cloth Creation
+
 	Cloth cloth (50.f, 50.f, 100, 100);
 
 	VertexArray vertexArrayObject;
@@ -49,25 +55,35 @@ void run ()
 	auto sizeOfIndices=indices.size() * sizeof(GLuint);
 	IndexBuffer indexBuffer(indices.data(), sizeOfIndices);
 
+#pragma endregion
+
+#pragma region BasicShader Creation
+
 	ShaderProgram basicShader{};
 	basicShader.CompileShader ("shader.vert", ShaderType::VERTEX);
 	basicShader.CompileShader ("shader.frag", ShaderType::FRAGMENT);
 	basicShader.Link();
 	basicShader.Validate();
-
 	basicShader.Use();
+
+#pragma endregion
 
 	camera.GetTransform().SetPosition ({ 0.f, 0.f, -10.f });
 	basicShader.SetUniform<glm::mat4> ("projectionMatrix", camera.GetProjectionMatrix());
 
+#pragma region UI Elements Creation
 
 	float cameraPosition[3] = { 0, 0, -10.f };
 	float cameraRotation[3] = { 0, 0, 0 };
-
 	renderer.AddFloatSliderUI("Camera Position", cameraPosition, -100.f, 100.f);
 	renderer.AddFloatSliderUI("Camera 'Rotation'", cameraRotation, -180.f, 180.f);
 
-	while (!glfwWindowShouldClose (glfwWindow)) {
+	renderer.AddBoolCheckboxUI ("Wireframe", &renderer.wireframe);
+
+#pragma endregion
+
+	while (!glfwWindowShouldClose (glfwWindow)) 
+	{
 		renderer.Clear();
 
 		renderer.DrawUI();
@@ -77,8 +93,7 @@ void run ()
 
 		basicShader.SetUniform<glm::mat4> ("viewMatrix", camera.GetUpdatedViewMatrix());
 		basicShader.SetUniform<glm::mat4> ("modelMatrix", glm::mat4{ 1.f });
-
-		//Draw the bound buffers data
+		
 		renderer.Draw (vertexArrayObject, indexBuffer, basicShader);
 
 		glfwSwapBuffers (glfwWindow);

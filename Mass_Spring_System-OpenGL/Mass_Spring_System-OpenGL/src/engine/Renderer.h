@@ -13,6 +13,12 @@ struct UISlider
 	float max;
 };
 
+struct UICheckbox
+{
+	const char* label;
+	bool* data;
+};
+
 class Renderer
 {
 public:
@@ -21,9 +27,14 @@ public:
 	void Clear () const;
 
 	void AddFloatSliderUI (const char* label, float* data, float min, float max);
+	void DrawBoolCheckboxUI (const char* label, bool* data);
+	void AddBoolCheckboxUI (const char* label, bool* data);
 	void DrawUI ();
+
+	bool wireframe;
 
 private:
 	std::vector<UISlider> UISliders;
+	std::vector<UICheckbox> UICheckboxes;
 	void DrawFloatSliderUI (const char* label, float* data, float min, float max);
 };

@@ -1,7 +1,13 @@
 #include "Window.h"
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
+
+void ResizeCallback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
 
 Window::Window()
 {
@@ -25,7 +31,9 @@ Window::Window()
 		throw std::runtime_error("Unable to load OpenGL functions!");
 	}
 
+	glfwSetWindowAspectRatio(window, 16, 9);
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	glfwSetFramebufferSizeCallback(window, ResizeCallback);
 
 	InitializeImGui ();
 }

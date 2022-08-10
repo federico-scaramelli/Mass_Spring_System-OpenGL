@@ -7,8 +7,8 @@
 
 #define OPENGL_MAJOR_VERSION 4
 #define OPENGL_MINOR_VERSION 6
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
+#define WINDOW_WIDTH 960
+#define WINDOW_HEIGHT 540
 #define WINDOW_TITLE "Mass Spring System"
 
 class Window
@@ -19,7 +19,12 @@ public:
 
 	GLFWwindow* GetGLFWWindow() { return window; }
 
-	GLfloat GetAspectRatio() const { return WINDOW_WIDTH / WINDOW_WIDTH; }
+	GLfloat GetAspectRatio() const
+	{
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
+		return static_cast<GLfloat>(width) / height;
+	}
 
 private:
 	GLFWwindow* window = nullptr;
