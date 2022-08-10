@@ -1,4 +1,7 @@
 #include "Window.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 Window::Window()
 {
@@ -23,10 +26,27 @@ Window::Window()
 	}
 
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+	InitializeImGui ();
 }
 
 Window::~Window()
 {
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
+void Window::InitializeImGui ()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io;
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL (GetGLFWWindow(), true);
+	ImGui_ImplOpenGL3_Init ("#version 460");
 }

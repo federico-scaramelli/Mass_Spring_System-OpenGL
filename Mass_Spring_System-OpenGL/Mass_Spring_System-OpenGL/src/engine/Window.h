@@ -23,4 +23,5 @@ public:
 
 private:
 	GLFWwindow* window = nullptr;
+	void InitializeImGui();
 };

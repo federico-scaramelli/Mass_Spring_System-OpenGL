@@ -72,7 +72,7 @@
     <ClCompile Include="libraries\include\imgui\imgui_widgets.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Cloth.cpp">
+    <ClCompile Include="src\Cloth.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1013,7 +1013,7 @@
     <ClInclude Include="libraries\include\imgui\imgui_impl_opengl3_loader.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Cloth.h">
+    <ClInclude Include="src\Cloth.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

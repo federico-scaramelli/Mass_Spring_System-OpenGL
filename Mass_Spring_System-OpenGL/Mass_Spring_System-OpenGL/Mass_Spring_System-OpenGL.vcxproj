@@ -165,7 +165,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Cloth.cpp" />
+    <ClCompile Include="src\Cloth.cpp" />
     <ClCompile Include="libraries\include\imgui\imgui.cpp" />
     <ClCompile Include="libraries\include\imgui\imgui_demo.cpp" />
     <ClCompile Include="libraries\include\imgui\imgui_draw.cpp" />
@@ -190,7 +190,7 @@
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Cloth.h" />
+    <ClInclude Include="src\Cloth.h" />
     <ClInclude Include="libraries\include\imgui\imconfig.h" />
     <ClInclude Include="libraries\include\imgui\imgui.h" />
     <ClInclude Include="libraries\include\imgui\imgui_impl_glfw.h" />

@@ -16,7 +16,7 @@ private:
 	int pointsByWidth;
 	int pointsByHeight;
 
-	std::vector<Vertex*> vertices;
+	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	//for later
 	// std::map<std::pair<int, int>, bool> pinnedVertices;
@@ -26,7 +26,7 @@ private:
 public:
 	Cloth(float clothWidth, float clothHeight, int pointsWidth, int pointsHeight);
 
-	std::vector<Vertex*>& GetVertices() { return vertices; }
+	std::vector<Vertex>& GetVertices() { return vertices; }
 
 	std::vector<GLuint>& GetIndices() { return indices; }
 
