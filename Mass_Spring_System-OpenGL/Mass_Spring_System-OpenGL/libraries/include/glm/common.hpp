@@ -288,7 +288,7 @@ namespace glm
 	/// @param[in]  a Interpolant.
 	///
 	/// @tparam	genTypeT Floating point scalar or vector.
-	/// @tparam genTypeU Floating point or boolean scalar or vector. It can't be a vector if it is the length of genTypeT.
+	/// @tparam genTypeU Floating point or boolean scalar or vector. It can't be a vector if it is the m_Length of genTypeT.
 	///
 	/// @code
 	/// #include <glm/glm.hpp>

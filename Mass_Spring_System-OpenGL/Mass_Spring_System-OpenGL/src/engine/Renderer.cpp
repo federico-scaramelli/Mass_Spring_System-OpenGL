@@ -13,13 +13,20 @@ void Renderer::Draw (const VertexArray& vao, const IndexBuffer& indexBuffer, con
 	shader.Use();
 	vao.Bind();
 	indexBuffer.Bind();
+
 	if (wireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	} else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);  
+
+	if (backface) {
+		glDisable(GL_CULL_FACE); 
+	} else {
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);  
+	}
+	
 	glDrawElements (GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 

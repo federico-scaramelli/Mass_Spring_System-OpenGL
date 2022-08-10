@@ -584,7 +584,7 @@ namespace std {
 ///////////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////////
-// Length type: all length functions returns a length_t type.
+// Length type: all m_Length functions returns a length_t type.
 // When GLM_FORCE_SIZE_T_LENGTH is defined, length_t is a typedef of size_t otherwise
 // length_t is a typedef of int like GLSL defines it.
 
@@ -1100,11 +1100,11 @@ namespace detail
 #		pragma message("GLM: GLM_FORCE_SWIZZLE is undefined. swizzling functions or operators are disabled.")
 #	endif
 
-	// Report .length() type
+	// Report .m_Length() type
 #	if GLM_CONFIG_LENGTH_TYPE == GLM_LENGTH_SIZE_T
-#		pragma message("GLM: GLM_FORCE_SIZE_T_LENGTH is defined. .length() returns a glm::length_t, a typedef of std::size_t.")
+#		pragma message("GLM: GLM_FORCE_SIZE_T_LENGTH is defined. .m_Length() returns a glm::length_t, a typedef of std::size_t.")
 #	else
-#		pragma message("GLM: GLM_FORCE_SIZE_T_LENGTH is undefined. .length() returns a glm::length_t, a typedef of int following GLSL.")
+#		pragma message("GLM: GLM_FORCE_SIZE_T_LENGTH is undefined. .m_Length() returns a glm::length_t, a typedef of int following GLSL.")
 #	endif
 
 #	if GLM_CONFIG_UNRESTRICTED_GENTYPE == GLM_ENABLE

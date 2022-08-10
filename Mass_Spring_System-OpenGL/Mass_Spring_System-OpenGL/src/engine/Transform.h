@@ -12,9 +12,10 @@ private:
 	glm::vec3 rotation{0,0,0};
 	GLfloat scale = 1.f;
 
+	//Default opengl axis
 	glm::vec3 rightDirection{1,0,0};
 	glm::vec3 upDirection{0,1,0};
-	glm::vec3 forwardDirection{0,0,1};
+	glm::vec3 forwardDirection{0,0,-1};
 
 public:
 	inline static const glm::vec3 worldUpDirection {0.f, 1.f, 0.f};
@@ -75,11 +76,16 @@ public:
 
 	void SetScale(GLfloat newScale) { scale = newScale; }
 	GLfloat GetScale() { return scale; }
+#pragma endregion
 
+#pragma region TransformManagement
 	glm::vec3 GetRightDirection() { return rightDirection; }
 	glm::vec3 GetUpDirection() { return upDirection; }
 	glm::vec3 GetForwardDirection() { return forwardDirection; }
 
+	void SetRightDirection(glm::vec3 newDir) { rightDirection=newDir; }
+	void SetUpDirection(glm::vec3 newDir) { upDirection=newDir; }
+	void SetForwardDirection(glm::vec3 newDir) { forwardDirection=newDir; }
 #pragma endregion
 };
 

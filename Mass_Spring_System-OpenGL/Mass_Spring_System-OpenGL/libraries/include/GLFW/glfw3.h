@@ -1656,10 +1656,10 @@ typedef void (* GLFWjoystickfun)(int jid, int event);
  */
 typedef struct GLFWvidmode
 {
-    /*! The width, in screen coordinates, of the video mode.
+    /*! The m_Width, in screen coordinates, of the video mode.
      */
     int width;
-    /*! The height, in screen coordinates, of the video mode.
+    /*! The m_Height, in screen coordinates, of the video mode.
      */
     int height;
     /*! The bit depth of the red channel of the video mode.
@@ -1719,10 +1719,10 @@ typedef struct GLFWgammaramp
  */
 typedef struct GLFWimage
 {
-    /*! The width, in pixels, of this image.
+    /*! The m_Width, in pixels, of this image.
      */
     int width;
-    /*! The height, in pixels, of this image.
+    /*! The m_Height, in pixels, of this image.
      */
     int height;
     /*! The pixel data of this image, arranged left-to-right, top-to-bottom.
@@ -2283,7 +2283,7 @@ GLFWAPI GLFWmonitorfun glfwSetMonitorCallback(GLFWmonitorfun callback);
  *  This function returns an array of all video modes supported by the specified
  *  monitor.  The returned array is sorted in ascending order, first by color
  *  bit depth (the sum of all channel depths), then by resolution area (the
- *  product of width and height), then resolution width and finally by refresh
+ *  product of m_Width and m_Height), then resolution m_Width and finally by refresh
  *  rate.
  *
  *  @param[in] monitor The monitor to query.
@@ -3439,11 +3439,11 @@ GLFWAPI GLFWmonitor* glfwGetWindowMonitor(GLFWwindow* window);
  *  This function sets the monitor that the window uses for full screen mode or,
  *  if the monitor is `NULL`, makes it windowed mode.
  *
- *  When setting a monitor, this function updates the width, height and refresh
+ *  When setting a monitor, this function updates the m_Width, m_Height and refresh
  *  rate of the desired video mode and switches to the video mode closest to it.
  *  The window position is ignored when setting a monitor.
  *
- *  When the monitor is `NULL`, the position, width and height are used to
+ *  When the monitor is `NULL`, the position, m_Width and m_Height are used to
  *  place the window content area.  The refresh rate is ignored when no monitor
  *  is specified.
  *

@@ -13,6 +13,7 @@
 #include "engine/Vertex.h"
 #include "engine/Camera.h"
 #include "Cloth.h"
+#include "Rope.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -34,10 +35,10 @@ void init ()
 void run ()
 {
 #pragma region Cloth Creation
-
 	Cloth cloth (50.f, 50.f, 100, 100);
+	Rope rope (50, 1000, 1);
 
-	VertexArray vertexArrayObject;
+	int scene=0;
 
 	VertexBufferLayout vertexBufferLayout;
 	vertexBufferLayout.Push<GLfloat> (3);
@@ -45,15 +46,29 @@ void run ()
 	vertexBufferLayout.Push<GLfloat> (3);
 	vertexBufferLayout.Push<GLfloat> (2);
 
-	std::vector<Vertex>& vertices = cloth.GetVertices();
-	GLsizei sizeOfVertices = vertices.size() * sizeof(Vertex);
-	VertexBuffer vertexBuffer{vertices.data(), sizeOfVertices};
+	//ROPE
+	std::vector<Vertex>& verticesRope = rope.GetMesh().GetVertices();
+	GLsizei verticesSizeRope = verticesRope.size() * sizeof(Vertex);
+	VertexBuffer vertexBufferRope{verticesRope.data(), verticesSizeRope};
+	
+	std::vector<GLuint>& indicesRope = rope.GetMesh().GetIndices();
+	auto indicesSizeRope=indicesRope.size() * sizeof(GLuint);
+	IndexBuffer indexBufferRope(indicesRope.data(), indicesSizeRope);
 
-	vertexArrayObject.AddVertexBuffer (vertexBuffer, vertexBufferLayout);
+	VertexArray vertexArrayObjectRope;
+	vertexArrayObjectRope.AddVertexBuffer (vertexBufferRope, vertexBufferLayout);
 
-	std::vector<GLuint>& indices = cloth.GetIndices();
-	auto sizeOfIndices=indices.size() * sizeof(GLuint);
-	IndexBuffer indexBuffer(indices.data(), sizeOfIndices);
+	//CLOTH
+	std::vector<Vertex>& verticesCloth = cloth.GetMesh().GetVertices();
+	GLsizei verticesSizeCloth = verticesCloth.size() * sizeof(Vertex);
+	VertexBuffer vertexBufferCloth{verticesCloth.data(), verticesSizeCloth};
+	
+	std::vector<GLuint>& indicesCloth = cloth.GetMesh().GetIndices();
+	auto indicesSizeCloth=indicesCloth.size() * sizeof(GLuint);
+	IndexBuffer indexBufferCloth(indicesCloth.data(), indicesSizeCloth);
+	
+	VertexArray vertexArrayObjectCloth;
+	vertexArrayObjectCloth.AddVertexBuffer (vertexBufferCloth, vertexBufferLayout);
 
 #pragma endregion
 
@@ -73,12 +88,18 @@ void run ()
 
 #pragma region UI Elements Creation
 
-	float cameraPosition[3] = { 0, 0, -10.f };
+	float clothPosition[3] = { 0, 0, 0 };
+	float clothRotation[3] = { 0, 0, 0 };
+	float cameraPosition[3] = { 0, 0, 20.f };
 	float cameraRotation[3] = { 0, 0, 0 };
+
 	renderer.AddFloatSliderUI("Camera Position", cameraPosition, -100.f, 100.f);
 	renderer.AddFloatSliderUI("Camera 'Rotation'", cameraRotation, -180.f, 180.f);
+	renderer.AddFloatSliderUI("Cloth Position", clothPosition, -100.f, 100.f);
+	renderer.AddFloatSliderUI("Cloth Rotation", clothRotation, -180.f, 180.f);
 
 	renderer.AddBoolCheckboxUI ("Wireframe", &renderer.wireframe);
+	renderer.AddBoolCheckboxUI ("Backface", &renderer.backface);
 
 #pragma endregion
 
@@ -86,16 +107,30 @@ void run ()
 	{
 		renderer.Clear();
 
-		renderer.DrawUI();
+		cloth.GetTransform().SetPosition({clothPosition[0], clothPosition[1], clothPosition[2]});
+		cloth.GetTransform().SetRotation({clothRotation[0], clothRotation[1], clothRotation[2]});
 
 		camera.GetTransform().SetRotation ({ cameraRotation[0], cameraRotation[1], cameraRotation[2] });
 		camera.GetTransform().SetPosition ({ cameraPosition[0], cameraPosition[1], cameraPosition[2] });
-
-		basicShader.SetUniform<glm::mat4> ("viewMatrix", camera.GetUpdatedViewMatrix());
-		basicShader.SetUniform<glm::mat4> ("modelMatrix", glm::mat4{ 1.f });
 		
-		renderer.Draw (vertexArrayObject, indexBuffer, basicShader);
+		basicShader.SetUniform<glm::mat4> ("modelMatrix", cloth.GetTransform().GetUpdatedModelMatrix());
+		basicShader.SetUniform<glm::mat4> ("viewMatrix", camera.GetUpdatedViewMatrix());
 
+		switch (scene)
+		{
+		case 0:
+			renderer.Draw (vertexArrayObjectCloth, indexBufferCloth, basicShader);
+			break;
+
+		case 1:
+			renderer.Draw (vertexArrayObjectRope, indexBufferRope, basicShader);
+			break;
+
+			default:
+				std::cout << "No scene setup on this index!";
+		}
+		
+		renderer.DrawUI();
 		glfwSwapBuffers (glfwWindow);
 		glfwPollEvents();
 	}

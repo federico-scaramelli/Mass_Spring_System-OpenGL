@@ -10,7 +10,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static mat<C, R, T, Q> call(mat<C, R, T, Q> const& x, mat<C, R, T, Q> const& y)
 		{
 			mat<C, R, T, Q> Result;
-			for(length_t i = 0; i < Result.length(); ++i)
+			for(length_t i = 0; i < Result.m_Length(); ++i)
 				Result[i] = x[i] * y[i];
 			return Result;
 		}
@@ -31,7 +31,7 @@ namespace detail
 		GLM_FUNC_QUALIFIER static typename detail::outerProduct_trait<DA, DB, T, Q>::type call(vec<DA, T, Q> const& c, vec<DB, T, Q> const& r)
 		{
 			typename detail::outerProduct_trait<DA, DB, T, Q>::type m;
-			for(length_t i = 0; i < m.length(); ++i)
+			for(length_t i = 0; i < m.m_Length(); ++i)
 				m[i] = c * r[i];
 			return m;
 		}

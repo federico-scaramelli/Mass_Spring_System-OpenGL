@@ -4,8 +4,8 @@
 
 #include "engine/Vertex.h"
 
-Cloth::Cloth (float clothWidth, float clothHeight, int pointsWidth, int pointsHeight) :
-	width (clothWidth), height (clothHeight), pointsByWidth (pointsWidth), pointsByHeight (pointsHeight)
+Cloth::Cloth (GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight) :
+	m_Width (clothWidth), m_Height (clothHeight), m_PointsByWidth (pointsWidth), m_PointsByHeight (pointsHeight)
 {
 	InitializeVertices();
 	InitializeIndices();
@@ -13,15 +13,17 @@ Cloth::Cloth (float clothWidth, float clothHeight, int pointsWidth, int pointsHe
 
 void Cloth::InitializeVertices ()
 {
+	auto& vertices=m_Mesh.GetVertices();
+
 	vertices.clear();
 
-	float spacingWidth = width / pointsByWidth;
-	float spacingHeight = height / pointsByHeight;
+	float spacingWidth = m_Width / m_PointsByWidth;
+	float spacingHeight = m_Height / m_PointsByHeight;
 
 	//Riga
-	for (auto x = 0; x < pointsByHeight; x++) {
+	for (auto x = 0; x < m_PointsByHeight; x++) {
 		//Colonna
-		for (auto y = 0; y < pointsByWidth; y++) {
+		for (auto y = 0; y < m_PointsByWidth; y++) {
 			glm::vec3 initialPosition {
 				y * spacingWidth,
 				x * spacingHeight,
@@ -38,15 +40,17 @@ void Cloth::InitializeVertices ()
 
 void Cloth::InitializeIndices ()
 {
+	auto& indices=m_Mesh.GetIndices();
+
 	indices.clear();
 
 	//Riga
-	for (auto x = 0; x < pointsByHeight - 1; x++) {
+	for (auto x = 0; x < m_PointsByHeight - 1; x++) {
 		//Colonna
-		for (auto y = 1; y < pointsByWidth; y++) {
-			int v = LinearIndex (x, y, pointsByWidth);
+		for (auto y = 1; y < m_PointsByWidth; y++) {
+			int v = LinearIndex (x, y, m_PointsByWidth);
 			int vLeft = v - 1;
-			int vUp = v + pointsByWidth;
+			int vUp = v + m_PointsByWidth;
 			int vUpLeft = vUp - 1;
 
 			indices.push_back (vLeft);
@@ -56,29 +60,7 @@ void Cloth::InitializeIndices ()
 			indices.push_back (vUp);
 			indices.push_back (vUpLeft);
 			indices.push_back (vLeft);
-
-			// indices.push_back(vBottomLeft);
-			// indices.push_back(vBottom);
-			// indices.push_back(v);
-			//
-			// indices.push_back(v);
-			// indices.push_back(vLeft);
-			// indices.push_back(vBottomLeft);
-
-
 		}
 	}
 }
 
-static std::random_device rd;
-static std::mt19937 cpuGenerator (rd());
-static std::uniform_real_distribution<float> unif{ 0, 1.0 };
-
-glm::vec3 Cloth::GetRandomColor ()
-{
-	return {
-		unif (cpuGenerator),
-		unif (cpuGenerator),
-		unif (cpuGenerator)
-	};
-}
