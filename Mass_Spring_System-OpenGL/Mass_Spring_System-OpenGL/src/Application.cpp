@@ -92,6 +92,7 @@ void run()
 	float cameraPosition[3] = {0, 0, 20.f};
 	float cameraRotation[3] = {0, 0, 0};
 
+	const char* toRenderOptions[] {"Cloth", "Rope"};
 	int toRenderIndex = 0;
 
 	renderer.AddFloatSliderUI("Camera Position", cameraPosition, -100.f, 100.f);
@@ -101,8 +102,8 @@ void run()
 
 	renderer.AddBoolCheckboxUI("Wireframe", &renderer.wireframe);
 	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
-
-	renderer.AddIntSliderUI("Scene", &toRenderIndex, 0, 1);
+	
+	renderer.AddListBoxUI("To render objects", &toRenderIndex, toRenderOptions, 2);
 
 #pragma endregion
 

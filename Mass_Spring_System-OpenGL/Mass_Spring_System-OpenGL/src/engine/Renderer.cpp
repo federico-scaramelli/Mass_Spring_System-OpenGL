@@ -73,6 +73,16 @@ void Renderer::DrawIntSliderUI(const char* label, int* data, int min, int max)
 	ImGui::SliderInt(label, data, min, max);
 }
 
+void Renderer::AddListBoxUI(const char* label, int* data, const char* const* items, int itemsCount)
+{
+	UIListBox.push_back({label, data, items, itemsCount});
+}
+
+void Renderer::DrawListBoxUI(const char* label, int* data, const char* const* items, int itemsCount)
+{
+	ImGui::ListBox(label, data, items, itemsCount);
+}
+
 void Renderer::DrawUI()
 {
 	ImGui_ImplOpenGL3_NewFrame();
@@ -90,9 +100,14 @@ void Renderer::DrawUI()
 		DrawBoolCheckboxUI(checkbox.label, checkbox.data);
 	}
 
-	for (UISliderInt slider : UISlidersInt)
+	for (auto slider : UISlidersInt)
 	{
 		DrawIntSliderUI(slider.label, slider.data, slider.min, slider.max);
+	}
+
+	for (auto slider : UIListBox)
+	{
+		DrawListBoxUI(slider.label, slider.data, slider.items, slider.itemsCount);
 	}
 
 	ImGui::End();

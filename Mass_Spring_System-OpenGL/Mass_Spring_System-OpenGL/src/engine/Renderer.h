@@ -5,6 +5,13 @@ class VertexArray;
 class IndexBuffer;
 class ShaderProgram;
 
+struct UIListBox {
+	const char* label;
+	int* data;
+	const char* const* items;
+	int itemsCount;
+};
+
 struct UISliderInt {
 	const char* label;
 	int* data;
@@ -31,18 +38,22 @@ public:
 	void Clear() const;
 
 	void AddFloatSliderUI(const char* label, float* data, float min, float max);
+	void DrawFloatSliderUI(const char* label, float* data, float min, float max);
 	void DrawBoolCheckboxUI(const char* label, bool* data);
 	void AddBoolCheckboxUI(const char* label, bool* data);
 	void AddIntSliderUI(const char* label, int* data, int min, int max);
 	void DrawIntSliderUI(const char* label, int* data, int min, int max);
+	void AddListBoxUI(const char* label, int* data, const char* const* items, int itemsCount);
+	void DrawListBoxUI(const char* label, int* data, const char* const* items, int itemsCount);
 	void DrawUI();
 
 	bool wireframe;
 	bool backface;
 
 private:
+	std::vector<UIListBox> UIListBox;
 	std::vector<UISliderInt> UISlidersInt;
 	std::vector<UISlider> UISliders;
 	std::vector<UICheckbox> UICheckboxes;
-	void DrawFloatSliderUI(const char* label, float* data, float min, float max);
+	
 };
