@@ -8,71 +8,94 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
-void Renderer::Draw (const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const
+void Renderer::Draw(const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const
 {
 	shader.Use();
 	vao.Bind();
 	indexBuffer.Bind();
 
-	if (wireframe) {
+	if (wireframe)
+	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	} else {
+	}
+	else
+	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
-	if (backface) {
-		glDisable(GL_CULL_FACE); 
-	} else {
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);  
+	if (backface)
+	{
+		glDisable(GL_CULL_FACE);
 	}
-	
-	glDrawElements (GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
+	else
+	{
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+	}
+
+	glDrawElements(GL_TRIANGLES, indexBuffer.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
 
-void Renderer::Clear () const
+void Renderer::Clear() const
 {
 	//Clear the color buffer
-	glClearColor (0.07f, 0.13f, 0.17f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT);
+	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void Renderer::AddFloatSliderUI (const char* label, float* data, float min, float max)
+void Renderer::AddFloatSliderUI(const char* label, float* data, float min, float max)
 {
-	UISliders.push_back ({label, data, min, max});
+	UISliders.push_back({label, data, min, max});
 }
 
-void Renderer::DrawFloatSliderUI (const char* label, float* data, float min, float max)
+void Renderer::DrawFloatSliderUI(const char* label, float* data, float min, float max)
 {
-	ImGui::SliderFloat3 (label, data, min, max);
+	ImGui::SliderFloat3(label, data, min, max);
 }
 
-void Renderer::DrawBoolCheckboxUI (const char* label, bool* data)
+void Renderer::DrawBoolCheckboxUI(const char* label, bool* data)
 {
-	ImGui::Checkbox (label, data);
+	ImGui::Checkbox(label, data);
 }
 
-void Renderer::AddBoolCheckboxUI (const char* label, bool* data)
+void Renderer::AddBoolCheckboxUI(const char* label, bool* data)
 {
-	UICheckboxes.push_back ({label, data});
+	UICheckboxes.push_back({label, data});
 }
 
-void Renderer::DrawUI ()
+void Renderer::AddIntSliderUI(const char* label, int* data, int min, int max)
+{
+	UISlidersInt.push_back({label, data, min, max});
+}
+
+void Renderer::DrawIntSliderUI(const char* label, int* data, int min, int max)
+{
+	ImGui::SliderInt(label, data, min, max);
+}
+
+void Renderer::DrawUI()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin ("ImGui Hello World!");
+	ImGui::Begin("ImGui Hello World!");
 
-	for (UISlider slider : UISliders) {
-		DrawFloatSliderUI (slider.label, slider.data, slider.min, slider.max);
+	for (UISlider slider : UISliders)
+	{
+		DrawFloatSliderUI(slider.label, slider.data, slider.min, slider.max);
 	}
 
-	for (UICheckbox checkbox : UICheckboxes) {
-		DrawBoolCheckboxUI (checkbox.label, checkbox.data);
+	for (UICheckbox checkbox : UICheckboxes)
+	{
+		DrawBoolCheckboxUI(checkbox.label, checkbox.data);
+	}
+
+	for (UISliderInt slider : UISlidersInt)
+	{
+		DrawIntSliderUI(slider.label, slider.data, slider.min, slider.max);
 	}
 
 	ImGui::End();
 	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData (ImGui::GetDrawData());
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

@@ -18,131 +18,137 @@
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.inl"
+#include "imgui/imgui.h"
 
 #pragma endregion
 
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
-Camera camera (window.GetAspectRatio());
+Camera camera(window.GetAspectRatio());
 
-void init ()
+void init()
 {
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
 }
 
-void run ()
+void run()
 {
 #pragma region Cloth Creation
-	Cloth cloth (50.f, 50.f, 100, 100);
-	Rope rope (50, 1000, 1);
-
-	int scene=0;
+	Cloth cloth(50.f, 50.f, 100, 100);
+	Rope rope(50, 1000, 1);
 
 	VertexBufferLayout vertexBufferLayout;
-	vertexBufferLayout.Push<GLfloat> (3);
-	vertexBufferLayout.Push<GLfloat> (3);
-	vertexBufferLayout.Push<GLfloat> (3);
-	vertexBufferLayout.Push<GLfloat> (2);
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(3);
+	vertexBufferLayout.Push<GLfloat>(2);
 
 	//ROPE
 	std::vector<Vertex>& verticesRope = rope.GetMesh().GetVertices();
 	GLsizei verticesSizeRope = verticesRope.size() * sizeof(Vertex);
 	VertexBuffer vertexBufferRope{verticesRope.data(), verticesSizeRope};
-	
+
 	std::vector<GLuint>& indicesRope = rope.GetMesh().GetIndices();
-	auto indicesSizeRope=indicesRope.size() * sizeof(GLuint);
+	auto indicesSizeRope = indicesRope.size() * sizeof(GLuint);
 	IndexBuffer indexBufferRope(indicesRope.data(), indicesSizeRope);
 
 	VertexArray vertexArrayObjectRope;
-	vertexArrayObjectRope.AddVertexBuffer (vertexBufferRope, vertexBufferLayout);
+	vertexArrayObjectRope.AddVertexBuffer(vertexBufferRope, vertexBufferLayout);
 
 	//CLOTH
 	std::vector<Vertex>& verticesCloth = cloth.GetMesh().GetVertices();
 	GLsizei verticesSizeCloth = verticesCloth.size() * sizeof(Vertex);
 	VertexBuffer vertexBufferCloth{verticesCloth.data(), verticesSizeCloth};
-	
+
 	std::vector<GLuint>& indicesCloth = cloth.GetMesh().GetIndices();
-	auto indicesSizeCloth=indicesCloth.size() * sizeof(GLuint);
+	auto indicesSizeCloth = indicesCloth.size() * sizeof(GLuint);
 	IndexBuffer indexBufferCloth(indicesCloth.data(), indicesSizeCloth);
-	
+
 	VertexArray vertexArrayObjectCloth;
-	vertexArrayObjectCloth.AddVertexBuffer (vertexBufferCloth, vertexBufferLayout);
+	vertexArrayObjectCloth.AddVertexBuffer(vertexBufferCloth, vertexBufferLayout);
 
 #pragma endregion
 
 #pragma region BasicShader Creation
 
 	ShaderProgram basicShader{};
-	basicShader.CompileShader ("shader.vert", ShaderType::VERTEX);
-	basicShader.CompileShader ("shader.frag", ShaderType::FRAGMENT);
+	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
+	basicShader.CompileShader("shader.frag", ShaderType::FRAGMENT);
 	basicShader.Link();
 	basicShader.Validate();
 	basicShader.Use();
 
 #pragma endregion
 
-	camera.GetTransform().SetPosition ({ 0.f, 0.f, -10.f });
-	basicShader.SetUniform<glm::mat4> ("projectionMatrix", camera.GetProjectionMatrix());
+	camera.GetTransform().SetPosition({0.f, 0.f, -10.f});
+	basicShader.SetUniform<glm::mat4>("projectionMatrix", camera.GetProjectionMatrix());
 
 #pragma region UI Elements Creation
 
-	float clothPosition[3] = { 0, 0, 0 };
-	float clothRotation[3] = { 0, 0, 0 };
-	float cameraPosition[3] = { 0, 0, 20.f };
-	float cameraRotation[3] = { 0, 0, 0 };
+	float clothPosition[3] = {0, 0, 0};
+	float clothRotation[3] = {0, 0, 0};
+	float cameraPosition[3] = {0, 0, 20.f};
+	float cameraRotation[3] = {0, 0, 0};
+
+	int toRenderIndex = 0;
 
 	renderer.AddFloatSliderUI("Camera Position", cameraPosition, -100.f, 100.f);
 	renderer.AddFloatSliderUI("Camera 'Rotation'", cameraRotation, -180.f, 180.f);
 	renderer.AddFloatSliderUI("Cloth Position", clothPosition, -100.f, 100.f);
 	renderer.AddFloatSliderUI("Cloth Rotation", clothRotation, -180.f, 180.f);
 
-	renderer.AddBoolCheckboxUI ("Wireframe", &renderer.wireframe);
-	renderer.AddBoolCheckboxUI ("Backface", &renderer.backface);
+	renderer.AddBoolCheckboxUI("Wireframe", &renderer.wireframe);
+	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
+
+	renderer.AddIntSliderUI("Scene", &toRenderIndex, 0, 1);
 
 #pragma endregion
 
-	while (!glfwWindowShouldClose (glfwWindow)) 
+	while (!glfwWindowShouldClose(glfwWindow))
 	{
 		renderer.Clear();
 
 		cloth.GetTransform().SetPosition({clothPosition[0], clothPosition[1], clothPosition[2]});
 		cloth.GetTransform().SetRotation({clothRotation[0], clothRotation[1], clothRotation[2]});
 
-		camera.GetTransform().SetRotation ({ cameraRotation[0], cameraRotation[1], cameraRotation[2] });
-		camera.GetTransform().SetPosition ({ cameraPosition[0], cameraPosition[1], cameraPosition[2] });
-		
-		basicShader.SetUniform<glm::mat4> ("modelMatrix", cloth.GetTransform().GetUpdatedModelMatrix());
-		basicShader.SetUniform<glm::mat4> ("viewMatrix", camera.GetUpdatedViewMatrix());
+		camera.GetTransform().SetRotation({cameraRotation[0], cameraRotation[1], cameraRotation[2]});
+		camera.GetTransform().SetPosition({cameraPosition[0], cameraPosition[1], cameraPosition[2]});
 
-		switch (scene)
+		basicShader.SetUniform<glm::mat4>("modelMatrix", cloth.GetTransform().GetUpdatedModelMatrix());
+		basicShader.SetUniform<glm::mat4>("viewMatrix", camera.GetUpdatedViewMatrix());
+
+		switch (toRenderIndex)
 		{
 		case 0:
-			renderer.Draw (vertexArrayObjectCloth, indexBufferCloth, basicShader);
+			renderer.Draw(vertexArrayObjectCloth, indexBufferCloth, basicShader);
 			break;
 
 		case 1:
-			renderer.Draw (vertexArrayObjectRope, indexBufferRope, basicShader);
+			renderer.Draw(vertexArrayObjectRope, indexBufferRope, basicShader);
 			break;
 
-			default:
-				std::cout << "No scene setup on this index!";
+		default:
+			std::cout << "No scene setup avaiable!";
 		}
-		
+
 		renderer.DrawUI();
-		glfwSwapBuffers (glfwWindow);
+
+		glfwSwapBuffers(glfwWindow);
 		glfwPollEvents();
 	}
 }
 
-int main ()
+int main()
 {
-	try {
+	try
+	{
 		init();
 		run();
 	}
-	catch (std::runtime_error& e) {
+	catch (std::runtime_error& e)
+	{
 		std::cout << e.what() << std::endl;
 	}
 
