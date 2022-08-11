@@ -50,6 +50,7 @@ ShaderProgram::~ShaderProgram()
 	glDeleteProgram(ID);
 }
 
+
 void ShaderProgram::CompileShader(std::string fileName, ShaderType type)
 {
 	std::string path = SHADER_PATH + fileName;

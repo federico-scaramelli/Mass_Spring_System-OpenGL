@@ -38,9 +38,9 @@ private:
 public:
 	ShaderProgram();
 	~ShaderProgram();
-
-	ShaderProgram(const ShaderProgram&) = delete;
-	ShaderProgram& operator=(const ShaderProgram&) = delete;
+	
+	// ShaderProgram(const ShaderProgram&) = delete;
+	// ShaderProgram& operator=(const ShaderProgram&) = delete;
 
 	void CompileShader (std::string fileName, ShaderType type);
 

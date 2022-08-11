@@ -32,7 +32,7 @@ void Cloth::InitializeVertices ()
 
 			Vertex vertex {initialPosition};
 			//vertex.color = GetRandomColor();
-			vertex.color = color;
+			// vertex.color = color;
 
 			vertices.push_back (vertex);
 		}

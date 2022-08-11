@@ -22,7 +22,8 @@ void VertexBuffer::SetData (const void* data, GLsizei size)
 	m_vboSize = size;
 
 	glGenBuffers(1, &m_vboID);
-	UpdateData (data, size);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
 
 void VertexBuffer::UpdateData (const void* data, GLsizei size)

@@ -2,78 +2,101 @@
 
 #include <random>
 
+#include "Material.h"
 #include "Mesh.h"
 #include "Transform.h"
 
 static std::random_device rd;
-static std::mt19937 cpuGenerator (rd());
-static std::uniform_real_distribution<float> unif{ 0, 1.0 };
+static std::mt19937 cpuGenerator(rd());
+static std::uniform_real_distribution<float> unif{0, 1.0};
 
 class GameObject {
 protected:
 	Transform m_Transform;
 	Mesh m_Mesh;
-	glm::vec3 color{0.15f, 0.15f, 0.7f};
+	Material m_Material;
 
 public:
 	GameObject()
 	{
-		 auto& vertices=m_Mesh.GetVertices();
-		 vertices.clear();
+		auto& vertices = m_Mesh.GetVertices();
+		vertices.clear();
 
-		 std::vector<Vertex> cubeVertices = {
-              {{ -0.5f,  0.5f,  0.5f }},
-              {{ -0.5f, -0.5f,  0.5f }},
-              {{  0.5f, -0.5f,  0.5f }},
-              {{  0.5f,  0.5f,  0.5f }},
-              {{  0.5f,  0.5f, -0.5f }},
-              {{  0.5f, -0.5f, -0.5f }},
-              {{ -0.5f,  0.5f, -0.5f }},
-              {{ -0.5f, -0.5f, -0.5f }}
-          };
+		std::vector<Vertex> cubeVertices = {
+			{{-0.5f, -0.5f, 0.5f}}, //0
+			{{0.5f, -0.5f, 0.5f}}, //1 
+			{{0.5f, 0.5f, 0.5f}}, //2 
+			{{-0.5f, 0.5f, 0.5f}}, //3 
+			{{-0.5f, -0.5f, -0.5f}}, //4 
+			{{0.5f, -0.5f, -0.5f}}, //5 
+			{{0.5f, 0.5f, -0.5f}}, //6 
+			{{-0.5f, 0.5f, -0.5f}} //7 
+		};
 
-        vertices.assign (cubeVertices.begin(), cubeVertices.end());
+		vertices.assign(cubeVertices.begin(), cubeVertices.end());
 
-		auto& indices=m_Mesh.GetIndices();
-        indices = {
-            0, 1, 2,
-            2, 3, 0,
+		auto& indices = m_Mesh.GetIndices();
+		indices = {
+			//front
+			0, 1, 2,
+			2, 3, 0,
 
-            4, 3, 2,
-            5, 4, 2,
+			//right
+			1, 5, 6,
+			6, 2, 1,
 
-            6, 4, 5,
-            7, 6, 5,
+			//left
+			0, 3, 7,
+			7, 4, 0,
 
-            6, 7, 0,
-            1, 0, 7,
+			//up
+			3, 2, 6,
+			6, 7, 3,
 
-            3, 6, 0,
-            4, 6, 3,
+			//down
+			0, 4, 5,
+			5, 1, 0,
 
-            1, 7, 2,
-            7, 5, 2
-        };
+			//back 
+			5, 4, 7,
+			7, 6, 5
+		};
 	}
 
-	Transform& GetTransform() { return m_Transform; }
-	Mesh& GetMesh() { return m_Mesh; }
+	Transform& GetTransform()
+	{
+		return m_Transform;
+	}
 
-	glm::vec3 GetRandomColor(){
+	Mesh& GetMesh()
+	{
+		return m_Mesh;
+	}
+
+	Material& GetMaterial()
+	{
+		return m_Material;
+	}
+
+	glm::vec3 GetRandomColor()
+	{
 		return {
-				unif (cpuGenerator),
-				unif (cpuGenerator),
-				unif (cpuGenerator)
+			unif(cpuGenerator),
+			unif(cpuGenerator),
+			unif(cpuGenerator)
 		};
 	}
 
 	void SetColor(glm::vec3 color)
 	{
-        for (Vertex& v : m_Mesh.GetVertices()) {
-	        v.color = color;
-        }
-        m_Mesh.UpdateBuffers();
-		this->color = color;
+		this->m_Material.m_DiffuseColor = color;
+		this->m_Material.m_AmbientColor = color;
+
+		for (Vertex& v : m_Mesh.GetVertices())
+		{
+			v.color = color;
+		}
+
+		m_Mesh.UpdateBuffers();
 	}
 };
-

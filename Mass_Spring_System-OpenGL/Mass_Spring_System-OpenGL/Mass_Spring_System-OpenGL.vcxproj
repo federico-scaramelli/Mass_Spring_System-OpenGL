@@ -165,6 +165,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\Material.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\engine\LightSource.cpp" />
     <ClCompile Include="src\Rope.cpp" />
     <ClCompile Include="src\Cloth.cpp" />
@@ -192,6 +194,8 @@
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\engine\Material.h" />
+    <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\engine\LightSource.h" />
     <ClInclude Include="src\engine\Mesh.h" />
     <ClInclude Include="src\engine\GameObject.h" />
