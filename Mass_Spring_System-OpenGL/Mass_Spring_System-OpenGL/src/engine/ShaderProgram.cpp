@@ -175,6 +175,13 @@ void ShaderProgram::SetUniform<glm::mat4>(const char* name, glm::mat4 val)
 }
 
 template<>
+void ShaderProgram::SetUniform<glm::mat3>(const char* name, glm::mat3 val)
+{
+	GLint loc = GetUniformLocation(name);
+	glUniformMatrix3fv(loc, 1, GL_FALSE, glm::value_ptr(val));	
+}
+
+template<>
 void ShaderProgram::SetUniform<GLfloat>(const char* name, GLfloat val)
 {
 	GLint loc = GetUniformLocation(name);

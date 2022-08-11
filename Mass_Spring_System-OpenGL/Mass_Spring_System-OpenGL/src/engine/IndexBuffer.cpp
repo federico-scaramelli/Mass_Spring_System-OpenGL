@@ -14,7 +14,7 @@ IndexBuffer::~IndexBuffer()
 	glDeleteBuffers(1, &m_RendererID);
 }
 
-void IndexBuffer::Set (const GLuint* data, GLuint size)
+void IndexBuffer::SetData (const GLuint* data, GLuint size)
 {
 	m_Size = size;
 	glGenBuffers(1, &m_RendererID);

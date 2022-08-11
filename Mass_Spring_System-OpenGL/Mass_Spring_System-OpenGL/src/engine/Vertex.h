@@ -6,7 +6,7 @@
 struct Vertex
 {
 	glm::vec3 position;
-	glm::vec3 color {1.f};
-	glm::vec3 normal {1.f};
+	glm::vec3 color {1.f, 0.f, 0.f};
+	glm::vec3 normal {0.f, 0.f, 1.f};
 	glm::vec2 uv {0.f};
 };

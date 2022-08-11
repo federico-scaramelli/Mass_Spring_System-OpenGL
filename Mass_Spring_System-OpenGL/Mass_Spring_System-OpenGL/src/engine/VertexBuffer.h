@@ -12,8 +12,13 @@ private:
 	GLsizei m_vboSize;
 
 public:
+	VertexBuffer() = default;
 	VertexBuffer(const void* data, GLsizei size);
+
 	~VertexBuffer();
+
+	void SetData(const void* data, GLsizei size);
+	void UpdateData(const void* data, GLsizei size);
 
 	void BindToVao(GLuint vaoID, GLuint bindingPoint, GLsizei stride) const; 
 	void Unbind(GLuint vaoID, GLuint bindingPoint) const;

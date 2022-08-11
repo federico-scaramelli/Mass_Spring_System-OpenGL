@@ -17,6 +17,20 @@ VertexBuffer::~VertexBuffer()
 	glDeleteBuffers(1, &m_vboID);
 }
 
+void VertexBuffer::SetData (const void* data, GLsizei size)
+{
+	m_vboSize = size;
+
+	glGenBuffers(1, &m_vboID);
+	UpdateData (data, size);
+}
+
+void VertexBuffer::UpdateData (const void* data, GLsizei size)
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_vboID);
+	glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+}
+
 void VertexBuffer::BindToVao(GLuint vaoID, GLuint bindingPoint, GLsizei stride) const
 {
 	glVertexArrayVertexBuffer(vaoID, bindingPoint, m_vboID, /* offset */ 0, stride);

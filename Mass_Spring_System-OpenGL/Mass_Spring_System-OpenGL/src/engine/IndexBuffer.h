@@ -13,7 +13,7 @@ public:
 	IndexBuffer(const GLuint* data, GLuint size);
 	~IndexBuffer();
 
-	void Set(const GLuint* data, GLuint size);
+	void SetData(const GLuint* data, GLuint size);
 
 	void Bind() const;
 	void Unbind() const;

@@ -14,9 +14,11 @@
 #include "engine/Camera.h"
 #include "Cloth.h"
 #include "Rope.h"
+#include "engine/LightSource.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
 #include "glm/gtc/type_ptr.inl"
 #include "imgui/imgui.h"
 
@@ -35,9 +37,7 @@ void init()
 
 void run()
 {
-#pragma region Cloth Creation
-	Cloth cloth(50.f, 50.f, 100, 100);
-	Rope rope(50, 1000, 1);
+#pragma region Scene Creation
 
 	VertexBufferLayout vertexBufferLayout;
 	vertexBufferLayout.Push<GLfloat>(3);
@@ -46,28 +46,17 @@ void run()
 	vertexBufferLayout.Push<GLfloat>(2);
 
 	//ROPE
-	std::vector<Vertex>& verticesRope = rope.GetMesh().GetVertices();
-	GLsizei verticesSizeRope = verticesRope.size() * sizeof(Vertex);
-	VertexBuffer vertexBufferRope{verticesRope.data(), verticesSizeRope};
-
-	std::vector<GLuint>& indicesRope = rope.GetMesh().GetIndices();
-	auto indicesSizeRope = indicesRope.size() * sizeof(GLuint);
-	IndexBuffer indexBufferRope(indicesRope.data(), indicesSizeRope);
-
-	VertexArray vertexArrayObjectRope;
-	vertexArrayObjectRope.AddVertexBuffer(vertexBufferRope, vertexBufferLayout);
+	Rope rope(50, 1000, 1);
+	rope.GetMesh().SetBuffers (vertexBufferLayout);
 
 	//CLOTH
-	std::vector<Vertex>& verticesCloth = cloth.GetMesh().GetVertices();
-	GLsizei verticesSizeCloth = verticesCloth.size() * sizeof(Vertex);
-	VertexBuffer vertexBufferCloth{verticesCloth.data(), verticesSizeCloth};
+	Cloth cloth(50.f, 50.f, 100, 100);
+	cloth.SetColor ({1.f, 0.f, 0.f});
+	cloth.GetMesh().SetBuffers (vertexBufferLayout);
 
-	std::vector<GLuint>& indicesCloth = cloth.GetMesh().GetIndices();
-	auto indicesSizeCloth = indicesCloth.size() * sizeof(GLuint);
-	IndexBuffer indexBufferCloth(indicesCloth.data(), indicesSizeCloth);
-
-	VertexArray vertexArrayObjectCloth;
-	vertexArrayObjectCloth.AddVertexBuffer(vertexBufferCloth, vertexBufferLayout);
+	//LIGHT
+	LightSource lightSource { {0.8f, 0.8f, 0.8f} };
+	lightSource.GetMesh().SetBuffers (vertexBufferLayout);
 
 #pragma endregion
 
@@ -81,53 +70,77 @@ void run()
 	basicShader.Use();
 
 #pragma endregion
-
-	camera.GetTransform().SetPosition({0.f, 0.f, -10.f});
+	
 	basicShader.SetUniform<glm::mat4>("projectionMatrix", camera.GetProjectionMatrix());
 
 #pragma region UI Elements Creation
 
-	float clothPosition[3] = {0, 0, 0};
-	float clothRotation[3] = {0, 0, 0};
-	float cameraPosition[3] = {0, 0, 20.f};
+	float cameraPosition[3] = {0, 0, 100.f};
 	float cameraRotation[3] = {0, 0, 0};
-
-	const char* toRenderOptions[] {"Cloth", "Rope"};
-	int toRenderIndex = 0;
-
 	renderer.AddFloatSliderUI("Camera Position", cameraPosition, -100.f, 100.f);
 	renderer.AddFloatSliderUI("Camera 'Rotation'", cameraRotation, -180.f, 180.f);
-	renderer.AddFloatSliderUI("Cloth Position", clothPosition, -100.f, 100.f);
-	renderer.AddFloatSliderUI("Cloth Rotation", clothRotation, -180.f, 180.f);
+
+	float objectPosition[3] = {0, 0, 0};
+	float objectRotation[3] = {0, 0, 0};
+	renderer.AddFloatSliderUI("Object Position", objectPosition, -100.f, 100.f);
+	renderer.AddFloatSliderUI("Object Rotation", objectRotation, -180.f, 180.f);
+
+	float lightPosition[3] = {0, 0, 0};
+	float lightIntensity[3] = {0, 0, 0};
+	renderer.AddFloatSliderUI ("Light Position", lightPosition, -100.f, 100.f);
+	renderer.AddFloatSliderUI ("Light Intensity", lightIntensity, 0.f, 1.f);
+
+	const char* sceneOptions[] {"Cloth", "Rope"};
+	int selectedScene = 0;
+	renderer.AddListBoxUI("To render objects", &selectedScene, sceneOptions, 2);
 
 	renderer.AddBoolCheckboxUI("Wireframe", &renderer.wireframe);
 	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
-	
-	renderer.AddListBoxUI("To render objects", &toRenderIndex, toRenderOptions, 2);
 
 #pragma endregion
 
-	while (!glfwWindowShouldClose(glfwWindow))
-	{
+	while (!glfwWindowShouldClose(glfwWindow)) {
 		renderer.Clear();
-
-		cloth.GetTransform().SetPosition({clothPosition[0], clothPosition[1], clothPosition[2]});
-		cloth.GetTransform().SetRotation({clothRotation[0], clothRotation[1], clothRotation[2]});
 
 		camera.GetTransform().SetRotation({cameraRotation[0], cameraRotation[1], cameraRotation[2]});
 		camera.GetTransform().SetPosition({cameraPosition[0], cameraPosition[1], cameraPosition[2]});
 
-		basicShader.SetUniform<glm::mat4>("modelMatrix", cloth.GetTransform().GetUpdatedModelMatrix());
-		basicShader.SetUniform<glm::mat4>("viewMatrix", camera.GetUpdatedViewMatrix());
+		glm::mat4 viewMatrix = camera.GetUpdatedViewMatrix();
+		glm::mat4 modelViewMatrix{};
 
-		switch (toRenderIndex)
+		//LIGHT
+		lightSource.GetTransform().SetPosition ({lightPosition[0], lightPosition[1], lightPosition[2]});
+		basicShader.SetUniform<glm::vec3>("lightPosition", lightSource.GetTransform().GetPosition());
+		basicShader.SetUniform<glm::vec3>("lightAmbient", glm::vec3( lightIntensity[0], lightIntensity[1], lightIntensity[2] ));
+		basicShader.SetUniform<glm::vec3>("lightDiffuse", glm::vec3( lightIntensity[0], lightIntensity[1], lightIntensity[2] ));
+		basicShader.SetUniform<glm::vec3>("lightSpecular", glm::vec3( lightIntensity[0], lightIntensity[1], lightIntensity[2] ));
+		basicShader.SetUniform<glm::vec3>("matAmbient", glm::vec3( lightIntensity[0], lightIntensity[1], lightIntensity[2] ));
+		basicShader.SetUniform<glm::vec3>("matDiffuse", glm::vec3( lightIntensity[0], lightIntensity[1], lightIntensity[2] ));
+		basicShader.SetUniform<glm::vec3>("matSpecular", glm::vec3( lightIntensity[0], lightIntensity[1], lightIntensity[2] ));
+		basicShader.SetUniform<GLfloat>("matShininess", 2);
+		modelViewMatrix = viewMatrix * lightSource.GetTransform().GetUpdatedModelMatrix();
+		basicShader.SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
+		basicShader.SetUniform<glm::mat3>("normalMatrix", glm::inverseTranspose( glm::mat3( modelViewMatrix )));
+		renderer.Draw (lightSource.GetMesh().vertexArrayObject, rope.GetMesh().indexBuffer, basicShader);
+
+		switch (selectedScene)
 		{
 		case 0:
-			renderer.Draw(vertexArrayObjectCloth, indexBufferCloth, basicShader);
+			cloth.GetTransform().SetPosition({objectPosition[0], objectPosition[1], objectPosition[2]});
+			cloth.GetTransform().SetRotation({objectRotation[0], objectRotation[1], objectRotation[2]});
+			modelViewMatrix = viewMatrix * cloth.GetTransform().GetUpdatedModelMatrix();
+			basicShader.SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
+			basicShader.SetUniform<glm::mat3>("normalMatrix", glm::inverseTranspose( glm::mat3( modelViewMatrix )));
+			renderer.Draw(cloth.GetMesh().vertexArrayObject, cloth.GetMesh().indexBuffer, basicShader);
 			break;
 
 		case 1:
-			renderer.Draw(vertexArrayObjectRope, indexBufferRope, basicShader);
+			rope.GetTransform().SetPosition({objectPosition[0], objectPosition[1], objectPosition[2]});
+			rope.GetTransform().SetRotation({objectRotation[0], objectRotation[1], objectRotation[2]});
+			modelViewMatrix = viewMatrix * rope.GetTransform().GetUpdatedModelMatrix();
+			basicShader.SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
+			basicShader.SetUniform<glm::mat3>("normalMatrix", glm::inverseTranspose( glm::mat3( modelViewMatrix )));
+			renderer.Draw(rope.GetMesh().vertexArrayObject, rope.GetMesh().indexBuffer, basicShader);
 			break;
 
 		default:
