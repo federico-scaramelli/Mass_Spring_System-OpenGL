@@ -12,11 +12,10 @@
 
 #include "engine/Vertex.h"
 #include "engine/Camera.h"
-#include "Cloth.h"
-#include "Rope.h"
-#include "Scene.h"
+#include "mass-spring/Cloth.h"
+#include "mass-spring/Rope.h"
+#include "engine/Scene.h"
 #include "engine/LightSource.h"
-#include "Scene.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -67,26 +66,25 @@ void run()
 	// CLOTH
 	Cloth cloth(50.f, 50.f, 100, 100);
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
-	cloth.GetMaterial().CreateShader({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
-	scene.AddGameObjectAndSetProj(&cloth);
+	cloth.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	scene.AddGameObject(&cloth);
 
-	// // ROPE
-	//  Rope rope(50, 1000, 1);
-	//  rope.GetMesh().SetBuffers(vertexBufferLayout);
-	//  rope.GetMaterial().CreateShader({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
-	//  scene.AddGameObjectAndSetProj(&rope);
+	 // ROPE
+	Rope rope(50, 1000, 1);
+	rope.GetMesh().SetBuffers(vertexBufferLayout);
+	rope.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	scene.AddGameObject(&rope);
 
 	// LIGHT
 	LightSource lightSource{{0.8f, 0.8f, 0.8f}};
 	lightSource.GetMesh().SetBuffers(vertexBufferLayout);
-	lightSource.GetMaterial().m_Shader=basicShader;
+	lightSource.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	scene.AddLightSource(&lightSource);
 
 #pragma endregion
 
-
-
 #pragma region UI Elements Creation
+
 	renderer.AddFloatSliderUI("Camera Position", scene.cameraPosition, -100.f, 100.f);
 	renderer.AddFloatSliderUI("Camera Rotation", scene.cameraRotation, -180.f, 180.f);
 	
@@ -106,10 +104,6 @@ void run()
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
 		renderer.Clear();
-
-		// scene.ApplyTransformations();
-
-		
 
 		scene.Update();
 		

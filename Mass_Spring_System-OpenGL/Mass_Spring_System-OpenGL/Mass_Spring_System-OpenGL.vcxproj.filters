@@ -42,7 +42,7 @@
     <ClCompile Include="src\engine\ShaderProgram.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\DebugLogger.cpp">
+    <ClCompile Include="src\engine\DebugLogger.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\Camera.cpp">
@@ -72,16 +72,16 @@
     <ClCompile Include="libraries\include\imgui\imgui_widgets.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Cloth.cpp">
+    <ClCompile Include="src\mass-spring\Cloth.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Rope.cpp">
+    <ClCompile Include="src\mass-spring\Rope.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\LightSource.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\Scene.cpp">
+    <ClCompile Include="src\engine\Scene.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\Material.cpp">
@@ -107,7 +107,7 @@
     <ClInclude Include="src\engine\Window.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils.h">
+    <ClInclude Include="src\engine\Utils.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Renderer.h">
@@ -986,7 +986,7 @@
     <ClInclude Include="src\engine\ShaderProgram.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\DebugLogger.h">
+    <ClInclude Include="src\engine\DebugLogger.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Vertex.h">
@@ -1025,10 +1025,10 @@
     <ClInclude Include="libraries\include\imgui\imgui_impl_opengl3_loader.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cloth.h">
+    <ClInclude Include="src\mass-spring\Cloth.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Rope.h">
+    <ClInclude Include="src\mass-spring\Rope.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Mesh.h">
@@ -1040,7 +1040,7 @@
     <ClInclude Include="src\engine\LightSource.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\Scene.h">
+    <ClInclude Include="src\engine\Scene.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Material.h">

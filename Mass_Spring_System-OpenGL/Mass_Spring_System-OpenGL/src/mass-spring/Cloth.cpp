@@ -2,7 +2,7 @@
 
 #include <random>
 
-#include "engine/Vertex.h"
+#include "../engine/Vertex.h"
 
 Cloth::Cloth (GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight) :
 	m_Width (clothWidth), m_Height (clothHeight), m_PointsByWidth (pointsWidth), m_PointsByHeight (pointsHeight)

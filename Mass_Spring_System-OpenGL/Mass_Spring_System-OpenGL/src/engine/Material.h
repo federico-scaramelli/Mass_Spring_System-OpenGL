@@ -10,8 +10,6 @@ class ShaderProgram;
 
 class Material {
 public:
-	ShaderProgram m_Shader{};
-
 	// glm::vec3 m_SurfaceColor{0.15f, 0.15f, 0.7f};
 
 	glm::vec3 m_DiffuseColor;
@@ -27,7 +25,11 @@ public:
 	m_DiffuseColor(diffuseColor), m_SpecularColor(specularColor), m_AmbientColor(ambientColor), m_Shininess(shininess) { }
 
 
-	void CreateShader(std::vector<std::pair<std::string, ShaderType>> pairList);
+	void CreateShaderProgram(std::vector<std::pair<std::string, ShaderType>> pairList);
 
+	ShaderProgram& GetShader() { return m_Shader; }
+
+private:
+	ShaderProgram m_Shader{};
 };
 

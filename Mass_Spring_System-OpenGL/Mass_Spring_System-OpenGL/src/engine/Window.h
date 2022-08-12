@@ -3,7 +3,7 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "../Utils.h"
+#include "Utils.h"
 
 #define OPENGL_MAJOR_VERSION 4
 #define OPENGL_MINOR_VERSION 6

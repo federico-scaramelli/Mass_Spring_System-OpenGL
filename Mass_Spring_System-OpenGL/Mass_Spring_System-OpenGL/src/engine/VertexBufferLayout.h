@@ -2,8 +2,8 @@
 #include <vector>
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-#include "../DebugLogger.h"
-#include "../Utils.h"
+#include "DebugLogger.h"
+#include "Utils.h"
 
 struct VertexBufferElement
 {

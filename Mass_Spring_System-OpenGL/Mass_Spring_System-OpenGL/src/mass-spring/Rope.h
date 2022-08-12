@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
-#include "engine/GameObject.h"
+#include "../engine/GameObject.h"
 #include <array>
 #include <utility>
 

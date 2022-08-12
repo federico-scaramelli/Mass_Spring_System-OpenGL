@@ -1,6 +1,6 @@
 #include "VertexBuffer.h"
 
-#include "../Utils.h"
+#include "Utils.h"
 #include "glm/vec3.hpp"
 
 VertexBuffer::VertexBuffer(const void* data, const GLsizei size)

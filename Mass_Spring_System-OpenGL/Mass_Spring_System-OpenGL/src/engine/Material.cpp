@@ -2,7 +2,7 @@
 
 
 
-void Material::CreateShader(std::vector<std::pair<std::string, ShaderType>> pairList)
+void Material::CreateShaderProgram(std::vector<std::pair<std::string, ShaderType>> pairList)
 {
 	for (auto& element : pairList)
 	{

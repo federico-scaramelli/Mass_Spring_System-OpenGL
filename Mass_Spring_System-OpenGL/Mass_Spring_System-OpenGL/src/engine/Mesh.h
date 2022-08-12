@@ -6,41 +6,50 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
+#include "Material.h"
 #include "glad/glad.h"
 
 class Mesh {
 private:
-	std::vector<Vertex> vertices;
-	std::vector<GLuint> indices;
+	std::vector<Vertex> m_Vertices;
+	std::vector<GLuint> m_Indices;
 
+	//TODO: move on Mass Spring class
 	//Map<indice vertice, se è pinnato>
-	std::map<int, bool> pinnedVertices;
+	//std::map<int, bool> pinnedVertices;
+
+	Material m_Material;
 
 public:
-	VertexBuffer vertexBuffer;
-	IndexBuffer indexBuffer;
-	VertexArray vertexArrayObject;
+	VertexBuffer m_vbo;
+	IndexBuffer m_indexBuffer;
+	VertexArray m_vao;
 
-	std::vector<Vertex>& GetVertices() { return vertices; }
+	std::vector<Vertex>& GetVertices() { return m_Vertices; }
+	std::vector<GLuint>& GetIndices() { return m_Indices; }
 
-	std::vector<GLuint>& GetIndices() { return indices; }
+	VertexBuffer& GetVertexBuffer() { return m_vbo; }
+	IndexBuffer& GetIndexBuffer() { return m_indexBuffer; }
+	VertexArray& GetVertexArray() { return m_vao; }
 
-	GLfloat GetSize() const { return vertices.size(); }
+	Material& GetMaterial() { return m_Material; }
 
-	void SetBuffers(VertexBufferLayout& layout)
+	GLfloat GetSize() const { return m_Vertices.size(); }
+
+	void SetBuffers(const VertexBufferLayout& layout)
 	{
-		GLsizei verticesSize = vertices.size() * sizeof(Vertex);
-		vertexBuffer.SetData (vertices.data(), verticesSize);
+		GLsizei verticesSize = m_Vertices.size() * sizeof(Vertex);
+		m_vbo.SetData (m_Vertices.data(), verticesSize);
 		
-		GLuint indicesSize = indices.size() * sizeof(GLuint);
-		indexBuffer.SetData (indices.data(), indicesSize);
+		GLuint indicesSize = m_Indices.size() * sizeof(GLuint);
+		m_indexBuffer.SetData (m_Indices.data(), indicesSize);
 
-		vertexArrayObject.AddVertexBuffer(vertexBuffer, layout);
+		m_vao.AddVertexBuffer(m_vbo, layout);
 	}
 
 	void UpdateBuffers()
 	{
-		GLsizei verticesSize = vertices.size() * sizeof(Vertex);
-		vertexBuffer.UpdateData (vertices.data(), verticesSize);
+		GLsizei verticesSize = m_Vertices.size() * sizeof(Vertex);
+		m_vbo.UpdateData (m_Vertices.data(), verticesSize);
 	}
 };

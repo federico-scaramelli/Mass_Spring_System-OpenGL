@@ -2,7 +2,6 @@
 
 #include <random>
 
-#include "Material.h"
 #include "Mesh.h"
 #include "Transform.h"
 
@@ -14,10 +13,9 @@ class GameObject {
 protected:
 	Transform m_Transform;
 	Mesh m_Mesh;
-	Material m_Material;
 
 public:
-	GameObject()
+	void SetDefaultMesh ()
 	{
 		auto& vertices = m_Mesh.GetVertices();
 		vertices.clear();
@@ -63,6 +61,11 @@ public:
 		};
 	}
 
+	GameObject()
+	{
+		SetDefaultMesh();
+	}
+
 	Transform& GetTransform()
 	{
 		return m_Transform;
@@ -71,11 +74,6 @@ public:
 	Mesh& GetMesh()
 	{
 		return m_Mesh;
-	}
-
-	Material& GetMaterial()
-	{
-		return m_Material;
 	}
 
 	glm::vec3 GetRandomColor()
@@ -89,8 +87,8 @@ public:
 
 	void SetColor(glm::vec3 color)
 	{
-		this->m_Material.m_DiffuseColor = color;
-		this->m_Material.m_AmbientColor = color;
+		this->m_Mesh.GetMaterial().m_DiffuseColor = color;
+		this->m_Mesh.GetMaterial().m_AmbientColor = color;
 
 		for (Vertex& v : m_Mesh.GetVertices())
 		{
