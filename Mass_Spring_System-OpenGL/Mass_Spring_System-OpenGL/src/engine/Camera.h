@@ -43,7 +43,7 @@ public:
 
 	void GenerateUI(Renderer& renderer)
 	{
-		m_Transform.GeneratePositionUI(renderer, -100, 10000);
+		m_Transform.GeneratePositionUI(renderer, -100, 100);
 		m_Transform.GenerateRotationUI(renderer);
 	}
 

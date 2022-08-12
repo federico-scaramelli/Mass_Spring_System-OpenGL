@@ -20,48 +20,7 @@ public:
 
 	void SetDefaultMesh ()
 	{
-		auto& vertices = m_Mesh.GetVertices();
-		vertices.clear();
-
-		std::vector<Vertex> cubeVertices = {
-			{{-0.5f, -0.5f, 0.5f}}, //0
-			{{0.5f, -0.5f, 0.5f}}, //1 
-			{{0.5f, 0.5f, 0.5f}}, //2 
-			{{-0.5f, 0.5f, 0.5f}}, //3 
-			{{-0.5f, -0.5f, -0.5f}}, //4 
-			{{0.5f, -0.5f, -0.5f}}, //5 
-			{{0.5f, 0.5f, -0.5f}}, //6 
-			{{-0.5f, 0.5f, -0.5f}} //7 
-		};
-
-		vertices.assign(cubeVertices.begin(), cubeVertices.end());
-
-		auto& indices = m_Mesh.GetIndices();
-		indices = {
-			//front
-			0, 1, 2,
-			2, 3, 0,
-
-			//right
-			1, 5, 6,
-			6, 2, 1,
-
-			//left
-			0, 3, 7,
-			7, 4, 0,
-
-			//up
-			3, 2, 6,
-			6, 7, 3,
-
-			//down
-			0, 4, 5,
-			5, 1, 0,
-
-			//back 
-			5, 4, 7,
-			7, 6, 5
-		};
+		SetCubeMesh();
 	}
 
 	GameObject(const char* name) : name(name)
@@ -116,5 +75,51 @@ public:
 		}
 
 		m_Mesh.UpdateBuffers();*/
+	}
+
+	void SetCubeMesh()
+	{
+		auto& vertices = m_Mesh.GetVertices();
+		vertices.clear();
+
+		std::vector<Vertex> cubeVertices = {
+			{{-0.5f, -0.5f, 0.5f}}, 
+			{{0.5f, -0.5f, 0.5f}},  
+			{{0.5f, 0.5f, 0.5f}},  
+			{{-0.5f, 0.5f, 0.5f}}, 
+			{{-0.5f, -0.5f, -0.5f}}, 
+			{{0.5f, -0.5f, -0.5f}},  
+			{{0.5f, 0.5f, -0.5f}},
+			{{-0.5f, 0.5f, -0.5f}} 
+		};
+
+		vertices.assign(cubeVertices.begin(), cubeVertices.end());
+
+		auto& indices = m_Mesh.GetIndices();
+		indices = {
+			//front
+			0, 1, 2,
+			2, 3, 0,
+
+			//right
+			1, 5, 6,
+			6, 2, 1,
+
+			//left
+			0, 3, 7,
+			7, 4, 0,
+
+			//up
+			3, 2, 6,
+			6, 7, 3,
+
+			//down
+			0, 4, 5,
+			5, 1, 0,
+
+			//back 
+			5, 4, 7,
+			7, 6, 5
+		};
 	}
 };

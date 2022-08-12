@@ -1,16 +1,30 @@
 #version 460
 
-layout ( local_size_x = 2 ) in;
+layout ( local_size_x = 10 ) in;
 
-layout ( std430, binding = 0 ) buffer Pos {
-	vec3 position[];
+struct Vertex {
+    vec3 pos;
+	float dummyPos;
+	vec3 color;
+	float dummyCol;
+	vec3 normal;
+	float dummyNor;
+	vec2 uv;
+	vec2 dummyUv;
+};
+
+layout(std430) buffer;
+layout ( binding = 0 ) buffer Pos {
+	Vertex vertices[];
 };
 
 void main() 
 {
-	uint idx = uint(mod(gl_LocalInvocationID.x, 2));
+	//uint idx = uint(mod(gl_LocalInvocationID.x, 2));
 
-	position[idx].x += gl_LocalInvocationID.x;
-	position[idx].y += gl_LocalInvocationID.x;
-	position[idx].z += gl_LocalInvocationID.x;
+	uint idx = gl_GlobalInvocationID.x;
+	
+	vertices[idx].pos.x += 0.01;
+	vertices[idx].pos.y += 0.01;
+	//vertices[idx].pos.z += 0.016;
 }

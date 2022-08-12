@@ -24,5 +24,6 @@ public:
 	void Unbind(GLuint vaoID, GLuint bindingPoint) const;
 
 	GLuint GetID() { return m_vboID; }
+	GLsizei GetSize() { return m_vboSize; }
 };
 
