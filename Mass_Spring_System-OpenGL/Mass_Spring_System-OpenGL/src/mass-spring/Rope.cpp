@@ -1,7 +1,8 @@
 #include "Rope.h"
 
 Rope::Rope (GLfloat length, GLint pointsByLength, GLfloat radius) :
-	m_Length (length), m_PointsByLength (pointsByLength), m_Radius (radius)
+	m_Length (length), m_PointsByLength (pointsByLength), m_Radius (radius),
+	GameObject ("Rope")
 {
 	InitializeNodes();
 	InitializeVertices();

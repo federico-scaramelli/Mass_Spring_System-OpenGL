@@ -3,6 +3,7 @@
 #include <random>
 
 #include "Mesh.h"
+#include "Renderer.h"
 #include "Transform.h"
 
 static std::random_device rd;
@@ -15,6 +16,8 @@ protected:
 	Mesh m_Mesh;
 
 public:
+	const char* name;
+
 	void SetDefaultMesh ()
 	{
 		auto& vertices = m_Mesh.GetVertices();
@@ -61,8 +64,9 @@ public:
 		};
 	}
 
-	GameObject()
+	GameObject(const char* name) : name(name)
 	{
+		m_Transform = {name};
 		SetDefaultMesh();
 	}
 
@@ -76,6 +80,22 @@ public:
 		return m_Mesh;
 	}
 
+	virtual void GenerateUI(Renderer& renderer)
+	{
+		//TODO: generate text with GO's name to define its section on the GUI
+
+		m_Transform.GenerateUI (renderer);
+
+		m_Mesh.GetMaterial().GenerateUI (renderer, name);
+	}
+
+	virtual void UpdateWithUI()
+	{
+		m_Transform.UpdateWithUI();
+
+		m_Mesh.GetMaterial().UpdateWithUI();
+	}
+
 	glm::vec3 GetRandomColor()
 	{
 		return {
@@ -87,7 +107,7 @@ public:
 
 	void SetColor(glm::vec3 color)
 	{
-		this->m_Mesh.GetMaterial().m_DiffuseColor = color;
+		/*this->m_Mesh.GetMaterial().m_DiffuseColor = color;
 		this->m_Mesh.GetMaterial().m_AmbientColor = color;
 
 		for (Vertex& v : m_Mesh.GetVertices())
@@ -95,6 +115,6 @@ public:
 			v.color = color;
 		}
 
-		m_Mesh.UpdateBuffers();
+		m_Mesh.UpdateBuffers();*/
 	}
 };

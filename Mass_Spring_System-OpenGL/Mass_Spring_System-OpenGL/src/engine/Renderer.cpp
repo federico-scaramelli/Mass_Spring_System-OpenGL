@@ -46,10 +46,20 @@ void Renderer::Clear() const
 
 void Renderer::AddFloatSliderUI(const char* label, float* data, float min, float max)
 {
-	UISliders.push_back({label, data, min, max});
+	UI_FloatSliders.push_back({label, data, min, max});
 }
 
 void Renderer::DrawFloatSliderUI(const char* label, float* data, float min, float max)
+{
+	ImGui::SliderFloat(label, data, min, max);
+}
+
+void Renderer::AddFloat3SliderUI(const char* label, float* data, float min, float max)
+{
+	UI_Float3Sliders.push_back({label, data, min, max});
+}
+
+void Renderer::DrawFloat3SliderUI(const char* label, float* data, float min, float max)
 {
 	ImGui::SliderFloat3(label, data, min, max);
 }
@@ -89,9 +99,14 @@ void Renderer::DrawUI()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("ImGui Hello World!");
+	ImGui::Begin("Mass Spring!");
 
-	for (UISlider slider : UISliders)
+	for (UISlider slider : UI_Float3Sliders)
+	{
+		DrawFloat3SliderUI(slider.label, slider.data, slider.min, slider.max);
+	}
+
+	for (UISlider slider : UI_FloatSliders)
 	{
 		DrawFloatSliderUI(slider.label, slider.data, slider.min, slider.max);
 	}

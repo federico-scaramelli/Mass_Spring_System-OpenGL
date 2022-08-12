@@ -10,11 +10,16 @@
 #include "glm/glm.hpp"
 
 Scene::Scene (Renderer* renderer) : m_Renderer (renderer)
-{}
+{
+	m_Renderer->AddListBoxUI ("Select object", &selectedObject, sceneObjects, 2);
+}
 
 void Scene::AddCamera (Camera* camera)
 {
 	m_Camera = camera;
+
+	camera->GenerateUI (*m_Renderer);
+	camera->GetTransform().SetPosition ({0, 0, 30});
 }
 
 void Scene::SetProjectionMatrix (GameObject* object)
@@ -29,6 +34,9 @@ void Scene::AddGameObject (GameObject* object)
 	SetProjectionMatrix (object);
 
 	m_GameObjects.push_back (object);
+
+	object->GenerateUI (*m_Renderer);
+	sceneObjects[m_GameObjects.size() - 1] = object->name;
 }
 
 void Scene::AddLightSource (LightSource* light)
@@ -36,12 +44,13 @@ void Scene::AddLightSource (LightSource* light)
 	SetProjectionMatrix (light);
 
 	m_LightSource = light;
+
+	light->GenerateUI (*m_Renderer);
 }
 
 void Scene::UpdateCamera ()
 {
-	m_Camera->GetTransform().SetRotation ({ cameraRotation[0], cameraRotation[1], cameraRotation[2] });
-	m_Camera->GetTransform().SetPosition ({ cameraPosition[0], cameraPosition[1], cameraPosition[2] });
+	m_Camera->UpdateWithUI();
 }
 
 void Scene::TransformLight ()
@@ -49,7 +58,7 @@ void Scene::TransformLight ()
 	glm::mat4 viewMatrix = m_Camera->GetUpdatedViewMatrix();
 	glm::mat4 modelViewMatrix = glm::mat4 (1.f);
 
-	m_LightSource->GetTransform().SetPosition ({ lightPosition[0], lightPosition[1], lightPosition[2] });
+	m_LightSource->UpdateWithUI();
 
 	modelViewMatrix = viewMatrix * m_LightSource->GetTransform().GetUpdatedModelMatrix();
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
@@ -57,28 +66,25 @@ void Scene::TransformLight ()
 		"normalMatrix", glm::inverseTranspose (glm::mat3 (modelViewMatrix)));
 
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightPosition",
-	                                                                       m_LightSource->GetTransform().GetPosition());
+	                                                                          m_LightSource->GetTransform().
+	                                                                          GetPosition());
 
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightAmbient",
-	                                                                       glm::vec3 (lightColor[0], lightColor[1],
-		                                                                       lightColor[2]));
-	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightDiffuse",
-	                                                                       glm::vec3 (lightColor[0], lightColor[1],
-		                                                                       lightColor[2]));
-	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightSpecular",
-	                                                                       glm::vec3 (lightColor[0], lightColor[1],
-		                                                                       lightColor[2]));
+	                                                                          m_LightSource->GetAmbient());
+	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("light",
+	                                                                          m_LightSource->GetIntensity());
 
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matAmbient",
-	                                                                       glm::vec3 (lightColor[0], lightColor[1],
-		                                                                       lightColor[2]));
+	                                                                          m_LightSource->GetMesh().GetMaterial().
+	                                                                          GetAmbient());
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matDiffuse",
-	                                                                       glm::vec3 (lightColor[0], lightColor[1],
-		                                                                       lightColor[2]));
+	                                                                          m_LightSource->GetMesh().GetMaterial().
+	                                                                          GetDiffuse());
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matSpecular",
-	                                                                       glm::vec3 (lightColor[0], lightColor[1],
-		                                                                       lightColor[2]));
-	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<GLfloat> ("matShininess", 2);
+	                                                                          m_LightSource->GetMesh().GetMaterial().
+	                                                                          GetSpecular());
+	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<GLfloat> ("matShininess", 
+																			  m_LightSource->GetMesh().GetMaterial().GetShininess());
 }
 
 void Scene::UpdateLight ()
@@ -122,42 +128,33 @@ void Scene::UpdateGameObject ()
 	glm::mat4 viewMatrix = m_Camera->GetUpdatedViewMatrix();
 	glm::mat4 modelViewMatrix = glm::mat4 (1.f);
 
-	m_currentGameObject->GetTransform().SetPosition ({ objectPosition[0], objectPosition[1], objectPosition[2] });
-	m_currentGameObject->GetTransform().SetRotation ({ objectRotation[0], objectRotation[1], objectRotation[2] });
+	m_currentGameObject->UpdateWithUI();
 
 	// Light parameters loaded in object uniforms
 	if (m_LightSource != nullptr) {
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<
-			glm::mat4> ("modelViewMatrix", modelViewMatrix);
-
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat3> (
-		  "normalMatrix", glm::inverseTranspose (glm::mat3 (modelViewMatrix)));
+		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
 
 		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightPosition",
-			m_LightSource->GetTransform().GetPosition());
+																				  m_LightSource->GetTransform().
+																				  GetPosition());
 
 		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightAmbient",
-			glm::vec3 (lightColor[0], lightColor[1],
-			           lightColor[2]));
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightDiffuse",
-			glm::vec3 (lightColor[0], lightColor[1],
-			           lightColor[2]));
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightSpecular",
-			glm::vec3 (lightColor[0], lightColor[1],
-			           lightColor[2]));
+																				  m_LightSource->GetAmbient());
+		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("light",
+																				  m_LightSource->GetIntensity());
 
 		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matAmbient",
-			glm::vec3 (lightColor[0], lightColor[1],
-			           lightColor[2]));
+																				  m_currentGameObject->GetMesh().GetMaterial().
+																				  GetAmbient());
 		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matDiffuse",
-			glm::vec3 (lightColor[0], lightColor[1],
-			           lightColor[2]));
+																				  m_currentGameObject->GetMesh().GetMaterial().
+																				  GetDiffuse());
 		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matSpecular",
-			glm::vec3 (lightColor[0], lightColor[1],
-			           lightColor[2]));
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<GLfloat> ("matShininess", 2);
+																				  m_currentGameObject->GetMesh().GetMaterial().
+																				  GetSpecular());
+		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<GLfloat> ("matShininess", 
+																				m_currentGameObject->GetMesh().GetMaterial().GetShininess());
 	}
-
 
 	modelViewMatrix = viewMatrix * m_currentGameObject->GetTransform().GetUpdatedModelMatrix();
 	m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);

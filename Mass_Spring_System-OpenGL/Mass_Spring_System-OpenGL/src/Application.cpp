@@ -39,18 +39,6 @@ void init()
 
 void run()
 {
-#pragma region BasicShader Creation
-
-	ShaderProgram basicShader{};
-	basicShader.CompileShader("shader.vert", ShaderType::VERTEX);
-	basicShader.CompileShader("shader.frag", ShaderType::FRAGMENT);
-	basicShader.Link();
-	basicShader.Validate();
-
-	basicShader.Use();
-	basicShader.SetUniform<glm::mat4>("projectionMatrix", camera.GetProjectionMatrix());
-
-#pragma endregion
 
 #pragma region Scene Creation
 	//Camera
@@ -69,14 +57,14 @@ void run()
 	cloth.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	scene.AddGameObject(&cloth);
 
-	 // ROPE
+	// ROPE
 	Rope rope(50, 1000, 1);
 	rope.GetMesh().SetBuffers(vertexBufferLayout);
 	rope.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	scene.AddGameObject(&rope);
 
 	// LIGHT
-	LightSource lightSource{{0.8f, 0.8f, 0.8f}};
+	LightSource lightSource{};
 	lightSource.GetMesh().SetBuffers(vertexBufferLayout);
 	lightSource.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	scene.AddLightSource(&lightSource);
@@ -85,17 +73,6 @@ void run()
 
 #pragma region UI Elements Creation
 
-	renderer.AddFloatSliderUI("Camera Position", scene.cameraPosition, -100.f, 100.f);
-	renderer.AddFloatSliderUI("Camera Rotation", scene.cameraRotation, -180.f, 180.f);
-	
-	renderer.AddFloatSliderUI("Light Position", scene.lightPosition, -100.f, 100.f);
-	renderer.AddFloatSliderUI("Light Color", scene.lightColor, 0.f, 1.f);
-
-	renderer.AddListBoxUI("To render objects", &scene.selectedObject, scene.sceneObjects, 2);
-
-	renderer.AddFloatSliderUI("Object Position", scene.objectPosition, -100.f, 100.f);
-	renderer.AddFloatSliderUI("Object Rotation", scene.objectRotation, -180.f, 180.f);
-	
 	renderer.AddBoolCheckboxUI("Wireframe", &renderer.wireframe);
 	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
 

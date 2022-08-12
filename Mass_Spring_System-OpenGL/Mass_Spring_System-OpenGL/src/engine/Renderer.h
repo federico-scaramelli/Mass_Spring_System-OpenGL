@@ -37,8 +37,10 @@ public:
 
 	void Clear() const;
 
-	void AddFloatSliderUI(const char* label, float* data, float min, float max);
-	void DrawFloatSliderUI(const char* label, float* data, float min, float max);
+	void AddFloatSliderUI (const char* label, float* data, float min, float max);
+	void DrawFloatSliderUI (const char* label, float* data, float min, float max);
+	void AddFloat3SliderUI(const char* label, float* data, float min, float max);
+	void DrawFloat3SliderUI(const char* label, float* data, float min, float max);
 	void DrawBoolCheckboxUI(const char* label, bool* data);
 	void AddBoolCheckboxUI(const char* label, bool* data);
 	void AddIntSliderUI(const char* label, int* data, int min, int max);
@@ -53,7 +55,8 @@ public:
 private:
 	std::vector<UIListBox> UIListBox;
 	std::vector<UISliderInt> UISlidersInt;
-	std::vector<UISlider> UISliders;
+	std::vector<UISlider> UI_Float3Sliders;
+	std::vector<UISlider> UI_FloatSliders;
 	std::vector<UICheckbox> UICheckboxes;
 	
 };

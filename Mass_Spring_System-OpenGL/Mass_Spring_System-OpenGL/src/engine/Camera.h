@@ -5,6 +5,8 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
+#include "Renderer.h"
+
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 1000.f
@@ -32,6 +34,16 @@ public:
 	{
 		UpdateViewMatrix();
 		return m_ViewMatrix;
+	}
+
+	void UpdateWithUI()
+	{
+		m_Transform.UpdateWithUI();
+	}
+
+	void GenerateUI(Renderer& renderer)
+	{
+		m_Transform.GenerateUI(renderer);
 	}
 
 	Transform& GetTransform() { return m_Transform; }

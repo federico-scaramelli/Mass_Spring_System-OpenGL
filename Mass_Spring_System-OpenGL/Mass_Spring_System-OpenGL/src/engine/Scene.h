@@ -13,16 +13,8 @@ class GameObject;
 class Scene {
 public:
 	Scene(Renderer* renderer);
-
-	//UIElements
-	float cameraPosition[3] = {0, 0, 100.f};
-	float cameraRotation[3] = {0, 0, 0};
-	float lightPosition[3] = {-10, -10, 25};
-	float lightColor[3] = {0, 0.4f, 0.6f};
-	float objectPosition[3] = {0, 0, 0};
-	float objectRotation[3] = {0, 0, 0};
-
-	const char* sceneObjects[2]{"Cloth", "Rope"};
+	
+	const char* sceneObjects[10];
 	int selectedObject = 0;
 
 	void AddCamera(Camera* camera);

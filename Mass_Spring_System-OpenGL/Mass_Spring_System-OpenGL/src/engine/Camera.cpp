@@ -5,6 +5,7 @@
 Camera::Camera(GLfloat aspect)
 {
 	SetPerspectiveProjection(FOV, aspect, NEAR_PLANE, FAR_PLANE);
+	m_Transform = {"Camera"};
 }
 
 void Camera::SetPerspectiveProjection(const GLfloat fovy, const GLfloat aspect, const GLfloat near, const GLfloat far)
