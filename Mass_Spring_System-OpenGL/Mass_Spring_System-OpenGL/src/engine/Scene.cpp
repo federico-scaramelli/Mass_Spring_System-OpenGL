@@ -19,7 +19,7 @@ void Scene::AddCamera (Camera* camera)
 	m_Camera = camera;
 
 	camera->GenerateUI (*m_Renderer);
-	camera->GetTransform().SetPosition ({0, 0, 30});
+	camera->GetTransform().SetPosition ({0, 0, 100});
 }
 
 void Scene::SetProjectionMatrix (GameObject* object)

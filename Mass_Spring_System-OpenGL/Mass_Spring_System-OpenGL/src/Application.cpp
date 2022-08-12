@@ -52,7 +52,7 @@ void run()
 	vertexBufferLayout.Push<GLfloat>(2);
 
 	// CLOTH
-	Cloth cloth(50.f, 50.f, 100, 100);
+	Cloth cloth(5.f, 5.f, 10, 10);
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
 	cloth.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	scene.AddGameObject(&cloth);
@@ -78,8 +78,37 @@ void run()
 
 #pragma endregion
 
+
+	ShaderProgram computeShader;
+	computeShader.CompileShader ("shader.comp", ShaderType::COMPUTE);
+	computeShader.Link();
+	computeShader.Validate();
+	computeShader.Use();
+
+	/*GLuint computeBufSize = cloth.GetMesh().GetVertices().size() * sizeof(Vertex);
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, cloth.GetMesh().m_vbo.GetID());
+	glBufferData (GL_SHADER_STORAGE_BUFFER, computeBufSize, &cloth.GetMesh().GetVertices(), GL_DYNAMIC_DRAW);*/
+
+	GLuint computeBufSize = sizeof(Vertex) * 2;
+	Vertex test[] = {{}, {}};
+	GLuint buf;
+	glGenBuffers(1, &buf);
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, buf);
+	glBufferData (GL_SHADER_STORAGE_BUFFER, computeBufSize, test, GL_DYNAMIC_DRAW);
+
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
+		computeShader.Use();
+		glDispatchCompute (2, 1, 1);
+		glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
+
+		glGetNamedBufferSubData(buf, 0, computeBufSize, test);
+
+		for (Vertex i : test) {
+			std::cout << "(" << i.position.x << ", " << i.position.y << ", " << i.position.z << ");   ";
+		}
+		std::cout << std::endl;
+
 		renderer.Clear();
 
 		scene.Update();

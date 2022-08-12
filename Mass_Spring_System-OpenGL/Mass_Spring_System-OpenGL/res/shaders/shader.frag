@@ -16,6 +16,12 @@ out vec4 fragColor;
 
 vec3 blinnPhong ( vec3 position, vec3 normal ) 
 {
+	vec3 cameraDir = normalize(-position.xyz);
+	float cameraDir_dot_normal = dot ( cameraDir, normal);
+	if ( cameraDir_dot_normal < 0 ) {
+		normal = -normal;
+	}
+
 	vec3 diffuseReflectivity = vec3 ( 1.0, 1.0, 1.0);
 	
 	vec3 ambient = lightAmbient * matAmbient;
@@ -28,7 +34,6 @@ vec3 blinnPhong ( vec3 position, vec3 normal )
 	vec3 specular = vec3(0.0);
 
 	if ( sourceDir_dot_normal > 0.0 ) {
-		vec3 cameraDir = normalize(-position.xyz);
 		vec3 halfway = normalize( cameraDir + lightSourceDir );
 		specular = matSpecular * pow( max( dot(halfway, normal), 0.0), matShininess);
 	}

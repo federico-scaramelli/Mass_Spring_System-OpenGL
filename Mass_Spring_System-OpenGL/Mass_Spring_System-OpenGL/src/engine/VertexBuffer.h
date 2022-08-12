@@ -22,5 +22,7 @@ public:
 
 	void BindToVao(GLuint vaoID, GLuint bindingPoint, GLsizei stride) const; 
 	void Unbind(GLuint vaoID, GLuint bindingPoint) const;
+
+	GLuint GetID() { return m_vboID; }
 };
 
