@@ -22,18 +22,52 @@ void Scene::AddCamera (Camera* camera)
 	camera->GetTransform().SetPosition ({0, 0, 100});
 }
 
-void Scene::SetProjectionMatrix (GameObject* object)
+void Scene::SetShaderUniforms (GameObject* object)
 {
-	object->GetMesh().GetMaterial().GetShader().Use();
-	object->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat4>
+	object->GetShader().Use();
+	object->GetShader().SetUniform<glm::mat4>
 		("projectionMatrix", m_Camera->GetProjectionMatrix());
+}
+
+void Scene::SetComputeShaderUniforms (GameObject* object)
+{
+	object->GetComputeShader().Use();
+
+	object->GetComputeShader().SetUniform<GLfloat>
+		("deltaTime", m_Parameters.deltaTime);
+
+	// object->GetComputeShader().SetUniform<GLfloat>
+	// 	("elasticStiffness", m_Parameters.stiffness);
+
+	// object->GetComputeShader().SetUniform<GLfloat>
+	// 	("restLenHorizontal", m_Parameters.restLengthHorizontal);
+	//
+	// object->GetComputeShader().SetUniform<GLfloat>
+	// 	("restLenVertical", m_Parameters.restLengthVertical);
+	//
+	// object->GetComputeShader().SetUniform<GLfloat>
+	// 	("restLenDiagonal", m_Parameters.restLengthDiagonal);
+	//
+	// object->GetComputeShader().SetUniform<GLfloat>
+	// 	("useGravity", m_Parameters.useGravity);
+	//
+	// object->GetComputeShader().SetUniform<GLfloat>
+	// 	("particleMass", m_Parameters.particleMass);
+	
+	object->GetComputeShader().SetUniform<glm::vec4>
+		("gravityAcceleration", m_Parameters.gravity);
 }
 
 void Scene::AddGameObject (GameObject* object)
 {
 	m_GameObjects.push_back (object);
 
-	SetProjectionMatrix (object);
+	SetShaderUniforms (object);
+
+	if(object->GetComputeShader().GetID() != 0)
+	{
+		SetComputeShaderUniforms(object);
+	}
 	
 	object->GenerateUI (*m_Renderer);
 	sceneObjects[m_GameObjects.size() - 1] = object->name;
@@ -41,7 +75,7 @@ void Scene::AddGameObject (GameObject* object)
 
 void Scene::AddLightSource (LightSource* light)
 {
-	SetProjectionMatrix (light);
+	SetShaderUniforms (light);
 
 	m_LightSource = light;
 
@@ -123,6 +157,7 @@ void Scene::UpdateGameObjects ()
 		m_currentGameObject->GetComputeShader().Use();
 		m_currentGameObject->GetComputeShader().Compute();
 		m_currentGameObject->GetComputeShader().Wait();
+	    m_currentGameObject->GetMesh().SwapComputeBuffers();
 	}
 	
 	m_currentGameObject->GetShader().Use();

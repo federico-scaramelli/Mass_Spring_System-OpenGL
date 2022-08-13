@@ -3,55 +3,135 @@
 layout ( local_size_x = 10, local_size_y = 1, local_size_z = 1 ) in;
 
 struct Vertex {
-    vec3 pos;
-	float dummyPos;
-	vec3 color;
-	float dummyCol;
-	vec3 normal;
-	float dummyNor;
+    vec4 pos;
+	vec4 vel;
+	vec4 color;
+	vec4 normal;
 	vec2 uv;
-	vec2 dummyUv;
+	float pinned;
+	float dummy;
 };
 
 layout(std430) buffer;
-layout ( binding = 0 ) buffer VertexBuffer {
-	Vertex vertices[];
+layout ( binding = 0 ) buffer VertexBufferIn {
+	Vertex verticesIn[];
 };
-layout ( binding = 1 ) buffer VertexBufferAlternate {
-	Vertex verticesAlternate[];
+layout ( binding = 1 ) buffer VertexBufferOut {
+	Vertex verticesOut[];
 };
+
+uniform float elasticStiffness;
+uniform float deltaTime;
+uniform float restLenHorizontal;
+uniform float restLenVertical;
+uniform float restLenDiagonal;
+uniform float useGravity;
+uniform float particleMass;
+uniform float damping;
+uniform vec4 gravityAcceleration;
 
 //A should be the particle, B the neighbour
-vec3 elasticForce ( vec3 positionA, vec3 positionB ) 
+vec3 elasticForce ( vec3 positionA, vec3 positionB, float restLength ) 
 {
-	float stiffness = 1000.0;
-	float restLength = 10.0;
-
 	vec3 AtoBVector = positionB - positionA;
 	vec3 AtoBDirection = normalize(AtoBVector);
 	float AtoBDistance = length(AtoBVector);
 
-	vec3 force = stiffness * (AtoBDistance - restLength) * AtoBDirection;
+	vec3 force = elasticStiffness * (AtoBDistance - restLength) * AtoBDirection;
 
 	return force;
 }
 
-void eulerIntegrator ( int idx, vec3 totalForce ) {
-	float deltaTime = 0.016;
-	float mass=1.0;
+void eulerIntegrator ( int idx, vec3 totalForce, vec3 velocity, vec3 position ) {
+	vec3 acceleration = totalForce / particleMass;
+	
+	verticesOut[idx].pos = vec4(position + (velocity * deltaTime) + (0.5 * acceleration * deltaTime * deltaTime), 1.0);
 
-	vec3 accel=totalForce/mass;
-	//PositionOut[idx] = vec4(p + v * DeltaT + 0.5 * a * DeltaT * DeltaT, 1.0);
-	//VelocityOut[idx] = vec4( v + a * DeltaT, 0.0);
+	verticesOut[idx].vel = vec4( velocity + (acceleration * deltaTime), 0.0);
 }
 
 void main() 
 {
-	//uint idx = uint(mod(gl_LocalInvocationID.x, 2));
-
-	uint idx = gl_GlobalInvocationID.x;
+	uvec3 nParticles = gl_NumWorkGroups * gl_WorkGroupSize;
+	uint idx = (gl_GlobalInvocationID.y * nParticles.x) + gl_GlobalInvocationID.x;
+	//uint idx = gl_GlobalInvocationID.x;
 	
-	vertices[idx].pos.x += 0.016;
-	vertices[idx].pos.y += 0.016;
-	//vertices[idx].pos.z += 0.016;
+	vec3 gravityForce = gravityAcceleration.xyz * particleMass;
+	vec3 totalForce=vec3(0,0,0);
+	
+	totalForce += gravityForce;
+	
+	vec3 velocity=verticesIn[idx].vel.xyz;
+	vec3 position=verticesIn[idx].pos.xyz;
+	
+	/*
+	// Particle above
+	if( gl_GlobalInvocationID.y < nParticles.y - 1 ) {
+		r = PositionIn[idx + nParticles.x].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthVert);
+	} 
+	// Below
+	if( gl_GlobalInvocationID.y > 0 ) {
+		r = PositionIn[idx - nParticles.x].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthVert);
+	} 
+	// Left
+	if( gl_GlobalInvocationID.x > 0 ) {
+		r = PositionIn[idx-1].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthHoriz);
+	} 
+	// Right
+	if( gl_GlobalInvocationID.x < nParticles.x - 1 ) {
+		r = PositionIn[idx + 1].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthHoriz);
+	}
+
+	// Diagonals
+	// Upper-left
+	if( gl_GlobalInvocationID.x > 0 && gl_GlobalInvocationID.y < nParticles.y - 1 ) {
+		r = PositionIn[idx + nParticles.x - 1].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthDiag);
+	}
+	// Upper-right
+	if( gl_GlobalInvocationID.x < nParticles.x - 1 && gl_GlobalInvocationID.y < nParticles.y - 1) {
+		r = PositionIn[idx + nParticles.x + 1].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthDiag);
+	}
+	// lower -left
+	if( gl_GlobalInvocationID.x > 0 && gl_GlobalInvocationID.y > 0 ) {
+		r = PositionIn[idx - nParticles.x - 1].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthDiag);
+	}
+	// lower-right
+	if( gl_GlobalInvocationID.x < nParticles.x - 1 && gl_GlobalInvocationID.y > 0 ) {
+		r = PositionIn[idx - nParticles.x + 1].xyz - p;
+		force += normalize(r) * SpringK * (length(r) - RestLengthDiag);
+	}
+
+	force += -DampingConst * v;
+
+	// Apply simple Euler integrator
+	vec3 a = force * ParticleInvMass;
+	PositionOut[idx] = vec4(
+		p + v * DeltaT + 0.5 * a * DeltaT * DeltaT, 1.0);
+	VelocityOut[idx] = vec4( v + a * DeltaT, 0.0);
+
+	// Pin a few of the top verts
+	if( gl_GlobalInvocationID.y == nParticles.y - 1 && 
+		(gl_GlobalInvocationID.x == 0 || 
+		gl_GlobalInvocationID.x == nParticles.x / 4 ||
+		gl_GlobalInvocationID.x == nParticles.x * 2 / 4 ||
+		gl_GlobalInvocationID.x == nParticles.x * 3 / 4 ||
+		gl_GlobalInvocationID.x == nParticles.x - 1)) {
+	PositionOut[idx] = vec4(p,1.0);
+	VelocityOut[idx] = vec4(0,0,0,0);
+	}
+
+	*/
+
+
+
+
+	verticesIn[idx].pos.x += deltaTime;
+	verticesIn[idx].pos.y += gravityAcceleration.y * deltaTime;
 }

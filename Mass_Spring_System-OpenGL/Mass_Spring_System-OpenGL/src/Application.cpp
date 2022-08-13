@@ -25,15 +25,6 @@
 
 #pragma endregion
 
-//Will be used as uniform
-struct ApplicationParameters {
-	GLfloat deltaTime = 0.016f;
-	GLfloat stiffness = 1000.f;
-	GLfloat restLength = 1.f;
-	GLfloat useGravity = 1;
-	glm::vec4 gravity {0.f,-9.81f,0.f, 0.f};
-};
-
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
@@ -55,15 +46,18 @@ void run()
 
 	//Layout
 	VertexBufferLayout vertexBufferLayout;
-	vertexBufferLayout.Push<GLfloat>(4);
-	vertexBufferLayout.Push<GLfloat>(4);
-	vertexBufferLayout.Push<GLfloat>(4);
-	vertexBufferLayout.Push<GLfloat>(4);
+	vertexBufferLayout.Push<GLfloat>(4); //pos
+	vertexBufferLayout.Push<GLfloat>(4); //vel
+	vertexBufferLayout.Push<GLfloat>(4); //color
+	vertexBufferLayout.Push<GLfloat>(4); //norm
+	vertexBufferLayout.Push<GLfloat>(2); //uv
+	vertexBufferLayout.Push<GLfloat>(1); //pinned
+	vertexBufferLayout.Push<GLfloat>(1); //dummy
 
 	// CLOTH
 	Cloth cloth(5.f, 5.f, 10, 10);
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
-	cloth.GetMesh().SetComputeBuffers(0);
+	cloth.GetMesh().SetComputeBuffers();
 	cloth.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	cloth.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
 	cloth.GetComputeShader().SetWorkGroupNumberFromVertexNumber(cloth.GetMesh().GetVertices().size());

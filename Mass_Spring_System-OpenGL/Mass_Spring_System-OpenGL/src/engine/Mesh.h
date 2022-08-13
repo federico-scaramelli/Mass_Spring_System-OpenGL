@@ -25,6 +25,10 @@ public:
 	IndexBuffer m_indexBuffer;
 	VertexArray m_vao;
 
+	//State of compute buffer/secondary buffer: if 0 normal, if 1 inverted
+	GLuint readBuf=0;
+	GLuint m_SecondaryVertexBuffer;
+
 	std::vector<Vertex>& GetVertices() { return m_Vertices; }
 	std::vector<GLuint>& GetIndices() { return m_Indices; }
 
@@ -48,11 +52,33 @@ public:
 		m_indexBuffer.SetData (m_Indices.data(), indicesSize);
 	}
 
-	void SetComputeBuffers(int bindingIndex)
+	void SetComputeBuffers()
 	{
 		//Compute Buffers
-		glBindBufferBase (GL_SHADER_STORAGE_BUFFER, bindingIndex, m_vbo.GetID());
+
+		//In
+		glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_vbo.GetID());
 		glBufferData (GL_SHADER_STORAGE_BUFFER, m_vbo.GetSize(), m_Vertices.data(), GL_DYNAMIC_DRAW);
+
+		//Out
+		glGenBuffers(1, &m_SecondaryVertexBuffer);
+		glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_SecondaryVertexBuffer);
+		glBufferData (GL_SHADER_STORAGE_BUFFER, m_vbo.GetSize(), NULL, GL_DYNAMIC_DRAW);
+	}
+
+	void SwapComputeBuffers()
+	{
+	    readBuf = 1 - readBuf;
+
+		if(readBuf==1)
+		{
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_SecondaryVertexBuffer);
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_vbo.GetID());
+		}else
+		{
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_vbo.GetID());
+			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_SecondaryVertexBuffer);
+		}
 	}
 
 	void UpdateBuffers()

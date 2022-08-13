@@ -169,6 +169,13 @@ void ShaderProgram::SetUniform<glm::vec3>(const char* name, glm::vec3 val)
 }
 
 template<>
+void ShaderProgram::SetUniform<glm::vec4>(const char* name, glm::vec4 val)
+{
+	GLint loc = GetUniformLocation(name);
+	glUniform4f(loc, val.x, val.y, val.z, val.w);	
+}
+
+template<>
 void ShaderProgram::SetUniform<glm::mat4>(const char* name, glm::mat4 val)
 {
 	GLint loc = GetUniformLocation(name);

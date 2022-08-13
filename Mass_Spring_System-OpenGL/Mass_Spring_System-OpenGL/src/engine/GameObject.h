@@ -84,14 +84,14 @@ public:
 		vertices.clear();
 
 		std::vector<Vertex> cubeVertices = {
-			{{-0.5f, -0.5f, 0.5f}}, 
-			{{0.5f, -0.5f, 0.5f}},  
-			{{0.5f, 0.5f, 0.5f}},  
-			{{-0.5f, 0.5f, 0.5f}}, 
-			{{-0.5f, -0.5f, -0.5f}}, 
-			{{0.5f, -0.5f, -0.5f}},  
-			{{0.5f, 0.5f, -0.5f}},
-			{{-0.5f, 0.5f, -0.5f}} 
+			{{-0.5f, -0.5f, 0.5f, 0.f}}, 
+			{{0.5f, -0.5f, 0.5f, 0.f}},  
+			{{0.5f, 0.5f, 0.5f, 0.f}},  
+			{{-0.5f, 0.5f, 0.5f, 0.f}}, 
+			{{-0.5f, -0.5f, -0.5f, 0.f}}, 
+			{{0.5f, -0.5f, -0.5f, 0.f}},  
+			{{0.5f, 0.5f, -0.5f, 0.f}},
+			{{-0.5f, 0.5f, -0.5f, 0.f}} 
 		};
 
 		vertices.assign(cubeVertices.begin(), cubeVertices.end());
@@ -157,13 +157,13 @@ public:
 		        x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
 		        y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
 
-				vertex.position={x,y,z};
+				vertex.position={x,y,z, 0};
 				
 		        nx = x * lengthInv;
 		        ny = y * lengthInv;
 		        nz = z * lengthInv;
 
-				vertex.normal={nx,ny,nz};
+				vertex.normal={nx,ny,nz, 0};
 
 				vertices.push_back(vertex);
 		    }

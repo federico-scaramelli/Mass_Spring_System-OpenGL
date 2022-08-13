@@ -5,15 +5,17 @@
 
 struct Vertex
 {
-	glm::vec3 position {0,0,0};
-	GLfloat dummyPosition;
+	glm::vec4 position {0,0,0,0};
 
-	glm::vec3 color {1.f, 0.f, 0.f};
-	GLfloat dummyColor;
+	glm::vec4 velocity {0,0,0,0};
 
-	glm::vec3 normal {0.f, 0.f, 1.f};
-	GLfloat dummyNormal;
+	glm::vec4 color {1.f, 0.f, 0.f, 0.f};
+
+	glm::vec4 normal {0.f, 0.f, 1.f, 1.f};
 
 	glm::vec2 uv {0.f};
-	glm::vec2 dummyUV;
+
+	GLfloat pinned = 0;
+
+	GLfloat dummy;
 };

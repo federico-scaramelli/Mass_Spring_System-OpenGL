@@ -20,24 +20,24 @@ void Cloth::InitializeVertices ()
 
 	float spacingWidth = m_Width / m_PointsByWidth;
 	float spacingHeight = m_Height / m_PointsByHeight;
-
-	//Riga
-	for (auto x = 0; x < m_PointsByHeight; x++) {
-		//Colonna
-		for (auto y = 0; y < m_PointsByWidth; y++) {
+	
+	for (auto row = 0; row < m_PointsByHeight; row++) {
+		for (auto column = 0; column < m_PointsByWidth; column++) {
 			glm::vec3 initialPosition {
-				y * spacingWidth,
-				x * spacingHeight,
+				column * spacingWidth,
+				row * spacingHeight,
 				0
 			};
 
-			Vertex vertex {initialPosition};
-			//vertex.color = GetRandomColor();
-			// vertex.color = color;
+			Vertex vertex {{initialPosition.x, initialPosition.y, initialPosition.z, 0}};
 
 			vertices.push_back (vertex);
 		}
 	}
+
+	//Pin top-left and top-right vertices
+	vertices[0].pinned=1;
+	vertices[m_PointsByWidth].pinned=1;
 }
 
 void Cloth::InitializeIndices ()
