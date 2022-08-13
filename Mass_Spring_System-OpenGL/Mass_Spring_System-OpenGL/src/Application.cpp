@@ -25,6 +25,15 @@
 
 #pragma endregion
 
+//Will be used as uniform
+struct ApplicationParameters {
+	GLfloat deltaTime = 0.016f;
+	GLfloat stiffness = 1000.f;
+	GLfloat restLength = 1.f;
+	GLfloat useGravity = 1;
+	glm::vec4 gravity {0.f,-9.81f,0.f, 0.f};
+};
+
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
@@ -57,8 +66,7 @@ void run()
 	cloth.GetMesh().SetComputeBuffers(0);
 	cloth.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	cloth.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
-	cloth.GetComputeShader().SetWorkGroupNumber(10);
-	cloth.GetComputeShader().SetWorkGroupSizeXFromTotalInvocation(cloth.GetMesh().GetVertices().size());
+	cloth.GetComputeShader().SetWorkGroupNumberFromVertexNumber(cloth.GetMesh().GetVertices().size());
 
 	scene.AddGameObject(&cloth);
 
