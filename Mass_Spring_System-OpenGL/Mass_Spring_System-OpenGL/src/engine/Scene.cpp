@@ -31,10 +31,10 @@ void Scene::SetProjectionMatrix (GameObject* object)
 
 void Scene::AddGameObject (GameObject* object)
 {
-	SetProjectionMatrix (object);
-
 	m_GameObjects.push_back (object);
 
+	SetProjectionMatrix (object);
+	
 	object->GenerateUI (*m_Renderer);
 	sceneObjects[m_GameObjects.size() - 1] = object->name;
 }
@@ -106,8 +106,7 @@ void Scene::Update ()
 	if (m_LightSource != nullptr) {
 		UpdateLight();
 	}
-
-
+	
 	if (!m_GameObjects.empty() && !(selectedObject > m_GameObjects.size())) {
 		UpdateGameObjects();
 	}
@@ -117,9 +116,18 @@ void Scene::UpdateGameObjects ()
 {
 	// TODO: loop on game objects list to update all the active ones
 	m_currentGameObject = m_GameObjects[selectedObject];
-	m_currentGameObject->GetMesh().GetMaterial().GetShader().Use();
 
+	//Update compute shader of game object
+	if(m_currentGameObject->GetComputeShader().GetID() != 0)
+	{
+		m_currentGameObject->GetComputeShader().Use();
+		m_currentGameObject->GetComputeShader().Compute();
+		m_currentGameObject->GetComputeShader().Wait();
+	}
+	
+	m_currentGameObject->GetShader().Use();
 	UpdateGameObject();
+
 	DrawGameObject();
 }
 
@@ -132,33 +140,33 @@ void Scene::UpdateGameObject ()
 
 	// Light parameters loaded in object uniforms
 	if (m_LightSource != nullptr) {
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
+		m_currentGameObject->GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
 
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightPosition",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3> ("lightPosition",
 																				  m_LightSource->GetTransform().
 																				  GetPosition());
 
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("lightAmbient",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3> ("lightAmbient",
 																				  m_LightSource->GetAmbient());
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("light",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3> ("light",
 																				  m_LightSource->GetIntensity());
 
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matAmbient",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3> ("matAmbient",
 																				  m_currentGameObject->GetMesh().GetMaterial().
 																				  GetAmbient());
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matDiffuse",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3> ("matDiffuse",
 																				  m_currentGameObject->GetMesh().GetMaterial().
 																				  GetDiffuse());
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3> ("matSpecular",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3> ("matSpecular",
 																				  m_currentGameObject->GetMesh().GetMaterial().
 																				  GetSpecular());
-		m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<GLfloat> ("matShininess", 
+		m_currentGameObject->GetShader().SetUniform<GLfloat> ("matShininess", 
 																				m_currentGameObject->GetMesh().GetMaterial().GetShininess());
 	}
 
 	modelViewMatrix = viewMatrix * m_currentGameObject->GetTransform().GetUpdatedModelMatrix();
-	m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
-	m_currentGameObject->GetMesh().GetMaterial().GetShader().SetUniform<glm::mat3> ("normalMatrix",
+	m_currentGameObject->GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
+	m_currentGameObject->GetShader().SetUniform<glm::mat3> ("normalMatrix",
 		glm::inverseTranspose (glm::mat3 (modelViewMatrix)));
 }
 
@@ -166,5 +174,5 @@ void Scene::DrawGameObject ()
 {
 	m_Renderer->Draw (m_currentGameObject->GetMesh().m_vao,
 	                  m_currentGameObject->GetMesh().m_indexBuffer,
-	                  m_currentGameObject->GetMesh().GetMaterial().GetShader());
+	                  m_currentGameObject->GetShader());
 }

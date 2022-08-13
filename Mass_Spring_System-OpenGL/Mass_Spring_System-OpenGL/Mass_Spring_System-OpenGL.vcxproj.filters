@@ -87,6 +87,9 @@
     <ClCompile Include="src\engine\Material.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\ShaderProgramCompute.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -1044,6 +1047,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Material.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\ShaderProgramCompute.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

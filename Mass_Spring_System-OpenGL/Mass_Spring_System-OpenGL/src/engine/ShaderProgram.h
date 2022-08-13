@@ -29,7 +29,7 @@ public:
 };
 
 class ShaderProgram {
-private:
+protected:
 	GLint ID;
 	GLboolean linked;
 	std::unordered_map<std::string, GLint> uniformLocations;

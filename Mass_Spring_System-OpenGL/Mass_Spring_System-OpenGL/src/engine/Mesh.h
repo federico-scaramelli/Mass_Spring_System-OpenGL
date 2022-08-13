@@ -38,13 +38,21 @@ public:
 
 	void SetBuffers(const VertexBufferLayout& layout)
 	{
+		//Vertex buffer
 		GLsizei verticesSize = m_Vertices.size() * sizeof(Vertex);
 		m_vbo.SetData (m_Vertices.data(), verticesSize);
-		
+		m_vao.AddVertexBuffer(m_vbo, layout);
+
+		//Index buffer
 		GLuint indicesSize = m_Indices.size() * sizeof(GLuint);
 		m_indexBuffer.SetData (m_Indices.data(), indicesSize);
+	}
 
-		m_vao.AddVertexBuffer(m_vbo, layout);
+	void SetComputeBuffers(int bindingIndex)
+	{
+		//Compute Buffers
+		glBindBufferBase (GL_SHADER_STORAGE_BUFFER, bindingIndex, m_vbo.GetID());
+		glBufferData (GL_SHADER_STORAGE_BUFFER, m_vbo.GetSize(), m_Vertices.data(), GL_DYNAMIC_DRAW);
 	}
 
 	void UpdateBuffers()

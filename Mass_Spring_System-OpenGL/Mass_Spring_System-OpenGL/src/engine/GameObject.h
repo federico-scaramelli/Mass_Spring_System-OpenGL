@@ -199,4 +199,19 @@ public:
 		    }
 		}
 	}
+
+	ShaderProgram& GetShader()
+	{
+		return m_Mesh.GetMaterial().GetShader();
+	}
+
+	ShaderProgramCompute& GetComputeShader()
+	{
+		return m_Mesh.GetMaterial().GetComputeShader();
+	}
+
+	Material& GetMaterial ()
+	{
+		return m_Mesh.GetMaterial();
+	}
 };

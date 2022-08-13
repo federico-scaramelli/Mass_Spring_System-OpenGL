@@ -54,13 +54,23 @@ void run()
 	// CLOTH
 	Cloth cloth(5.f, 5.f, 10, 10);
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
-	cloth.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	cloth.GetMesh().SetComputeBuffers(0);
+	cloth.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	cloth.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
+	cloth.GetComputeShader().SetWorkGroupNumber(10);
+	cloth.GetComputeShader().SetWorkGroupSizeXFromTotalInvocation(cloth.GetMesh().GetVertices().size());
+
 	scene.AddGameObject(&cloth);
 
 	// ROPE
-	Rope rope(50, 1000, 1);
+	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
+	Rope rope(50, 10, 1);
 	rope.GetMesh().SetBuffers(vertexBufferLayout);
-	rope.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	// rope.GetMesh().SetComputeBuffers(1);
+	rope.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	// rope.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
+	// rope.GetComputeShader().SetWorkGroupNumber(10);
+	// rope.GetComputeShader().SetWorkGroupSizeXFromTotalInvocation(rope.GetMesh().GetVertices().size());
 	scene.AddGameObject(&rope);
 
 	// LIGHT
@@ -77,62 +87,11 @@ void run()
 	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
 
 #pragma endregion
-
-
-	ShaderProgram computeShader;
-	computeShader.CompileShader ("shader.comp", ShaderType::COMPUTE);
-	computeShader.Link();
-	computeShader.Validate();
-	computeShader.Use();
-
 	
-	
-	
-	// std::vector<Vertex> test = {
-	// 	{{0,0,0}},
-	// 	{{0,0,0}},
-	// 	{{0,0,0}}
-	// 	};
-	// GLuint computeBufSize = sizeof(Vertex) * test.size();
-	
-	// GLuint buf;
-	// glGenBuffers(1, &buf);
-	// glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, buf);
-	// glBufferData (GL_SHADER_STORAGE_BUFFER, computeBufSize, test.data(), GL_STATIC_DRAW);
-
-
-	auto vertexCount=cloth.GetMesh().GetVertices().size();
-
-	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, cloth.GetMesh().m_vbo.GetID());
-	glBufferData (GL_SHADER_STORAGE_BUFFER, cloth.GetMesh().m_vbo.GetSize(), cloth.GetMesh().GetVertices().data(), GL_DYNAMIC_DRAW);
-
-
-
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
-		computeShader.Use();
-
-		
-		//start compute
-		int workGroupsNumber=10;
-		int workSize=vertexCount/workGroupsNumber;
-		glDispatchCompute (workSize, 1, 1); //Work group size x y z (abbiamo 1 work group, da 3 thread ciascuno, specificati nello shader)
-
-		//wait the compute end
-		glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
-
-		// glGetNamedBufferSubData(cloth.GetMesh().m_vbo.GetID(), 0, cloth.GetMesh().m_vbo.GetSize(), test.data());
-
-		// glGetNamedBufferSubData(buf, 0, computeBufSize, test.data());
-		//
-		// for (auto i : test) {
-		// 	std::cout << "(" << i.position.x << ", " << i.position.y << ", " << i.position.z << ") ";
-		// }
-
-		std::cout << std::endl;
-
 		renderer.Clear();
-
+		
 		scene.Update();
 		
 		renderer.DrawUI();
