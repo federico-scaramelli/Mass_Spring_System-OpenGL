@@ -28,7 +28,6 @@
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
-Camera camera(window.GetAspectRatio());
 Scene scene{&renderer};
 
 void init()
@@ -42,25 +41,29 @@ void run()
 
 #pragma region Scene Creation
 	//Camera
+	Camera camera(window.GetAspectRatio());
 	scene.AddCamera(&camera);
 
 	//Layout
 	VertexBufferLayout vertexBufferLayout;
-	vertexBufferLayout.Push<GLfloat>(4); //pos
-	vertexBufferLayout.Push<GLfloat>(4); //vel
-	vertexBufferLayout.Push<GLfloat>(4); //color
-	vertexBufferLayout.Push<GLfloat>(4); //norm
-	vertexBufferLayout.Push<GLfloat>(2); //uv
-	vertexBufferLayout.Push<GLfloat>(1); //pinned
-	vertexBufferLayout.Push<GLfloat>(1); //dummy
+	vertexBufferLayout.Push<GLfloat>(4); //0
+	vertexBufferLayout.Push<GLfloat>(4); //1
+	vertexBufferLayout.Push<GLfloat>(4); //2
+	vertexBufferLayout.Push<GLfloat>(4); //3
+	vertexBufferLayout.Push<GLfloat>(4); //4
 
 	// CLOTH
 	Cloth cloth(5.f, 5.f, 10, 10);
-	cloth.GetMesh().SetBuffers(vertexBufferLayout);
-	cloth.GetMesh().SetComputeBuffers();
 	cloth.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
 	cloth.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
+
+	cloth.GetComputeShader().SetWorkGroupSize({10,1,1});
 	cloth.GetComputeShader().SetWorkGroupNumberFromVertexNumber(cloth.GetMesh().GetVertices().size());
+
+	cloth.GetMesh().SetBuffers(vertexBufferLayout);
+	cloth.GetMesh().SetComputeBuffers();
+
+	
 
 	scene.AddGameObject(&cloth);
 
@@ -68,11 +71,7 @@ void run()
 	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
 	Rope rope(50, 10, 1);
 	rope.GetMesh().SetBuffers(vertexBufferLayout);
-	// rope.GetMesh().SetComputeBuffers(1);
 	rope.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
-	// rope.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
-	// rope.GetComputeShader().SetWorkGroupNumber(10);
-	// rope.GetComputeShader().SetWorkGroupSizeXFromTotalInvocation(rope.GetMesh().GetVertices().size());
 	scene.AddGameObject(&rope);
 
 	// LIGHT

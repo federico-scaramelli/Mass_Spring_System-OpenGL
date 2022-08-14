@@ -655,6 +655,7 @@
     <None Include="libraries\include\glm\gtx\vector_angle.inl" />
     <None Include="libraries\include\glm\gtx\vector_query.inl" />
     <None Include="libraries\include\glm\gtx\wrap.inl" />
+    <None Include="res\shaders\clothShader.comp" />
     <None Include="res\shaders\shader.comp" />
     <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\shader.vert" />

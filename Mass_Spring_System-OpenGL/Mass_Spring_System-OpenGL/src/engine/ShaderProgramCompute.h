@@ -5,13 +5,13 @@
 
 class ShaderProgramCompute : public ShaderProgram {
 private:
-	int workGroupNumber = 1;
-	glm::ivec3 workGroupSizes{10,1,1};//Fixed in comp shader
+	int numWorkGroups = 1;
+	glm::ivec3 workGroupSize{10, 1, 1}; //Fixed in comp shader
 
 public:
 	void Compute()
 	{
-		glDispatchCompute(workGroupSizes.x, workGroupSizes.y, workGroupSizes.z);
+		glDispatchCompute(workGroupSize.x, workGroupSize.y, workGroupSize.z);
 	}
 
 	void Wait()
@@ -19,15 +19,15 @@ public:
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 	}
 
-	void SetWorkGroupSizes(glm::vec3 sizes)
+	void SetWorkGroupSize(glm::vec3 size)
 	{
-		workGroupSizes = sizes;
+		workGroupSize = size;
 	}
 
 	void SetWorkGroupNumberFromVertexNumber(int vertexNumber)
 	{
-		int totalInvocations=workGroupSizes.x * workGroupSizes.y * workGroupSizes.z;
-		workGroupNumber = vertexNumber / totalInvocations;
+		int totalInvocationsPerGroup = workGroupSize.x * workGroupSize.y * workGroupSize.z;
+		numWorkGroups = vertexNumber / totalInvocationsPerGroup;
 	}
-	
+
 };

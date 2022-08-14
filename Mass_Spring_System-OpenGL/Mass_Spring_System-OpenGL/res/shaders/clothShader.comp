@@ -1,0 +1,117 @@
+#version 460
+
+layout ( local_size_x = 10, local_size_y = 10, local_size_z = 1 ) in;
+
+struct Vertex {
+    vec4 pos;
+	vec4 vel;
+	vec4 color;
+	vec4 normal;
+	vec2 uv;
+	float pinned;
+	float dummy;
+};
+
+layout(std430) buffer;
+layout ( binding = 0 ) buffer VertexBufferIn {
+	Vertex verticesIn[];
+};
+layout ( binding = 1 ) buffer VertexBufferOut {
+	Vertex verticesOut[];
+};
+
+uniform float elasticStiffness;
+uniform float deltaTime;
+uniform float restLenHorizontal;
+uniform float restLenVertical;
+uniform float restLenDiagonal;
+uniform float useGravity;
+uniform float particleMass;
+uniform float damping;
+uniform vec4 gravityAcceleration;
+
+//A should be the particle, B the neighbour
+vec3 elasticForce ( vec3 positionA, vec3 positionB, float restLength ) 
+{
+	vec3 AtoBVector = positionB - positionA;
+	vec3 AtoBDirection = normalize(AtoBVector);
+	float AtoBDistance = length(AtoBVector);
+
+	vec3 force = elasticStiffness * (AtoBDistance - restLength) * AtoBDirection;
+
+	return force;
+}
+
+void eulerIntegrator ( uint idx, vec3 totalForce, vec3 velocity, vec3 position ) {
+	vec3 acceleration = totalForce / particleMass;
+	
+	verticesOut[idx].pos = vec4(position + (velocity * deltaTime) + (0.5 * acceleration * deltaTime * deltaTime), 1.0);
+
+	verticesOut[idx].vel = vec4( velocity + (acceleration * deltaTime), 0.0);
+}
+
+void main() 
+{
+	
+	uvec3 nParticles = gl_NumWorkGroups * gl_WorkGroupSize;
+	uvec3 id = gl_GlobalInvocationID; 
+	uint index =  id.x + (id.y * nParticles.x);
+	
+	if (index > nParticles.x * nParticles.y) 
+		return;
+
+	if (verticesIn[index].pinned >= 1.0) {
+		verticesOut[index].pos = verticesOut[index].pos;
+		verticesOut[index].vel = vec4(0.0);
+		return;
+	}
+	
+	vec3 gravityForce = gravityAcceleration.xyz * particleMass;
+	vec3 totalForce=vec3(0,0,0);
+	
+	totalForce += gravityForce;
+
+	vec3 position=verticesIn[index].pos.xyz;
+	vec3 velocity=verticesIn[index].vel.xyz;
+	
+	
+	// Spring forces from neighboring particles
+
+	// left
+	if (id.x > 0) {
+		totalForce += elasticForce(position, verticesIn[index-1].pos.xyz, restLenHorizontal);
+	} 
+	// right
+	if (id.x < nParticles.x - 1) {
+		totalForce += elasticForce(position, verticesIn[index + 1].pos.xyz, restLenHorizontal);
+	}
+	// upper
+	if (id.y < nParticles.y - 1) {
+		totalForce += elasticForce(position, verticesIn[index + nParticles.x].pos.xyz, restLenVertical);
+	} 
+	// lower
+	if (id.y > 0) {
+		totalForce += elasticForce(position, verticesIn[index - nParticles.x].pos.xyz, restLenVertical);
+	} 
+	// upper-left
+	if ((id.x > 0) && (id.y < nParticles.y - 1)) {
+		totalForce += elasticForce(position, verticesIn[index + nParticles.x - 1].pos.xyz, restLenDiagonal);
+	}
+	// lower-left
+	if ((id.x > 0) && (id.y > 0)) {
+		totalForce += elasticForce(position, verticesIn[index - nParticles.x - 1].pos.xyz, restLenDiagonal);
+	}
+	// upper-right
+	if ((id.x < nParticles.x - 1) && (id.y < nParticles.y - 1)) {
+		totalForce += elasticForce(position, verticesIn[index + nParticles.x + 1].pos.xyz, restLenDiagonal);
+	}
+	// lower-right
+	if ((id.x < nParticles.x - 1) && (id.y > 0)) {
+		totalForce += elasticForce(position, verticesIn[index - nParticles.x + 1].pos.xyz, restLenDiagonal);
+	}
+	
+
+	totalForce += (-damping * velocity);
+	
+	eulerIntegrator(index, totalForce, velocity, position);
+}

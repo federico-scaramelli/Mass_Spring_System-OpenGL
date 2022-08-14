@@ -4,9 +4,7 @@ layout(location = 0) in vec4 vertexPosition;
 layout(location = 1) in vec4 vertexVelocity;
 layout(location = 2) in vec4 vertexColor;
 layout(location = 3) in vec4 vertexNormal;
-layout(location = 4) in vec2 vertexUV;
-layout(location = 5) in float pinned;
-layout(location = 6) in float dummy;
+layout(location = 4) in vec4 pinned;
 
 out vec3 position;
 out vec3 normal;

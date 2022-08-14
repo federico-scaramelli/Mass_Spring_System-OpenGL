@@ -30,14 +30,17 @@ void Cloth::InitializeVertices ()
 			};
 
 			Vertex vertex {{initialPosition.x, initialPosition.y, initialPosition.z, 0}};
+			// vertex.pinned={1,0,0,0};
 
 			vertices.push_back (vertex);
 		}
 	}
 
-	//Pin top-left and top-right vertices
-	vertices[0].pinned=1;
-	vertices[m_PointsByWidth].pinned=1;
+	//Pin the 4 outern vertices
+	vertices[LinearIndex(0,0,m_PointsByWidth-1)].pinned={1,0,0,0};
+	vertices[LinearIndex(0,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
+	vertices[LinearIndex(m_PointsByHeight-1,0,m_PointsByWidth)].pinned={1,0,0,0};
+	vertices[LinearIndex(m_PointsByHeight-1,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
 }
 
 void Cloth::InitializeIndices ()

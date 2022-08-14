@@ -1474,6 +1474,7 @@
       <Filter>File di intestazione</Filter>
     </None>
     <None Include="res\shaders\shader.comp" />
+    <None Include="res\shaders\clothShader.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="libraries\include\glm\CMakeLists.txt" />

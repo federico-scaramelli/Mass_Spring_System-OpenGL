@@ -63,7 +63,7 @@ public:
 		//Out
 		glGenBuffers(1, &m_SecondaryVertexBuffer);
 		glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_SecondaryVertexBuffer);
-		glBufferData (GL_SHADER_STORAGE_BUFFER, m_vbo.GetSize(), NULL, GL_DYNAMIC_DRAW);
+		glBufferData (GL_SHADER_STORAGE_BUFFER, m_vbo.GetSize(), m_Vertices.data(), GL_DYNAMIC_DRAW);
 	}
 
 	void SwapComputeBuffers()

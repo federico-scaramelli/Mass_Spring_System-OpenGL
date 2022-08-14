@@ -157,6 +157,16 @@ void Scene::UpdateGameObjects ()
 		m_currentGameObject->GetComputeShader().Use();
 		m_currentGameObject->GetComputeShader().Compute();
 		m_currentGameObject->GetComputeShader().Wait();
+		
+		// glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
+		// std::vector<Vertex> copy;
+		// copy.resize(m_currentGameObject->GetMesh().GetVertices().size());
+		// glad_glGetNamedBufferSubData(m_currentGameObject->GetMesh().m_vbo.GetID(),0, m_currentGameObject->GetMesh().m_vbo.GetSize(), copy.data());
+		// std::cout << "( " << copy[0].position.x << " " << copy[0].position.y << " " <<  copy[0].position.z << " ) - " << copy[0].pinned.x << "\n";
+		// glad_glGetNamedBufferSubData(m_currentGameObject->GetMesh().m_SecondaryVertexBuffer,0, m_currentGameObject->GetMesh().m_vbo.GetSize(), copy.data());
+		// std::cout << "( " << copy[0].position.x << " " << copy[0].position.y << " " <<  copy[0].position.z << " ) - " << copy[0].pinned.x << "\n";
+		// std::cout << " ----- \n";
+
 	    m_currentGameObject->GetMesh().SwapComputeBuffers();
 	}
 	
