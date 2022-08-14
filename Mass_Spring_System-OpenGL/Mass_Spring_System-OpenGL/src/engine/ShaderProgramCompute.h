@@ -1,19 +1,21 @@
 #pragma once
 
 #include "ShaderProgram.h"
+#include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
 class ShaderProgramCompute : public ShaderProgram {
 private:
-	int numWorkGroups = 1;
-	glm::ivec3 workGroupSize{10, 1, 1}; //Fixed in comp shader
+	//Number of invocations per group = 100 invoc. per group
+	glm::ivec3 workGroupSize{10, 10, 1}; //Fixed in comp shader
+	glm::ivec3 workGroupNum{1,1,1};
 
 public:
 	void Compute()
 	{
-		glDispatchCompute(workGroupSize.x, workGroupSize.y, workGroupSize.z);
+		glDispatchCompute(workGroupNum.x, workGroupNum.y, workGroupNum.z);
 	}
-
+	
 	void Wait()
 	{
 		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -24,10 +26,8 @@ public:
 		workGroupSize = size;
 	}
 
-	void SetWorkGroupNumberFromVertexNumber(int vertexNumber)
+	void SetWorkGroupNum(glm::vec3 ObjectSize)
 	{
-		int totalInvocationsPerGroup = workGroupSize.x * workGroupSize.y * workGroupSize.z;
-		numWorkGroups = vertexNumber / totalInvocationsPerGroup;
+		workGroupNum={ObjectSize.x/workGroupSize.x, ObjectSize.y/workGroupSize.y, ObjectSize.z/workGroupSize.z};
 	}
-
 };

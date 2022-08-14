@@ -8,6 +8,7 @@
 #include "Renderer.h"
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/glm.hpp"
+#include "../mass-spring/Cloth.h"
 
 Scene::Scene (Renderer* renderer) : m_Renderer (renderer)
 {
@@ -33,29 +34,34 @@ void Scene::SetComputeShaderUniforms (GameObject* object)
 {
 	object->GetComputeShader().Use();
 
-	object->GetComputeShader().SetUniform<GLfloat>
-		("deltaTime", m_Parameters.deltaTime);
+	Cloth* cloth= dynamic_cast<Cloth*>(object);
+	if(cloth != nullptr)
+	{
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// ("deltaTime", cloth->m_Parameters.deltaTime);
 
-	// object->GetComputeShader().SetUniform<GLfloat>
-	// 	("elasticStiffness", m_Parameters.stiffness);
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// 	("elasticStiffness", cloth->m_Parameters.stiffness);
 
-	// object->GetComputeShader().SetUniform<GLfloat>
-	// 	("restLenHorizontal", m_Parameters.restLengthHorizontal);
-	//
-	// object->GetComputeShader().SetUniform<GLfloat>
-	// 	("restLenVertical", m_Parameters.restLengthVertical);
-	//
-	// object->GetComputeShader().SetUniform<GLfloat>
-	// 	("restLenDiagonal", m_Parameters.restLengthDiagonal);
-	//
-	// object->GetComputeShader().SetUniform<GLfloat>
-	// 	("useGravity", m_Parameters.useGravity);
-	//
-	// object->GetComputeShader().SetUniform<GLfloat>
-	// 	("particleMass", m_Parameters.particleMass);
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// 	("restLenHorizontal", cloth->m_Parameters.restLengthHorizontal);
+		
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// 	("restLenVertical", cloth->m_Parameters.restLengthVertical);
+		
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// 	("restLenDiagonal", cloth->m_Parameters.restLengthDiagonal);
+
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// 	("particleMass", cloth->m_Parameters.particleMass);
+
+		// object->GetComputeShader().SetUniform<GLfloat>
+		// 	("damping", cloth->m_Parameters.damping);
+		
+		object->GetComputeShader().SetUniform<glm::vec4>
+			("gravityAcceleration", cloth->m_Parameters.gravityAccel);
+		}
 	
-	object->GetComputeShader().SetUniform<glm::vec4>
-		("gravityAcceleration", m_Parameters.gravity);
 }
 
 void Scene::AddGameObject (GameObject* object)
@@ -156,6 +162,7 @@ void Scene::UpdateGameObjects ()
 	{
 		m_currentGameObject->GetComputeShader().Use();
 		m_currentGameObject->GetComputeShader().Compute();
+		// m_currentGameObject->GetComputeShader().Compute(100, 10, 10);
 		m_currentGameObject->GetComputeShader().Wait();
 		
 		// glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);

@@ -10,6 +10,16 @@ Cloth::Cloth (GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint 
 {
 	InitializeVertices();
 	InitializeIndices();
+
+	Vertex& topLeft=m_Mesh.GetVertices()[LinearIndex(0,0,pointsWidth)];
+	Vertex& bottomTopLeft=m_Mesh.GetVertices()[LinearIndex(1,0,pointsWidth)];
+	Vertex& rightTopLeft=m_Mesh.GetVertices()[LinearIndex(0,1,pointsWidth)];
+	Vertex& bottomRightTopLeft=m_Mesh.GetVertices()[LinearIndex(1,1,pointsWidth)];
+
+	m_Parameters.stiffness=1000;
+	m_Parameters.restLengthHorizontal=glm::length(topLeft.position - rightTopLeft.position);
+	m_Parameters.restLengthVertical=glm::length(topLeft.position - bottomTopLeft.position);
+	m_Parameters.restLengthDiagonal=glm::length(topLeft.position - bottomRightTopLeft.position);
 }
 
 void Cloth::InitializeVertices ()
@@ -30,17 +40,23 @@ void Cloth::InitializeVertices ()
 			};
 
 			Vertex vertex {{initialPosition.x, initialPosition.y, initialPosition.z, 0}};
-			// vertex.pinned={1,0,0,0};
+			vertex.oldPosition=vertex.position;
 
+			//pin all top vertices
+			if(row==m_PointsByHeight-1)
+			{
+				vertex.pinned={1,0,0,0};
+			}
+			
 			vertices.push_back (vertex);
 		}
 	}
 
 	//Pin the 4 outern vertices
-	vertices[LinearIndex(0,0,m_PointsByWidth-1)].pinned={1,0,0,0};
-	vertices[LinearIndex(0,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
-	vertices[LinearIndex(m_PointsByHeight-1,0,m_PointsByWidth)].pinned={1,0,0,0};
-	vertices[LinearIndex(m_PointsByHeight-1,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
+	// vertices[LinearIndex(0,0,m_PointsByWidth-1)].pinned={1,0,0,0};
+	// vertices[LinearIndex(0,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
+	// vertices[LinearIndex(m_PointsByHeight-1,0,m_PointsByWidth)].pinned={1,0,0,0};
+	// vertices[LinearIndex(m_PointsByHeight-1,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
 }
 
 void Cloth::InitializeIndices ()
@@ -61,10 +77,18 @@ void Cloth::InitializeIndices ()
 			indices.push_back (vLeft);
 			indices.push_back (v);
 			indices.push_back (vUp);
-
+			
 			indices.push_back (vUp);
 			indices.push_back (vUpLeft);
 			indices.push_back (vLeft);
+
+			// indices.push_back (vLeft);
+			// indices.push_back (vUpLeft);
+			// indices.push_back (vUp);
+			//
+			// indices.push_back (vUp);
+			// indices.push_back (v);
+			// indices.push_back (vLeft);
 		}
 	}
 }

@@ -1,12 +1,13 @@
 #version 460
 
-layout ( local_size_x = 10, local_size_y = 1, local_size_z = 1 ) in;
+layout ( local_size_x = 10, local_size_y = 10, local_size_z = 1 ) in;
 
 struct Vertex {
     vec4 pos;
 	vec4 vel;
 	vec4 color;
 	vec4 normal;
+	vec4 oldPos;
 	vec4 pinned;
 };
 
@@ -22,11 +23,11 @@ uniform vec4 gravityAcceleration;
 
 void main() 
 {
-	uvec3 nParticles = gl_NumWorkGroups * gl_WorkGroupSize;
+	uvec3 numParticles = gl_NumWorkGroups * gl_WorkGroupSize;
 	uvec3 id = gl_GlobalInvocationID; 
-	uint index =  id.x + (id.y * nParticles.x);
+	uint index =  id.x + (id.y * numParticles.x);
 	
-	if (index > nParticles.x * nParticles.y) 
+	if (index > numParticles.x * numParticles.y) 
 		return;
 
 	

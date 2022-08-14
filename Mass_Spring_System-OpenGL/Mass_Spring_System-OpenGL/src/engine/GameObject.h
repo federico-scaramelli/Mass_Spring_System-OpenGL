@@ -10,6 +10,18 @@ static std::random_device rd;
 static std::mt19937 cpuGenerator(rd());
 static std::uniform_real_distribution<float> unif{0, 1.0};
 
+//Will be used as uniform
+struct PhysicsParameters {
+	GLfloat deltaTime = 0.016f;
+	GLfloat stiffness = 1.f;
+	GLfloat restLengthHorizontal = 1.f;
+	GLfloat restLengthVertical = 1.f;
+	GLfloat restLengthDiagonal = 1.f;
+	GLfloat particleMass = 1;
+	GLfloat damping=0.98f;
+	glm::vec4 gravityAccel {0.f,-9.81f,0.f, 0.f};
+};
+
 class GameObject {
 protected:
 	Transform m_Transform;

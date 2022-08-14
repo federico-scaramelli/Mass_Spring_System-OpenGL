@@ -10,17 +10,24 @@
 struct Vertex;
 
 class Cloth : public GameObject {
-private:
+public:
 	GLfloat m_Width;
 	GLfloat m_Height;
 	GLint m_PointsByWidth;
 	GLint m_PointsByHeight;
 
-public:
+
+	PhysicsParameters m_Parameters;
+
 	Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight);
 	
 	void InitializeVertices();
 
 	void InitializeIndices();
+
+	glm::vec2 GetClothSize()
+	{
+		return {m_PointsByWidth, m_PointsByHeight};
+	}
 };
 

@@ -51,20 +51,19 @@ void run()
 	vertexBufferLayout.Push<GLfloat>(4); //2
 	vertexBufferLayout.Push<GLfloat>(4); //3
 	vertexBufferLayout.Push<GLfloat>(4); //4
+	vertexBufferLayout.Push<GLfloat>(4); //5
 
 	// CLOTH
 	Cloth cloth(5.f, 5.f, 10, 10);
+
 	cloth.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
-	cloth.GetMaterial().CreateComputeShaderProgram({{"shader.comp", ShaderType::COMPUTE}});
 
-	cloth.GetComputeShader().SetWorkGroupSize({10,1,1});
-	cloth.GetComputeShader().SetWorkGroupNumberFromVertexNumber(cloth.GetMesh().GetVertices().size());
-
+	cloth.GetMaterial().CreateComputeShaderProgram({{"clothShader.comp", ShaderType::COMPUTE}});
+	cloth.GetComputeShader().SetWorkGroupSize({10,10,1});
+	cloth.GetComputeShader().SetWorkGroupNum({cloth.GetClothSize(), 1});
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
 	cloth.GetMesh().SetComputeBuffers();
-
 	
-
 	scene.AddGameObject(&cloth);
 
 	// ROPE

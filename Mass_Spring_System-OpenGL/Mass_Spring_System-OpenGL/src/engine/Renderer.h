@@ -49,7 +49,7 @@ public:
 	void DrawListBoxUI(const char* label, int* data, const char* const* items, int itemsCount);
 	void DrawUI();
 
-	bool wireframe;
+	bool wireframe=true;
 	bool backface;
 
 private:
