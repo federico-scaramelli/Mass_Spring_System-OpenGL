@@ -5,7 +5,7 @@
 
 #include "../engine/GameObject.h"
 
-#define LinearIndex(i,j,rowSize) ((i)*(rowSize) + (j))
+#define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 
 struct Vertex;
 
@@ -16,14 +16,21 @@ public:
 	GLint m_PointsByWidth;
 	GLint m_PointsByHeight;
 
-
 	PhysicsParameters m_Parameters;
+	ShaderProgramCompute firstStageComputeShader {};
+	ShaderProgramCompute secondStageComputeShader {};
+	GLuint m_ComputeTempVertexBuffer;
 
 	Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight);
 	
 	void InitializeVertices();
 
 	void InitializeIndices();
+
+	void Create() override;
+	void Update() override;
+
+	void SetComputeBuffers ();
 
 	glm::vec2 GetClothSize()
 	{

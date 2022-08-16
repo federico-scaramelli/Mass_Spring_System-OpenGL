@@ -49,8 +49,8 @@ public:
 	void DrawListBoxUI(const char* label, int* data, const char* const* items, int itemsCount);
 	void DrawUI();
 
-	bool wireframe=true;
-	bool backface;
+	bool wireframe = true;
+	bool backface = true;
 
 private:
 	std::vector<UIListBox> UIListBox;

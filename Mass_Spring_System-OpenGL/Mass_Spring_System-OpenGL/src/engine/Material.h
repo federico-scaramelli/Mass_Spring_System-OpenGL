@@ -14,7 +14,6 @@ class Material
 {
 private:
 	ShaderProgram m_Shader{};
-	ShaderProgramCompute m_ComputeShader{};
 
 	glm::vec3 m_DiffuseColor;
 	glm::vec3 m_SpecularColor;
@@ -51,11 +50,7 @@ public:
 
 	void CreateShaderProgram(std::vector<std::pair<std::string, ShaderType>> pairList);
 
-	void CreateComputeShaderProgram(std::vector<std::pair<std::string, ShaderType>> pairList);
-
 	ShaderProgram& GetShader() { return m_Shader; }
-
-	ShaderProgramCompute& GetComputeShader() { return m_ComputeShader; }
 
 	glm::vec3 GetAmbient() { return m_AmbientColor; }
 	glm::vec3 GetDiffuse() { return m_DiffuseColor; }

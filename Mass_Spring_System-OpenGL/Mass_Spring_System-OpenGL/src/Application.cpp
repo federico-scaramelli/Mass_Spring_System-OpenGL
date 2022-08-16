@@ -52,15 +52,23 @@ void run() {
 	vertexBufferLayout.Push<GLfloat>(4); //5
 
 	// CLOTH
-	Cloth cloth(5.f, 5.f, 20, 20);
+	Cloth cloth(5.f, 5.f, 30, 30);
 
 	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
 
-	cloth.GetMaterial().CreateComputeShaderProgram({ {"clothShader.comp", ShaderType::COMPUTE} });
-	cloth.GetComputeShader().SetWorkGroupSize({ 10,10,1 });
-	cloth.GetComputeShader().SetWorkGroupNum({ cloth.GetClothSize(), 1 });
+	// Compute stage 1: compute new positions without constraints
+	
+	cloth.firstStageComputeShader.CreateProgram ( {"clothShader.comp", ShaderType::COMPUTE} );
+	cloth.firstStageComputeShader.SetWorkGroupSize({ 10, 10, 1 });
+	cloth.firstStageComputeShader.SetWorkGroupNum( { cloth.GetClothSize(), 1 } );
+
+	// Compute stage 2: apply constraints
+	cloth.secondStageComputeShader.CreateProgram ( {"clothConstraints.comp", ShaderType::COMPUTE} );
+	cloth.secondStageComputeShader.SetWorkGroupSize({ 10, 10, 1 });
+	cloth.secondStageComputeShader.SetWorkGroupNum( { cloth.GetClothSize(), 1 } );
+
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
-	cloth.GetMesh().SetComputeBuffers();
+	cloth.SetComputeBuffers();
 
 	scene.AddGameObject(&cloth);
 

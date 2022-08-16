@@ -15,7 +15,7 @@ private:
 	char UILabel_Ambient[50];
 
 public:
-  LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1}) : GameObject ("Light ")
+	LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1}) : GameObject ("Light ")
 	{
 		this->m_LightIntensity = lightIntensity;
 		this->m_LightAmbient = lightAmbient;
@@ -37,6 +37,9 @@ public:
 		strcat_s (UILabel_Ambient, " ambient");
 		renderer.AddFloat3SliderUI (UILabel_Ambient, UI_LightAmbient, min, max);
 	}
+
+	void Create() override {}
+	void Update() override {}
 
 	void UpdateWithUI() override
 	{

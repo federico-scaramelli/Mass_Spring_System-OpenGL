@@ -35,7 +35,6 @@ private:
 	LightSource* m_LightSource;
 
 	void SetShaderUniforms (GameObject* object);
-	void SetComputeShaderUniforms(GameObject* object);
 	void UpdateGameObjects();
 
 	void UpdateCamera();

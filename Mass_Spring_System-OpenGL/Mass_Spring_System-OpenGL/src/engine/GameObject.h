@@ -13,13 +13,13 @@ static std::uniform_real_distribution<float> unif{ 0, 1.0 };
 //Will be used as uniform
 struct PhysicsParameters {
 	GLfloat deltaTime = 0.016f;
-	GLfloat stiffness = 100000.f;
+	GLfloat stiffness = 50000.f;
 	GLfloat restLengthHorizontal = 0.5f;
 	GLfloat restLengthVertical = 0.5f;
 	GLfloat restLengthDiagonal = 0.707f;
 	GLfloat particleMass = 100;
 	GLfloat damping = 0.98f;
-	glm::vec4 gravityAccel{ 0.f,-9.81f,0.f, 0.f };
+	glm::vec4 gravityAccel{ 0.f, -9.81f, 0.f, 0.f };
 };
 
 class GameObject {
@@ -28,6 +28,7 @@ protected:
 	Mesh m_Mesh;
 
 public:
+	virtual ~GameObject () = default;
 	const char* name;
 
 	void SetDefaultMesh() {
@@ -206,9 +207,8 @@ public:
 		return m_Mesh.GetMaterial().GetShader();
 	}
 
-	ShaderProgramCompute& GetComputeShader() {
-		return m_Mesh.GetMaterial().GetComputeShader();
-	}
+	virtual void Create() = 0;
+	virtual void Update() = 0;
 
 	Material& GetMaterial() {
 		return m_Mesh.GetMaterial();

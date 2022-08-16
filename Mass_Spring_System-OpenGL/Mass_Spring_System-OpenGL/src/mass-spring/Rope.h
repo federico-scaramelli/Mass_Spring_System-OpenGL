@@ -42,4 +42,7 @@ public:
 	void CreateMidSurfaceIndices();
 
 	void CreateBackSurfaceIndices();
+
+	void Create() override {}
+	void Update() override {}
 };

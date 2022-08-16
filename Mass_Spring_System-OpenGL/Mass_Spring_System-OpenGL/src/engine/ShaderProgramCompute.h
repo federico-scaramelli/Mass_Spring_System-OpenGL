@@ -11,6 +11,14 @@ private:
 	glm::ivec3 workGroupNum{1,1,1};
 
 public:
+
+	void CreateProgram (std::pair<std::string, ShaderType> pairList)
+	{
+		CompileShader(pairList.first, pairList.second);
+		Link();
+		Validate();
+	}
+
 	void Compute()
 	{
 		glDispatchCompute(workGroupNum.x, workGroupNum.y, workGroupNum.z);
@@ -18,7 +26,8 @@ public:
 	
 	void Wait()
 	{
-		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		//glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	void SetWorkGroupSize(glm::vec3 size)
