@@ -28,6 +28,11 @@ public:
 
 	void SetWorkGroupNum(glm::vec3 ObjectSize)
 	{
-		workGroupNum={ObjectSize.x/workGroupSize.x, ObjectSize.y/workGroupSize.y, ObjectSize.z/workGroupSize.z};
+		
+		workGroupNum={
+			(ObjectSize.x + workGroupSize.x -1)/workGroupSize.x, 
+			(ObjectSize.y + workGroupSize.y -1)/workGroupSize.y, 
+			ObjectSize.z/workGroupSize.z
+		};
 	}
 };

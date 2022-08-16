@@ -28,16 +28,14 @@
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
-Scene scene{&renderer};
+Scene scene{ &renderer };
 
-void init()
-{
+void init() {
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
 }
 
-void run()
-{
+void run() {
 
 #pragma region Scene Creation
 	//Camera
@@ -54,29 +52,29 @@ void run()
 	vertexBufferLayout.Push<GLfloat>(4); //5
 
 	// CLOTH
-	Cloth cloth(5.f, 5.f, 10, 10);
+	Cloth cloth(5.f, 5.f, 20, 20);
 
-	cloth.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
 
-	cloth.GetMaterial().CreateComputeShaderProgram({{"clothShader.comp", ShaderType::COMPUTE}});
-	cloth.GetComputeShader().SetWorkGroupSize({10,10,1});
-	cloth.GetComputeShader().SetWorkGroupNum({cloth.GetClothSize(), 1});
+	cloth.GetMaterial().CreateComputeShaderProgram({ {"clothShader.comp", ShaderType::COMPUTE} });
+	cloth.GetComputeShader().SetWorkGroupSize({ 10,10,1 });
+	cloth.GetComputeShader().SetWorkGroupNum({ cloth.GetClothSize(), 1 });
 	cloth.GetMesh().SetBuffers(vertexBufferLayout);
 	cloth.GetMesh().SetComputeBuffers();
-	
+
 	scene.AddGameObject(&cloth);
 
 	// ROPE
 	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
 	Rope rope(50, 10, 1);
 	rope.GetMesh().SetBuffers(vertexBufferLayout);
-	rope.GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	rope.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
 	scene.AddGameObject(&rope);
 
 	// LIGHT
 	LightSource lightSource{};
 	lightSource.GetMesh().SetBuffers(vertexBufferLayout);
-	lightSource.GetMesh().GetMaterial().CreateShaderProgram({{"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT}});
+	lightSource.GetMesh().GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
 	scene.AddLightSource(&lightSource);
 
 #pragma endregion
@@ -87,22 +85,21 @@ void run()
 	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
 
 #pragma endregion
-	
+
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
 		renderer.Clear();
-		
+
 		scene.Update();
-		
+
 		renderer.DrawUI();
-		
+
 		glfwSwapBuffers(glfwWindow);
 		glfwPollEvents();
 	}
 }
 
-int main()
-{
+int main() {
 	try
 	{
 		init();

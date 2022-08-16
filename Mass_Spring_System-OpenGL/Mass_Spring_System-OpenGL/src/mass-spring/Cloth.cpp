@@ -4,64 +4,52 @@
 
 #include "../engine/Vertex.h"
 
-Cloth::Cloth (GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight) :
-	m_Width (clothWidth), m_Height (clothHeight), m_PointsByWidth (pointsWidth), m_PointsByHeight (pointsHeight),
-	GameObject("Cloth")
-{
+Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight) :
+	m_Width(clothWidth), m_Height(clothHeight), m_PointsByWidth(pointsWidth), m_PointsByHeight(pointsHeight),
+	GameObject("Cloth") {
 	InitializeVertices();
 	InitializeIndices();
 
-	Vertex& topLeft=m_Mesh.GetVertices()[LinearIndex(0,0,pointsWidth)];
-	Vertex& bottomTopLeft=m_Mesh.GetVertices()[LinearIndex(1,0,pointsWidth)];
-	Vertex& rightTopLeft=m_Mesh.GetVertices()[LinearIndex(0,1,pointsWidth)];
-	Vertex& bottomRightTopLeft=m_Mesh.GetVertices()[LinearIndex(1,1,pointsWidth)];
+	//Pin the 4 outern vertices
+	auto& vertices = m_Mesh.GetVertices();
 
-	m_Parameters.stiffness=1000;
-	m_Parameters.restLengthHorizontal=glm::length(topLeft.position - rightTopLeft.position);
-	m_Parameters.restLengthVertical=glm::length(topLeft.position - bottomTopLeft.position);
-	m_Parameters.restLengthDiagonal=glm::length(topLeft.position - bottomRightTopLeft.position);
+	vertices[LinearIndex(0, 0, m_PointsByWidth - 1)].pinned = { 1,0,0,0 };
+	vertices[LinearIndex(0, m_PointsByWidth - 1, m_PointsByWidth)].pinned = { 1,0,0,0 };
+
+	vertices[LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth)].pinned = { 1,0,0,0 };
+	vertices[LinearIndex(m_PointsByHeight - 1, m_PointsByWidth - 1, m_PointsByWidth)].pinned = { 1,0,0,0 };
+
+	vertices[LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth)].position.x -= m_Width * 2.f;
+	vertices[LinearIndex(m_PointsByHeight - 1, m_PointsByWidth - 1, m_PointsByWidth)].position.x += m_Width * 2.f;
 }
 
-void Cloth::InitializeVertices ()
-{
-	auto& vertices=m_Mesh.GetVertices();
+void Cloth::InitializeVertices() {
+	auto& vertices = m_Mesh.GetVertices();
 
 	vertices.clear();
 
 	float spacingWidth = m_Width / m_PointsByWidth;
 	float spacingHeight = m_Height / m_PointsByHeight;
-	
+
 	for (auto row = 0; row < m_PointsByHeight; row++) {
 		for (auto column = 0; column < m_PointsByWidth; column++) {
-			glm::vec3 initialPosition {
+			glm::vec3 initialPosition{
 				column * spacingWidth,
 				row * spacingHeight,
-				0
+				row * 2
 			};
 
-			Vertex vertex {{initialPosition.x, initialPosition.y, initialPosition.z, 0}};
-			vertex.oldPosition=vertex.position;
+			Vertex vertex{ {initialPosition.x, initialPosition.y, initialPosition.z, 0} };
+			vertex.oldPosition = vertex.position;
 
-			//pin all top vertices
-			if(row==m_PointsByHeight-1)
-			{
-				vertex.pinned={1,0,0,0};
-			}
-			
-			vertices.push_back (vertex);
+
+			vertices.push_back(vertex);
 		}
 	}
-
-	//Pin the 4 outern vertices
-	// vertices[LinearIndex(0,0,m_PointsByWidth-1)].pinned={1,0,0,0};
-	// vertices[LinearIndex(0,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
-	// vertices[LinearIndex(m_PointsByHeight-1,0,m_PointsByWidth)].pinned={1,0,0,0};
-	// vertices[LinearIndex(m_PointsByHeight-1,m_PointsByWidth-1,m_PointsByWidth)].pinned={1,0,0,0};
 }
 
-void Cloth::InitializeIndices ()
-{
-	auto& indices=m_Mesh.GetIndices();
+void Cloth::InitializeIndices() {
+	auto& indices = m_Mesh.GetIndices();
 
 	indices.clear();
 
@@ -69,18 +57,18 @@ void Cloth::InitializeIndices ()
 	for (auto x = 0; x < m_PointsByHeight - 1; x++) {
 		//Colonna
 		for (auto y = 1; y < m_PointsByWidth; y++) {
-			int v = LinearIndex (x, y, m_PointsByWidth);
+			int v = LinearIndex(x, y, m_PointsByWidth);
 			int vLeft = v - 1;
 			int vUp = v + m_PointsByWidth;
 			int vUpLeft = vUp - 1;
 
-			indices.push_back (vLeft);
-			indices.push_back (v);
-			indices.push_back (vUp);
-			
-			indices.push_back (vUp);
-			indices.push_back (vUpLeft);
-			indices.push_back (vLeft);
+			indices.push_back(vLeft);
+			indices.push_back(v);
+			indices.push_back(vUp);
+
+			indices.push_back(vUp);
+			indices.push_back(vUpLeft);
+			indices.push_back(vLeft);
 
 			// indices.push_back (vLeft);
 			// indices.push_back (vUpLeft);

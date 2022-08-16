@@ -19,13 +19,13 @@ layout ( std430, binding = 1 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
 
-uniform float elasticStiffness=2000;
+uniform float elasticStiffness=100000;
 uniform float deltaTime=0.016;
 uniform float restLenHorizontal=0.5;
 uniform float restLenVertical=0.5;
 uniform float restLenDiagonal=0.707;
 uniform float particleMass=100;
-uniform float damping=0.02;
+uniform float damping=0.98;
 uniform vec4 gravityAcceleration=vec4(0,-9.81,0,1);
 
 //A should be the particle, B the neighbour
@@ -35,37 +35,60 @@ vec3 elasticForce ( vec3 particlePosition, vec3 otherPosition, float restLength 
 	return normalize(dist) * elasticStiffness * (length(dist) - restLength);
 }
 
-void eulerIntegrator ( uint idx, vec3 acceleration, vec3 velocity, vec3 position ) {
-	verticesOut[idx].pos = vec4(position + (velocity * deltaTime) + (0.5 * acceleration * deltaTime * deltaTime), 1.0);
-
-	verticesOut[idx].vel = vec4( velocity + (acceleration * deltaTime), 0.0);
-}
-
 void verletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosition ) {
 	vec3 deltaAcceleration = acceleration * deltaTime * deltaTime;
 	vec3 deltaPosition = (position - oldPosition) * damping;
 
 	vec3 nextPosition =	position + deltaPosition + deltaAcceleration;
 
-	verticesOut[idx].oldPos=verticesOut[idx].pos;
+	verticesOut[idx].oldPos=vec4(position,1.0);
 	verticesOut[idx].pos=vec4(nextPosition,1.0);
 
-	verticesOut[idx].vel = vec4(((nextPosition - position) / deltaTime),0.0);
+	verticesOut[idx].vel = vec4(((nextPosition - position) * deltaTime),0.0);
+}
+
+bool IsPinned (uint index) {
+	return verticesIn[index].pinned.x >= 0.5;
+}
+
+void ApplyConstraints (uint particle, uint other, float maxDistance) {
+	vec3 position=verticesIn[particle].pos.xyz;
+	vec3 otherPosition=verticesIn[other].pos.xyz;
+
+	vec3 BtoAVector = position - otherPosition;
+	float BtoAMagnitude = length(BtoAVector);
+	
+	if (BtoAMagnitude > maxDistance) {
+		float diff = BtoAMagnitude - maxDistance;
+		vec3 correction = normalize(BtoAVector) * diff * 0.5f;
+
+		if (!IsPinned(particle) && !IsPinned(other)) {
+			verticesOut[particle].pos= vec4((position - correction),1.0);
+			//verticesOut[other].pos= vec4((otherPosition + correction),1.0);
+		}
+		else if (!IsPinned(particle)) {
+			verticesOut[particle].pos= vec4((position - (2.f * correction)),1.0);
+		}
+		else {
+			//verticesOut[other].pos= vec4((otherPosition + (2.f * correction)),1.0);
+		}
+	}
 }
 
 void main() 
 {
 	uvec3 nParticles = gl_NumWorkGroups * gl_WorkGroupSize;
 	uvec3 id = gl_GlobalInvocationID; 
-	uint index =  id.x + (id.y * nParticles.x);
+	uint index = id.x + (id.y * nParticles.x);
+	
+	//uint index = gl_LocalInvocationIndex;
 	
 	if (index > nParticles.x * nParticles.y) 
 		return;
 
 	vec3 gravityForce = gravityAcceleration.xyz * particleMass;
 
-	if (verticesIn[index].pinned.x >= 0.5) {
-		
+	if (IsPinned(index)) {
 		verticesOut[index].pos = verticesIn[index].pos;
 		verticesOut[index].vel = vec4(0.0);
 		return;
@@ -80,46 +103,59 @@ void main()
 
 	// upper
 	if (id.y < nParticles.y - 1) {
-		totalForce += elasticForce(position, verticesIn[index + nParticles.x].pos.xyz, restLenVertical);
+		totalForce += 0.2*elasticForce(position, verticesIn[index + nParticles.x].pos.xyz, restLenVertical);
 	} 
 
 	// lower
 	if (id.y > 0) {
-		totalForce += elasticForce(position, verticesIn[index - nParticles.x].pos.xyz, restLenVertical);
+		totalForce += 0.2*elasticForce(position, verticesIn[index - nParticles.x].pos.xyz, restLenVertical);
 	}
-	
+		
 	// left
 	if (id.x > 0) {
-		totalForce += elasticForce(position, verticesIn[index-1].pos.xyz, restLenHorizontal);
+		totalForce += 0.2*elasticForce(position, verticesIn[index-1].pos.xyz, restLenHorizontal);
 	} 
 	// right
 	if (id.x < nParticles.x - 1) {
-		totalForce += elasticForce(position, verticesIn[index + 1].pos.xyz, restLenHorizontal);
+		totalForce += 0.2*elasticForce(position, verticesIn[index + 1].pos.xyz, restLenHorizontal);
 	}
 
 	// upper-left
 	if ((id.x > 0) && (id.y < nParticles.y - 1)) {
-		totalForce += elasticForce(position, verticesIn[index + nParticles.x - 1].pos.xyz, restLenDiagonal);
+		totalForce += 0.2*elasticForce(position, verticesIn[index + nParticles.x - 1].pos.xyz, restLenDiagonal);
 	}
 	// lower-left
 	if ((id.x > 0) && (id.y > 0)) {
-		totalForce += elasticForce(position, verticesIn[index - nParticles.x - 1].pos.xyz, restLenDiagonal);
+		totalForce += 0.2*elasticForce(position, verticesIn[index - nParticles.x - 1].pos.xyz, restLenDiagonal);
 	}
 	// upper-right
 	if ((id.x < nParticles.x - 1) && (id.y < nParticles.y - 1)) {
-		totalForce += elasticForce(position, verticesIn[index + nParticles.x + 1].pos.xyz, restLenDiagonal);
+		totalForce += 0.2*elasticForce(position, verticesIn[index + nParticles.x + 1].pos.xyz, restLenDiagonal);
 	}
 	// lower-right
 	if ((id.x < nParticles.x - 1) && (id.y > 0)) {
-		totalForce += elasticForce(position, verticesIn[index - nParticles.x + 1].pos.xyz, restLenDiagonal);
+		totalForce += 0.2*elasticForce(position, verticesIn[index - nParticles.x + 1].pos.xyz, restLenDiagonal);
 	}
-	
 /*	
+
 */
-	totalForce += (-damping * velocity);
+	//totalForce += (-damping * velocity);
 
 	vec3 acceleration = totalForce / particleMass;
 
-	eulerIntegrator(index, acceleration, velocity, position);
-	//verletIntegrator(index, acceleration, position, oldPosition);
+	//eulerIntegrator(index, acceleration, velocity, position);
+	verletIntegrator(index, acceleration, position, oldPosition);
+
+	/*
+	if (id.y < nParticles.y - 1) {
+		ApplyConstraints(index, index + nParticles.x, restLenVertical*2);
+		//totalForce += 0.2*elasticForce(position, verticesIn[index + nParticles.x].pos.xyz, restLenVertical);
+	} 
+
+	// lower
+	if (id.y > 0) {
+		ApplyConstraints(index, index - nParticles.x, restLenVertical*2);
+		//totalForce += 0.2*elasticForce(position, verticesIn[index - nParticles.x].pos.xyz, restLenVertical);
+	}
+	*/
 }

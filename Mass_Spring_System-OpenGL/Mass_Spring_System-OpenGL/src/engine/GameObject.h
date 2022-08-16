@@ -8,18 +8,18 @@
 
 static std::random_device rd;
 static std::mt19937 cpuGenerator(rd());
-static std::uniform_real_distribution<float> unif{0, 1.0};
+static std::uniform_real_distribution<float> unif{ 0, 1.0 };
 
 //Will be used as uniform
 struct PhysicsParameters {
 	GLfloat deltaTime = 0.016f;
-	GLfloat stiffness = 1.f;
-	GLfloat restLengthHorizontal = 1.f;
-	GLfloat restLengthVertical = 1.f;
-	GLfloat restLengthDiagonal = 1.f;
-	GLfloat particleMass = 1;
-	GLfloat damping=0.98f;
-	glm::vec4 gravityAccel {0.f,-9.81f,0.f, 0.f};
+	GLfloat stiffness = 100000.f;
+	GLfloat restLengthHorizontal = 0.5f;
+	GLfloat restLengthVertical = 0.5f;
+	GLfloat restLengthDiagonal = 0.707f;
+	GLfloat particleMass = 100;
+	GLfloat damping = 0.98f;
+	glm::vec4 gravityAccel{ 0.f,-9.81f,0.f, 0.f };
 };
 
 class GameObject {
@@ -30,46 +30,39 @@ protected:
 public:
 	const char* name;
 
-	void SetDefaultMesh ()
-	{
+	void SetDefaultMesh() {
 		// SetCubeMesh();
 		SetSphereMesh();
 	}
 
-	GameObject(const char* name) : name(name)
-	{
-		m_Transform = {name};
+	GameObject(const char* name) : name(name) {
+		m_Transform = { name };
 		SetDefaultMesh();
 	}
 
-	Transform& GetTransform()
-	{
+	Transform& GetTransform() {
 		return m_Transform;
 	}
 
-	Mesh& GetMesh()
-	{
+	Mesh& GetMesh() {
 		return m_Mesh;
 	}
 
-	virtual void GenerateUI(Renderer& renderer)
-	{
+	virtual void GenerateUI(Renderer& renderer) {
 		//TODO: generate text with GO's name to define its section on the GUI
 
-		m_Transform.GenerateUI (renderer);
+		m_Transform.GenerateUI(renderer);
 
-		m_Mesh.GetMaterial().GenerateUI (renderer, name);
+		m_Mesh.GetMaterial().GenerateUI(renderer, name);
 	}
 
-	virtual void UpdateWithUI()
-	{
+	virtual void UpdateWithUI() {
 		m_Transform.UpdateWithUI();
 
 		m_Mesh.GetMaterial().UpdateWithUI();
 	}
 
-	glm::vec3 GetRandomColor()
-	{
+	glm::vec3 GetRandomColor() {
 		return {
 			unif(cpuGenerator),
 			unif(cpuGenerator),
@@ -77,8 +70,7 @@ public:
 		};
 	}
 
-	void SetColor(glm::vec3 color)
-	{
+	void SetColor(glm::vec3 color) {
 		/*this->m_Mesh.GetMaterial().m_DiffuseColor = color;
 		this->m_Mesh.GetMaterial().m_AmbientColor = color;
 
@@ -90,20 +82,19 @@ public:
 		m_Mesh.UpdateBuffers();*/
 	}
 
-	void SetCubeMesh()
-	{
+	void SetCubeMesh() {
 		auto& vertices = m_Mesh.GetVertices();
 		vertices.clear();
 
 		std::vector<Vertex> cubeVertices = {
-			{{-0.5f, -0.5f, 0.5f, 0.f}}, 
-			{{0.5f, -0.5f, 0.5f, 0.f}},  
-			{{0.5f, 0.5f, 0.5f, 0.f}},  
-			{{-0.5f, 0.5f, 0.5f, 0.f}}, 
-			{{-0.5f, -0.5f, -0.5f, 0.f}}, 
-			{{0.5f, -0.5f, -0.5f, 0.f}},  
+			{{-0.5f, -0.5f, 0.5f, 0.f}},
+			{{0.5f, -0.5f, 0.5f, 0.f}},
+			{{0.5f, 0.5f, 0.5f, 0.f}},
+			{{-0.5f, 0.5f, 0.5f, 0.f}},
+			{{-0.5f, -0.5f, -0.5f, 0.f}},
+			{{0.5f, -0.5f, -0.5f, 0.f}},
 			{{0.5f, 0.5f, -0.5f, 0.f}},
-			{{-0.5f, 0.5f, -0.5f, 0.f}} 
+			{{-0.5f, 0.5f, -0.5f, 0.f}}
 		};
 
 		vertices.assign(cubeVertices.begin(), cubeVertices.end());
@@ -136,17 +127,16 @@ public:
 		};
 	}
 
-	void SetSphereMesh()
-	{
+	void SetSphereMesh() {
 		//Vertici
 		auto& vertices = m_Mesh.GetVertices();
 		vertices.clear();
 
-		float PI=3.14f;
-		float radius=0.5f;
-		int stackCount=8;
-		int sectorCount=stackCount*3;
-		
+		float PI = 3.14f;
+		float radius = 0.5f;
+		int stackCount = 8;
+		int sectorCount = stackCount * 3;
+
 		float x, y, z, xy;                              // vertex position
 		float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 
@@ -154,76 +144,73 @@ public:
 		float stackStep = PI / stackCount;
 		float sectorAngle, stackAngle;
 
-		for(int i = 0; i <= stackCount; ++i)
+		for (int i = 0; i <= stackCount; ++i)
 		{
-		    stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
-		    xy = radius * cosf(stackAngle);          // r * cos(u)
-		    z = radius * sinf(stackAngle);           // r * sin(u)
-			
-		    for(int j = 0; j <= sectorCount; ++j)
-		    {
+			stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
+			xy = radius * cosf(stackAngle);          // r * cos(u)
+			z = radius * sinf(stackAngle);           // r * sin(u)
+
+			for (int j = 0; j <= sectorCount; ++j)
+			{
 				Vertex vertex{};
 
-		        sectorAngle = j * sectorStep;           // starting from 0 to 2pi
-				
-		        x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
-		        y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
+				sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
-				vertex.position={x,y,z, 0};
-				
-		        nx = x * lengthInv;
-		        ny = y * lengthInv;
-		        nz = z * lengthInv;
+				x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
+				y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
 
-				vertex.normal={nx,ny,nz, 0};
+				vertex.position = { x,y,z, 0 };
+
+				nx = x * lengthInv;
+				ny = y * lengthInv;
+				nz = z * lengthInv;
+
+				vertex.normal = { nx,ny,nz, 0 };
 
 				vertices.push_back(vertex);
-		    }
+			}
 		}
 
 		//Indici
 		auto& indices = m_Mesh.GetIndices();
 		indices.clear();
-		
+
 		int k1, k2;
-		for(int i = 0; i < stackCount; ++i)
+		for (int i = 0; i < stackCount; ++i)
 		{
-		    k1 = i * (sectorCount + 1);     // beginning of current stack
-		    k2 = k1 + sectorCount + 1;      // beginning of next stack
+			k1 = i * (sectorCount + 1);     // beginning of current stack
+			k2 = k1 + sectorCount + 1;      // beginning of next stack
 
-		    for(int j = 0; j < sectorCount; ++j, ++k1, ++k2)
-		    {
-		        // k1 => k2 => k1+1
-		        if(i != 0)
-		        {
-		            indices.push_back(k1);
-		            indices.push_back(k2);
-		            indices.push_back(k1 + 1);
-		        }
+			for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
+			{
+				// k1 => k2 => k1+1
+				if (i != 0)
+				{
+					indices.push_back(k1);
+					indices.push_back(k2);
+					indices.push_back(k1 + 1);
+				}
 
-		        // k1+1 => k2 => k2+1
-		        if(i != (stackCount-1))
-		        {
-		            indices.push_back(k1 + 1);
-		            indices.push_back(k2);
-		            indices.push_back(k2 + 1);
-		        }
-		    }
+				// k1+1 => k2 => k2+1
+				if (i != (stackCount - 1))
+				{
+					indices.push_back(k1 + 1);
+					indices.push_back(k2);
+					indices.push_back(k2 + 1);
+				}
+			}
 		}
 	}
 
-	ShaderProgram& GetShader()
-	{
+	ShaderProgram& GetShader() {
 		return m_Mesh.GetMaterial().GetShader();
 	}
 
-	ShaderProgramCompute& GetComputeShader()
-	{
+	ShaderProgramCompute& GetComputeShader() {
 		return m_Mesh.GetMaterial().GetComputeShader();
 	}
 
-	Material& GetMaterial ()
-	{
+	Material& GetMaterial() {
 		return m_Mesh.GetMaterial();
 	}
 };
