@@ -55,7 +55,7 @@ void run() {
 	int sizeMult=2;
 	Cloth cloth(20.f, 20.f, 16*sizeMult, 16*sizeMult);
 
-	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
+	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
 
 	// Compute stage 1: compute new positions without constraints
 	cloth.firstStageComputeShader.CreateProgram ( {"clothShader.comp", ShaderType::COMPUTE} );
@@ -76,13 +76,13 @@ void run() {
 	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
 	Rope rope(50, 10, 1);
 	rope.GetMesh().SetBuffers(vertexBufferLayout);
-	rope.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
+	rope.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
 	scene.AddGameObject(&rope);
 
 	// LIGHT
 	LightSource lightSource{};
 	lightSource.GetMesh().SetBuffers(vertexBufferLayout);
-	lightSource.GetMesh().GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
+	lightSource.GetMesh().GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
 	scene.AddLightSource(&lightSource);
 
 #pragma endregion

@@ -44,8 +44,7 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 
 		correction = (IsPinned(otherIndex)) ? 
 			correction * 2 :
-			correction;
-		
+			correction;		
 	}
 
 	return correction;
@@ -146,13 +145,46 @@ void main()
 	
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx);
 
-	
+		
 	float mult=0.3;
 	position += correction*mult;
 	
+	//Update pos 
 	verticesOut[linearIdx].pos = vec4(position, 1.0);
 	verticesOut[linearIdx].oldPos = vec4(oldPosition, 1.0);
 	verticesOut[linearIdx].vel = verticesIn[linearIdx].vel;
 
+	//Calculate normal
+	vec3 normal = vec3(0.0);
+	vec3 a, b, c;
+	if (globalIdx.y > 0) {
+		if (globalIdx.x > 0) {
+			a = verticesIn[linearIdx - 1].pos.xyz - position;
+			b = verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz - position;
+			c = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;
+			normal += cross(a,b) + cross(b,c);
+		}
+		if (globalIdx.x < particleGridDims.x - 1) {
+			a = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;
+			b = verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz - position;
+			c = verticesIn[linearIdx + 1].pos.xyz - position;
+			normal += cross(a,b) + cross(b,c);
+		}
+	}
+	if (globalIdx.y < particleGridDims.y - 1) {
+		if (globalIdx.x > 0) {
+			a = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;
+			b = verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz - position;
+			c = verticesIn[linearIdx - 1].pos.xyz - position;
+			normal += cross(a,b) + cross(b,c);
+		}
+		if (globalIdx.x < particleGridDims.x - 1) {
+			a = verticesIn[linearIdx + 1].pos.xyz - position;
+			b = verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz - position;
+			c = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;
+			normal += cross(a,b) + cross(b,c);
+		}
+	}
 
+	verticesOut[linearIdx].normal = vec4(normalize(normal), 0.0f);
 }

@@ -29,6 +29,7 @@ public:
 	GLfloat restLengthDiagonal;
 	GLfloat particleMass;
 	GLfloat clothMass;
+	GLfloat density;
 
 	Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight);
 

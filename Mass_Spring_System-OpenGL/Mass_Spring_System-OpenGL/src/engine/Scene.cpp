@@ -67,7 +67,7 @@ void Scene::TransformLight() {
 
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3>("lightAmbient",
 		m_LightSource->GetAmbient());
-	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3>("light",
+	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3>("lightDiffuse",
 		m_LightSource->GetIntensity());
 
 	m_LightSource->GetMesh().GetMaterial().GetShader().SetUniform<glm::vec3>("matAmbient",
@@ -135,7 +135,7 @@ void Scene::UpdateGameObject() {
 
 		m_currentGameObject->GetShader().SetUniform<glm::vec3>("lightAmbient",
 			m_LightSource->GetAmbient());
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("light",
+		m_currentGameObject->GetShader().SetUniform<glm::vec3>("lightDiffuse",
 			m_LightSource->GetIntensity());
 
 		m_currentGameObject->GetShader().SetUniform<glm::vec3>("matAmbient",
