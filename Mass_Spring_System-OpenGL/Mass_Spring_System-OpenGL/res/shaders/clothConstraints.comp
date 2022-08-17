@@ -54,7 +54,8 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) 
 {
 	vec3 totalCorrection = vec3(0,0,0);
-	
+/*
+*/
 	// Structure Spring - Down
 	totalCorrection = (globalIdx.y > 0) ?
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenVertical)) :
@@ -74,6 +75,7 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 	totalCorrection = (globalIdx.x > 0) ?
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx-1, restLenHorizontal) :
 		totalCorrection;
+
 	
 	// Shear Spring - Upper-Left
 	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
@@ -93,6 +95,28 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 	// Shear Spring - Lower-Right
 	totalCorrection = (globalIdx.x < particleGridDims.x - 1) && (globalIdx.y > 0) ?
 		totalCorrection+ApplyConstraints(linearIdx, linearIdx - particleGridDims.x + 1, restLenDiagonal) :
+		totalCorrection;
+/*
+*/
+
+	// Bend Spring - Up
+	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection;
+
+	// Bend Spring - Down
+	totalCorrection = (globalIdx.y > 1) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection;
+		
+	// Bend Spring - Left
+	totalCorrection = (globalIdx.x > 1) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
+		totalCorrection;
+
+	// Bend Spring - Right
+	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
 		totalCorrection;
 
 	return totalCorrection;
@@ -123,7 +147,7 @@ void main()
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx);
 
 	
-	float mult=0.334;
+	float mult=0.3;
 	position += correction*mult;
 	
 	verticesOut[linearIdx].pos = vec4(position, 1.0);

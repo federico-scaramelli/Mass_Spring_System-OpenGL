@@ -123,6 +123,7 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	totalForce = (globalIdx.x > 1) ?
 		totalForce+constBendMult * ElasticForce(position, verticesIn[linearIdx - 2].pos.xyz, restLenHorizontal * 2) :
 		totalForce;
+
 	// Bend Spring - Right
 	totalForce = (globalIdx.x < particleGridDims.x - 2) ?
 		totalForce+constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHorizontal * 2) :
