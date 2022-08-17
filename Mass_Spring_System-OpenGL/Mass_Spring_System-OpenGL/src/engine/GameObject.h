@@ -13,13 +13,8 @@ static std::uniform_real_distribution<float> unif{ 0, 1.0 };
 //Will be used as uniform
 struct PhysicsParameters {
 	GLfloat deltaTime = 0.016f;
-	GLfloat stiffness = 50000.f;
-	GLfloat restLengthHorizontal = 0.5f;
-	GLfloat restLengthVertical = 0.5f;
-	GLfloat restLengthDiagonal = 0.707f;
-	GLfloat particleMass = 100;
 	GLfloat damping = 0.98f;
-	glm::vec4 gravityAccel{ 0.f, -9.81f, 0.f, 0.f };
+	glm::vec4 gravityAccel{ 0.f, - 9.81f, 0.f, 0.f };
 };
 
 class GameObject {

@@ -93,6 +93,7 @@
     <IntDir>$(SolutionDir)\bin\intermediates\$(Platform)\$(Configuration)\</IntDir>
     <IncludePath>G:\Progetti\Uni\RTGP\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\libraries\include;$(IncludePath)</IncludePath>
     <LibraryPath>G:\Progetti\Uni\RTGP\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\libraries\lib;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -153,7 +154,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include\imgui;G:\Progetti\Uni\RTGP\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\Mass_Spring_System-OpenGL\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)libraries\include\imgui;$(SolutionDir)Mass_Spring_System-OpenGL\libraries\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

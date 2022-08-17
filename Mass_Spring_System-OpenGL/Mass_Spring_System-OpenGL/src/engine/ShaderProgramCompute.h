@@ -26,8 +26,8 @@ public:
 	
 	void Wait()
 	{
-		//glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-		glMemoryBarrier(GL_ALL_BARRIER_BITS);
+		glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+		//glMemoryBarrier(GL_ALL_BARRIER_BITS);
 	}
 
 	void SetWorkGroupSize(glm::vec3 size)
