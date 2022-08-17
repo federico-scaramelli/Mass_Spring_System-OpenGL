@@ -206,6 +206,10 @@ template<>
 void ShaderProgram::SetUniform<GLfloat>(const char* name, GLfloat x, GLfloat y, GLfloat z)
 {
 	GLint loc = GetUniformLocation(name);
+	if(loc<0)
+	{
+		return;
+	}
     glUniform3f(loc, x, y, z);
 }
 
@@ -213,7 +217,9 @@ GLint ShaderProgram::GetUniformLocation(const char* name)
 {
 	if (uniformLocations.find(name) == uniformLocations.end()) 
 	{
-		throw std::runtime_error("Uniform location invalid!");
+		std::cout << "Uniform active not found" << std::endl;
+		return -1;
+		// throw std::runtime_error("Uniform location invalid!");
 	}
 
 	return uniformLocations[name];

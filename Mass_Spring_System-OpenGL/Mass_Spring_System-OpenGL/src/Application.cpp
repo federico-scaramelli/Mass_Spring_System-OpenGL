@@ -55,7 +55,7 @@ void run() {
 	int sizeMult=2;
 	Cloth cloth(20.f, 20.f, 16*sizeMult, 16*sizeMult);
 
-	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
+	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"normalShader.frag", ShaderType::FRAGMENT} });
 
 	// Compute stage 1: compute new positions without constraints
 	cloth.firstStageComputeShader.CreateProgram ( {"clothShader.comp", ShaderType::COMPUTE} );

@@ -660,6 +660,7 @@
     <None Include="res\shaders\clothConstraints.comp" />
     <None Include="res\shaders\clothShader.comp" />
     <None Include="res\shaders\blinnPhongShader.frag" />
+    <None Include="res\shaders\normalShader.frag" />
     <None Include="res\shaders\shader.comp" />
     <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\shader.vert" />

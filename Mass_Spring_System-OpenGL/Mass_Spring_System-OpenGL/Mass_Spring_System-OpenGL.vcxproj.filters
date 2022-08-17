@@ -1477,6 +1477,7 @@
     <None Include="res\shaders\clothShader.comp" />
     <None Include="res\shaders\clothConstraints.comp" />
     <None Include="res\shaders\blinnPhongShader.frag" />
+    <None Include="res\shaders\normalShader.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="libraries\include\glm\CMakeLists.txt" />
