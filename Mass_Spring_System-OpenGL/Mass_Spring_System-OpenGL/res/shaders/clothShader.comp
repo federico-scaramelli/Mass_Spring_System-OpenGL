@@ -131,7 +131,6 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	return totalForce;
 }
 
-
 void main() 
 {
 	uvec3 particleGridDims = gl_NumWorkGroups * gl_WorkGroupSize;

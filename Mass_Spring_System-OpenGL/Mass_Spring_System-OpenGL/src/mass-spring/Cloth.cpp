@@ -129,6 +129,7 @@ void Cloth::Create()
 	firstStageComputeShader.SetUniform<GLfloat>("particleMass", clothMass);
 
 	firstStageComputeShader.SetUniform<GLfloat>("constShearMult", kSheering);
+
 	firstStageComputeShader.SetUniform<GLfloat>("constBendMult", kBending);
 
 	// secondStageComputeShader.Use();
