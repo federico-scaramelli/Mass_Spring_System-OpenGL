@@ -24,10 +24,9 @@ Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint p
 	restLengthHorizontal = m_Width / m_PointsByWidth;
 	restLengthDiagonal = static_cast<GLfloat>(sqrt(pow(restLengthVertical, 2) + pow(restLengthHorizontal, 2)));
 	particleMass=1.0;
-	stiffness=50000.f;
+	stiffness=5000.f;
 	kSheering=1.5;
 	kBending=kSheering*0.2f;
-
 	clothMass=vertices.size() * particleMass;
 
 	topLeft.pinned = {1, 0, 0, 0};

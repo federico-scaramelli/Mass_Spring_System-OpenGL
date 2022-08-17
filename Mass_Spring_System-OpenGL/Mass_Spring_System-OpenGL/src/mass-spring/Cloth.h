@@ -21,14 +21,14 @@ public:
 	ShaderProgramCompute secondStageComputeShader{};
 	GLuint m_ComputeTempVertexBuffer;
 
-	GLfloat stiffness = 1000000.f;
-	GLfloat kSheering = 0.2f;
-	GLfloat kBending = 0.2f;
-	GLfloat restLengthHorizontal = 0.5f;
-	GLfloat restLengthVertical = 0.5f;
-	GLfloat restLengthDiagonal = 0.707f;
-	GLfloat particleMass = 10;
-	GLfloat clothMass = 1000;
+	GLfloat stiffness;
+	GLfloat kSheering;
+	GLfloat kBending;
+	GLfloat restLengthHorizontal;
+	GLfloat restLengthVertical;
+	GLfloat restLengthDiagonal;
+	GLfloat particleMass;
+	GLfloat clothMass;
 
 	Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight);
 

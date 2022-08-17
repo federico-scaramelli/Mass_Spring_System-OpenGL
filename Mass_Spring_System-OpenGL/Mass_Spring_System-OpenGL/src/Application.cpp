@@ -53,7 +53,7 @@ void run() {
 
 	// CLOTH
 	int sizeMult=2;
-	Cloth cloth(10.f, 10.f, 16*sizeMult, 16*sizeMult);
+	Cloth cloth(20.f, 20.f, 16*sizeMult, 16*sizeMult);
 
 	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"shader.frag", ShaderType::FRAGMENT} });
 
