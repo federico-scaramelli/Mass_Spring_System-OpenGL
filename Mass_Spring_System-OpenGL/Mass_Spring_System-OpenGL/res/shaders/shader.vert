@@ -16,11 +16,11 @@ uniform mat3 normalMatrix;
 
 void main() 
 {
-	normal = normalize (  normalMatrix * vertexNormal.xyz );
-	position = ( modelViewMatrix * vec4 ( vertexPosition.xyz, 1.0 ) ).xyz;
+	vec4 camSpaceCoords = modelViewMatrix * vec4(vertexPosition.xyz, 1.0);
+	vec4 clipSpaceCoordinates = projectionMatrix * camSpaceCoords;
 
-	vec4 camCoords = modelViewMatrix * vec4(vertexPosition.xyz, 1.0);
-	vec4 clipSpaceCoordinates = projectionMatrix * camCoords;
+	normal = normalize (  normalMatrix * vertexNormal.xyz );
+	position = camSpaceCoords.xyz;
 
 	gl_Position = clipSpaceCoordinates;
 }	

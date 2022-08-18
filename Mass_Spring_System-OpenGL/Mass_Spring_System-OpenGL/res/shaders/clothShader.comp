@@ -56,6 +56,8 @@ void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosit
 
 	vec3 nextPosition =	position + deltaPosition + deltaAcceleration;
 
+	float vertetDistanceIntegration = distance(position, nextPosition);
+
 	verticesOut[idx].oldPos = vec4(position, 1.0);
 	verticesOut[idx].pos = vec4(nextPosition, 1.0);
 

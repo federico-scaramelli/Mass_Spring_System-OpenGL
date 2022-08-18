@@ -7,5 +7,14 @@ out vec4 fragColor;
 
 void main() 
 {
-	fragColor = vec4 ( normal, 1);
+	vec3 viewDir = normalize(-position.xyz);
+	vec3 bisideNormal=normal;
+
+	//Bi-side lighting
+    float viewNormalDot = dot ( viewDir, normal);
+	if ( viewNormalDot < 0 ) {
+		bisideNormal = -normal;
+	}
+
+	fragColor = vec4 ( bisideNormal, 1);
 }	

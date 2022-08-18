@@ -1,5 +1,6 @@
 #version 460
 
+//posizione vertice in camera coords
 in vec3 position;
 in vec3 normal;
 

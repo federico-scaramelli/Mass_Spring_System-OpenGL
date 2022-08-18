@@ -217,7 +217,7 @@ GLint ShaderProgram::GetUniformLocation(const char* name)
 {
 	if (uniformLocations.find(name) == uniformLocations.end()) 
 	{
-		std::cout << "Uniform active not found" << std::endl;
+		std::cout << "Uniform active " << name << " not found" << std::endl;
 		return -1;
 		// throw std::runtime_error("Uniform location invalid!");
 	}

@@ -55,6 +55,27 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 	vec3 totalCorrection = vec3(0,0,0);
 /*
 */
+// Bend Spring - Up
+	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection;
+
+	// Bend Spring - Down
+	totalCorrection = (globalIdx.y > 1) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection;
+		
+	// Bend Spring - Left
+	totalCorrection = (globalIdx.x > 1) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
+		totalCorrection;
+
+	// Bend Spring - Right
+	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
+		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
+		totalCorrection;
+
+
 	// Structure Spring - Down
 	totalCorrection = (globalIdx.y > 0) ?
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenVertical)) :
@@ -98,25 +119,7 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 /*
 */
 
-	// Bend Spring - Up
-	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
-		totalCorrection;
-
-	// Bend Spring - Down
-	totalCorrection = (globalIdx.y > 1) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
-		totalCorrection;
-		
-	// Bend Spring - Left
-	totalCorrection = (globalIdx.x > 1) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
-		totalCorrection;
-
-	// Bend Spring - Right
-	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
-		totalCorrection;
+	
 
 	return totalCorrection;
 }
@@ -146,7 +149,7 @@ void main()
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx);
 
 		
-	float mult=0.3;
+	float mult=0.25;
 	position += correction*mult;
 	
 	//Update pos 

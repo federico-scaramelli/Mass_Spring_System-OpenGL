@@ -5,37 +5,44 @@
 
 #include "../engine/Vertex.h"
 
-Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight) :
-	m_Width(clothWidth), m_Height(clothHeight), m_PointsByWidth(pointsWidth), m_PointsByHeight(pointsHeight),
+Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight) :
+	m_Width(clothWidth), m_Height(clothHeight),
 	GameObject("Cloth")
 {
+	density = 2.56f;
+	float vertexCount=density*(m_Width*m_Height);
+	float desiredMass=500;
+	particleMass=desiredMass/vertexCount;
+	clothMass = vertexCount * particleMass;
+
+	m_PointsByWidth=static_cast<int>(sqrt(vertexCount));
+	m_PointsByHeight=m_PointsByWidth;
+	
 	InitializeVertices();
 	InitializeIndices();
 
 	//Pin the 4 outern vertices
 	auto& vertices = m_Mesh.GetVertices();
 
-	auto& topLeft = vertices[LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth)];
-	auto& topRight = vertices[LinearIndex(m_PointsByHeight - 1, m_PointsByWidth - 1, m_PointsByWidth)];
-	auto& bottomLeft = vertices[LinearIndex(0, 0, m_PointsByWidth - 1)];
-	auto& bottomRight = vertices[LinearIndex(0, m_PointsByWidth - 1, m_PointsByWidth)];
-
-	density=1.f;
-
+	auto& topLeft = vertices[LinearIndex(m_PointsByHeight -2, m_PointsByWidth/10, m_PointsByWidth)];
+	auto& topRight = vertices[LinearIndex(m_PointsByHeight -2, m_PointsByWidth * 9/10, m_PointsByWidth)];
+	auto& topCenter = vertices[LinearIndex(m_PointsByHeight -2, m_PointsByWidth/2, m_PointsByWidth)];
+	
 	restLengthVertical = m_Height / m_PointsByHeight;
 	restLengthHorizontal = m_Width / m_PointsByWidth;
 	restLengthDiagonal = static_cast<GLfloat>(sqrt(pow(restLengthVertical, 2) + pow(restLengthHorizontal, 2)));
-	particleMass=1.0;
-	stiffness=5000.f;
-	kSheering=1.5;
-	kBending=kSheering*0.2f;
-	clothMass=static_cast<float>(vertices.size()) * particleMass * density;
+	stiffness = 5000.f;
+	kSheering = 1.5;
+	kBending = kSheering * 0.2f;
 	
+
 
 	topLeft.pinned = {1, 0, 0, 0};
 	topRight.pinned = {1, 0, 0, 0};
-	bottomRight.pinned = {1, 0, 0, 0};
-	bottomLeft.pinned = {1, 0, 0, 0};
+	topCenter.pinned = {1, 0, 0, 0};
+	
+	// bottomRight.pinned = {1, 0, 0, 0};
+	// bottomLeft.pinned = {1, 0, 0, 0};
 
 	// topLeft.position.x -= m_Width * 2.f;
 	// topRight.position.x += m_Width * 2.f;
@@ -155,11 +162,9 @@ void Cloth::Update()
 
 	secondStageComputeShader.Use();
 	BindComputeBuffers(1, 0);
-	
+
 	secondStageComputeShader.Compute();
 	secondStageComputeShader.Wait();
-
-
 
 
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);

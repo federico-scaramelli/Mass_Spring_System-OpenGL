@@ -31,7 +31,7 @@ public:
 	GLfloat clothMass;
 	GLfloat density;
 
-	Cloth(GLfloat clothWidth, GLfloat clothHeight, GLint pointsWidth, GLint pointsHeight);
+	Cloth(GLfloat clothWidth, GLfloat clothHeight);
 
 	void InitializeVertices();
 
