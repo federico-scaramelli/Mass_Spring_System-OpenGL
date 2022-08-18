@@ -41,7 +41,7 @@ Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight) :
 	restLengthVertical = m_Height / m_PointsByHeight;
 	restLengthHorizontal = m_Width / m_PointsByWidth;
 	restLengthDiagonal = static_cast<GLfloat>(sqrt(pow(restLengthVertical, 2) + pow(restLengthHorizontal, 2)));
-	stiffness = 50000.f;
+	stiffness = 5000.f;
 	kSheering = 1.5;
 	kBending = kSheering * 0.2f;
 
@@ -150,25 +150,30 @@ void Cloth::Create()
 	secondStageComputeShader.SetUniform<GLfloat>("restLenVertical", restLengthVertical);
 
 	secondStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", restLengthDiagonal);
+
+	secondStageComputeShader.SetUniform<GLfloat>("deltaTime", m_Parameters.deltaTime);
 }
 
 void Cloth::Update()
 {
-	
-	firstStageComputeShader.Use();
-	BindComputeBuffers(0, 1);
+	int maxIterations = 100;
 
-	firstStageComputeShader.Compute();
-	firstStageComputeShader.Wait();
+	for (int i = 0; i < maxIterations; i++)
+	{
+		firstStageComputeShader.Use();
+		BindComputeBuffers(0, 1);
 
-	// SwapComputeBuffers();
+		firstStageComputeShader.Compute();
+		firstStageComputeShader.Wait();
 
-	secondStageComputeShader.Use();
-	BindComputeBuffers(1, 0);
+		// SwapComputeBuffers();
 
-	secondStageComputeShader.Compute();
-	secondStageComputeShader.Wait();
-	
+		secondStageComputeShader.Use();
+		BindComputeBuffers(1, 0);
+
+		secondStageComputeShader.Compute();
+		secondStageComputeShader.Wait();
+	}
 
 
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);

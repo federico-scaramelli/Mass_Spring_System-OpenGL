@@ -52,13 +52,13 @@ void run() {
 	vertexBufferLayout.Push<GLfloat>(4); //5
 
 	// CLOTH
-	int size=30;
+	int size=20;
 	Cloth cloth(size, size);
 
 	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
 
 	// Compute stage 1: compute new positions without constraints
-	cloth.firstStageComputeShader.CreateProgram ( {"clothShader.comp", ShaderType::COMPUTE} );
+	cloth.firstStageComputeShader.CreateProgram ( {"eulerClothShader.comp", ShaderType::COMPUTE} );
 	cloth.firstStageComputeShader.SetWorkGroupSize({ 16, 16, 1 });
 	cloth.firstStageComputeShader.SetWorkGroupNum( { cloth.GetClothSize(), 1 } );
 
@@ -96,19 +96,15 @@ void run() {
 
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
-		int maxIterations = 50;
+		renderer.Clear();
+		
+		scene.Update();
+		
+		renderer.DrawUI();
 
-		for (int i = 0; i < maxIterations; i++)
-		{
-			renderer.Clear();
-
-			scene.Update();
-
-			renderer.DrawUI();
-
-			glfwSwapBuffers(glfwWindow);
-			glfwPollEvents();
-		}
+		glfwSwapBuffers(glfwWindow);
+		glfwPollEvents();
+	
 	}
 }
 

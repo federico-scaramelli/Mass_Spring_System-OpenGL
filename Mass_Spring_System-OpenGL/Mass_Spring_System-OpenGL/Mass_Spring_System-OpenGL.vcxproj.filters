@@ -1474,10 +1474,11 @@
       <Filter>File di intestazione</Filter>
     </None>
     <None Include="res\shaders\shader.comp" />
-    <None Include="res\shaders\clothShader.comp" />
+    <None Include="res\shaders\verletClothShader.comp" />
     <None Include="res\shaders\clothConstraints.comp" />
     <None Include="res\shaders\blinnPhongShader.frag" />
     <None Include="res\shaders\normalShader.frag" />
+    <None Include="res\shaders\eulerClothShader.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="libraries\include\glm\CMakeLists.txt" />

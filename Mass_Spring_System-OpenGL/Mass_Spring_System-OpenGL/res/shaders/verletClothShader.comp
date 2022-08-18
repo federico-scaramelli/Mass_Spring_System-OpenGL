@@ -37,11 +37,10 @@ uniform vec4 gridDims;
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
 	vec3 vectorToOther = otherPosition - myPosition;
-	float maxDist=restLength*1.1;
-	float minDist=restLength*0.9;
-	float distance=length(vectorToOther);
+	float maxDist = restLength * 1.1;
+	float minDist = restLength * 0.9;
+	float distance = length(vectorToOther);
 	
-
 	vec3 force=elasticStiffness * (distance - restLength) * normalize(vectorToOther);
 	
 	/*
@@ -69,9 +68,6 @@ void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosit
 	}
 	*/
 
-	
-	
-
 	vec3 deltaPosition = (position - oldPosition) * damping;
 	/*
 
@@ -83,7 +79,6 @@ void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosit
 		deltaPosition *= 1/ratioPos;
 	}
 	*/
-
 
 	vec3 nextPosition =	position + deltaPosition + deltaAcceleration;
 
@@ -103,14 +98,12 @@ float random (vec2 st) {
     return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
-
 vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx, vec3 position) 
 {
 	vec3 totalForce = vec3(0,0,0);
 
 	vec3 gravity = gravityAcceleration.xyz;
-//	gravity.z *= random(vec2(totalForce.y, totalForce.y / 2));
-//	gravity.z *= 20 / (globalIdx.y + 1);
+
 	vec3 gravityForce = gravity * particleMass;
 	totalForce += gravityForce;
 
@@ -131,148 +124,50 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 		totalForce;
 	// Structure Spring - Right
 	totalForce = (globalIdx.x < particleGridDims.x - 1) ?
-		totalForce+constShearMult * ElasticForce(position, verticesIn[linearIdx + 1].pos.xyz, restLenHorizontal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + 1].pos.xyz, restLenHorizontal) :
 		totalForce;
 
 	// SHEAR - Diagonal
 	// Shear Spring - Upper-Left
 	totalForce = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
-		totalForce + constShearMult*ElasticForce(position, verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz, restLenDiagonal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz, restLenDiagonal) :
 		totalForce;
 	// Shear Spring - Lower-Left
 	totalForce = ((globalIdx.x > 0) && (globalIdx.y > 0)) ?
-		totalForce+constShearMult*ElasticForce(position, verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz, restLenDiagonal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz, restLenDiagonal) :
 		totalForce;
 	// Shear Spring - Upper-Right
 	totalForce = ((globalIdx.x < particleGridDims.x - 1) && (globalIdx.y < particleGridDims.y - 1)) ?
-		totalForce+constShearMult*ElasticForce(position, verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz, restLenDiagonal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz, restLenDiagonal) :
 		totalForce;
 	// Shear Spring - Lower-Right
 	totalForce = (globalIdx.x < particleGridDims.x - 1) && (globalIdx.y > 0) ?
-		totalForce+constShearMult*ElasticForce(position, verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz, restLenDiagonal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz, restLenDiagonal) :
 		totalForce;
 
 	// BEND - Distance 2  Horizonal / Vertical 
 	// Bend Spring - Up
 	totalForce = (globalIdx.y < particleGridDims.y - 2) ?
-		totalForce+constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
 		totalForce;
 
 	// Bend Spring - Down
 	totalForce = (globalIdx.y > 1) ?
-		totalForce+constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
 		totalForce;
 		
 	// Bend Spring - Left
 	totalForce = (globalIdx.x > 1) ?
-		totalForce+constBendMult * ElasticForce(position, verticesIn[linearIdx - 2].pos.xyz, restLenHorizontal * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2].pos.xyz, restLenHorizontal * 2) :
 		totalForce;
 
 	// Bend Spring - Right
 	totalForce = (globalIdx.x < particleGridDims.x - 2) ?
-		totalForce+constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHorizontal * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHorizontal * 2) :
 		totalForce;
 
 	return totalForce;
 }
-
-//NOT USED HERE
-vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen) 
-{
-	vec3 position=verticesIn[myIndex].pos.xyz;
-	vec3 otherPosition=verticesIn[otherIndex].pos.xyz;
-
-	vec3 VectorToOther = otherPosition - position;
-	float DistanceToOther = length(VectorToOther);
-
-	float maxDistance=restLen*1.1;
-
-	vec3 correction = vec3(0,0,0);
-	float diff = DistanceToOther - maxDistance;
-	if (diff > 0) {
-		correction = normalize(VectorToOther) * diff * 0.5;
-
-		correction = (IsPinned(otherIndex)) ? 
-			correction * 2 :
-			correction;
-		
-	}
-
-	return correction;
-}
-
-//NOT USED HERE
-vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) 
-{
-	vec3 totalCorrection = vec3(0,0,0);
-/*
-*/
-	// Structure Spring - Down
-	totalCorrection = (globalIdx.y > 0) ?
-		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenVertical)) :
-		totalCorrection;
-	
-	// Structure Spring - Right
-	totalCorrection = (globalIdx.x < particleGridDims.x - 1) ?
-		totalCorrection+ (ApplyConstraints(linearIdx, linearIdx + 1, restLenHorizontal)) :
-		totalCorrection;
-
-	// Structure Spring - Up
-	totalCorrection = (globalIdx.y < particleGridDims.y - 1) ? 
-		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenVertical)) :
-		totalCorrection;
-
-	// Structure Spring - Left
-	totalCorrection = (globalIdx.x > 0) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx-1, restLenHorizontal) :
-		totalCorrection;
-
-	
-	// Shear Spring - Upper-Left
-	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx + particleGridDims.x - 1, restLenDiagonal) :
-		totalCorrection;
-
-	// Shear Spring - Upper-Right
-	totalCorrection = ((globalIdx.x < particleGridDims.x - 1) && (globalIdx.y < particleGridDims.y - 1)) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + particleGridDims.x + 1, restLenDiagonal) :
-		totalCorrection;
-
-	// Shear Spring - Lower-Left
-	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y > 0)) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - particleGridDims.x - 1, restLenDiagonal) :
-		totalCorrection;
-
-	// Shear Spring - Lower-Right
-	totalCorrection = (globalIdx.x < particleGridDims.x - 1) && (globalIdx.y > 0) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - particleGridDims.x + 1, restLenDiagonal) :
-		totalCorrection;
-/*
-*/
-
-	// Bend Spring - Up
-	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
-		totalCorrection;
-
-	// Bend Spring - Down
-	totalCorrection = (globalIdx.y > 1) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
-		totalCorrection;
-		
-	// Bend Spring - Left
-	totalCorrection = (globalIdx.x > 1) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
-		totalCorrection;
-
-	// Bend Spring - Right
-	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
-		totalCorrection;
-
-	return totalCorrection;
-}
-
 
 void main() 
 {
@@ -303,7 +198,4 @@ void main()
 	vec3 acceleration = totalForce / particleMass;
 
 	VerletIntegrator(linearIdx, acceleration, position, oldPosition);
-
-	
-
 }

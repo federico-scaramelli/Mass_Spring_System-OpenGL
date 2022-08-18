@@ -24,6 +24,7 @@ uniform float restLenVertical = 0.5;
 uniform float restLenDiagonal = 0.707;
 
 uniform vec4 gridDims;
+uniform float deltaTime = 0.016;
 
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
@@ -31,13 +32,13 @@ bool IsPinned (uint linearIdx) {
 
 vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen) 
 {
-	vec3 position=verticesIn[myIndex].pos.xyz;
-	vec3 otherPosition=verticesIn[otherIndex].pos.xyz;
+	vec3 position = verticesIn[myIndex].pos.xyz;
+	vec3 otherPosition = verticesIn[otherIndex].pos.xyz;
 
 	vec3 VectorToOther = otherPosition - position;
 	float DistanceToOther = length(VectorToOther);
 
-	float maxDistance=restLen*1.1;
+	float maxDistance = restLen*1.1;
 
 	vec3 correction = vec3(0,0,0);
 	float diff = DistanceToOther - maxDistance;
@@ -56,41 +57,30 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 {
 	vec3 totalCorrection = vec3(0,0,0);
 
-// Bend Spring - Up
-	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
-		totalCorrection;
 /*
-*/
+	// Bend Spring - Up
+	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection;
+
 	// Bend Spring - Down
 	totalCorrection = (globalIdx.y > 1) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
 		totalCorrection;
 		
 	// Bend Spring - Left
 	totalCorrection = (globalIdx.x > 1) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
 		totalCorrection;
 
 	// Bend Spring - Right
 	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
 		totalCorrection;
-
-
+*/
 	// Structure Spring - Down
 	totalCorrection = (globalIdx.y > 0) ?
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenVertical)) :
-		totalCorrection;
-	
-	// Structure Spring - Right
-	totalCorrection = (globalIdx.x < particleGridDims.x - 1) ?
-		totalCorrection+ (ApplyConstraints(linearIdx, linearIdx + 1, restLenHorizontal)) :
-		totalCorrection;
-
-	// Structure Spring - Up
-	totalCorrection = (globalIdx.y < particleGridDims.y - 1) ? 
-		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenVertical)) :
 		totalCorrection;
 
 	// Structure Spring - Left
@@ -98,7 +88,18 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx-1, restLenHorizontal) :
 		totalCorrection;
 
-	
+
+	// Structure Spring - Right
+	totalCorrection = (globalIdx.x < particleGridDims.x - 1) ?
+		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + 1, restLenHorizontal)) :
+		totalCorrection;
+
+	// Structure Spring - Up
+	totalCorrection = (globalIdx.y < particleGridDims.y - 1) ? 
+		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenVertical)) :
+		totalCorrection;
+
+/*
 	// Shear Spring - Upper-Left
 	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx + particleGridDims.x - 1, restLenDiagonal) :
@@ -106,30 +107,63 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 
 	// Shear Spring - Upper-Right
 	totalCorrection = ((globalIdx.x < particleGridDims.x - 1) && (globalIdx.y < particleGridDims.y - 1)) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx + particleGridDims.x + 1, restLenDiagonal) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx + particleGridDims.x + 1, restLenDiagonal) :
 		totalCorrection;
 
 	// Shear Spring - Lower-Left
 	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y > 0)) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - particleGridDims.x - 1, restLenDiagonal) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - particleGridDims.x - 1, restLenDiagonal) :
 		totalCorrection;
 
 	// Shear Spring - Lower-Right
 	totalCorrection = (globalIdx.x < particleGridDims.x - 1) && (globalIdx.y > 0) ?
-		totalCorrection+ApplyConstraints(linearIdx, linearIdx - particleGridDims.x + 1, restLenDiagonal) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - particleGridDims.x + 1, restLenDiagonal) :
 		totalCorrection;
-/*
 */
-
-	
-
 	return totalCorrection;
+}
+
+void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
+	vec3 position = verticesIn[linearIdx].pos.xyz;
+
+	//Calculate normal
+	vec3 normal = vec3(0.0);
+	vec3 a, b, c;
+	if (globalIdx.y > 0) {
+		if (globalIdx.x > 0) {
+			a = verticesIn[linearIdx - 1].pos.xyz - position;
+			b = verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz - position;
+			c = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;
+			normal += cross(a, b) + cross(b, c);
+		}
+		if (globalIdx.x < particleGridDims.x - 1) {
+			a = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;
+			b = verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz - position;
+			c = verticesIn[linearIdx + 1].pos.xyz - position;
+			normal += cross(a, b) + cross(b, c);
+		}
+	}
+	if (globalIdx.y < particleGridDims.y - 1) {
+		if (globalIdx.x > 0) {
+			a = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;
+			b = verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz - position;
+			c = verticesIn[linearIdx - 1].pos.xyz - position;
+			normal += cross(a, b) + cross(b, c);
+		}
+		if (globalIdx.x < particleGridDims.x - 1) {
+			a = verticesIn[linearIdx + 1].pos.xyz - position;
+			b = verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz - position;
+			c = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;
+			normal += cross(a, b) + cross(b, c);
+		}
+	}
+
+	verticesOut[linearIdx].normal = vec4(normalize(normal), 0.0f);
 }
 
 void main() 
 {
 	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
-	//uvec3 particleGridDims = gl_NumWorkGroups * gl_WorkGroupSize;
 	uvec3 globalIdx = gl_GlobalInvocationID; 
 	uint linearIdx = globalIdx.x + (globalIdx.y * particleGridDims.x);
 	
@@ -144,56 +178,21 @@ void main()
 		return;
 	}
 
-	vec3 position=verticesIn[linearIdx].pos.xyz;
+	vec3 position = verticesIn[linearIdx].pos.xyz;
 	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
-	
-	vec3 correction=vec3(0,0,0);
-	
-	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx);
+	vec3 velocity = verticesIn[linearIdx].vel.xyz;
 
-		
-	float mult=1.0;
-	vec3 correctedPosition = position + correction*mult;
-	
-	vec2 interpolationWheights = vec2(0.8, 0.2);
-	vec3 interpPosition=(interpolationWheights.x * position) + (interpolationWheights.y * correctedPosition);
+	float correctionDamp = 0.6;
+	vec3 correction = vec3(0,0,0);
+	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
+
+	vec3 correctedPosition = position + correction;
+	vec3 correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 
 	//Update pos 
-	verticesOut[linearIdx].pos = vec4(interpPosition, 1.0);
+	verticesOut[linearIdx].pos = vec4(correctedPosition, 1.0);
 	verticesOut[linearIdx].oldPos = vec4(oldPosition, 1.0);
-	verticesOut[linearIdx].vel = verticesIn[linearIdx].vel;
+	verticesOut[linearIdx].vel = vec4(correctedVelocity, 0.0);
 
-	//Calculate normal
-	vec3 normal = vec3(0.0);
-	vec3 a, b, c;
-	if (globalIdx.y > 0) {
-		if (globalIdx.x > 0) {
-			a = verticesIn[linearIdx - 1].pos.xyz - position;
-			b = verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz - position;
-			c = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;
-			normal += cross(a,b) + cross(b,c);
-		}
-		if (globalIdx.x < particleGridDims.x - 1) {
-			a = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;
-			b = verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz - position;
-			c = verticesIn[linearIdx + 1].pos.xyz - position;
-			normal += cross(a,b) + cross(b,c);
-		}
-	}
-	if (globalIdx.y < particleGridDims.y - 1) {
-		if (globalIdx.x > 0) {
-			a = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;
-			b = verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz - position;
-			c = verticesIn[linearIdx - 1].pos.xyz - position;
-			normal += cross(a,b) + cross(b,c);
-		}
-		if (globalIdx.x < particleGridDims.x - 1) {
-			a = verticesIn[linearIdx + 1].pos.xyz - position;
-			b = verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz - position;
-			c = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;
-			normal += cross(a,b) + cross(b,c);
-		}
-	}
-
-	verticesOut[linearIdx].normal = vec4(normalize(normal), 0.0f);
+	UpdateNormals(linearIdx, particleGridDims, globalIdx);
 }

@@ -1,0 +1,181 @@
+#version 460
+
+//Worksize
+layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
+
+struct Vertex {
+    vec4 pos;
+	vec4 vel;
+	vec4 color;
+	vec4 normal;
+	vec4 oldPos;
+	vec4 pinned;
+};
+
+layout ( std430, binding = 0 ) buffer VertexBufferIn {
+	Vertex verticesIn[];
+};
+layout ( std430, binding = 1 ) buffer VertexBufferOut {
+	Vertex verticesOut[];
+};
+
+uniform float restLenHorizontal = 0.5;
+uniform float restLenVertical = 0.5;
+uniform float restLenDiagonal = 0.707;
+
+uniform float constShearMult = 1.0;
+uniform float constBendMult = 0.2;
+
+uniform float elasticStiffness = 100000;
+uniform float damping = 0.98;
+uniform float particleMass = 100;
+uniform vec4 gravityAcceleration = vec4(0, -9.81, 0, 1);
+uniform float deltaTime = 0.016;
+
+uniform vec4 gridDims;
+
+vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
+{
+	vec3 vectorToOther = otherPosition - myPosition;
+	float maxDist = restLength * 1.1;
+	float minDist = restLength * 0.9;
+	float distance = length(vectorToOther);
+	
+	vec3 force=elasticStiffness * (distance - restLength) * normalize(vectorToOther);
+	
+	/*
+	if(distance>maxDist || distance<minDist ){
+		//Deactivate string
+		force *= 0;
+	}
+	*/
+	
+	return force;
+}
+
+void EulerIntegrator (uint idx, vec3 acceleration, vec3 velocity, vec3 position) 
+{
+	verticesOut[idx].oldPos = vec4(position, 1.0);
+
+	vec3 newVelocity = velocity + acceleration * deltaTime;
+
+	vec3 newPosition = position + newVelocity * deltaTime;
+
+	verticesOut[idx].pos = vec4(newPosition, 1.0);
+
+	verticesOut[idx].vel = vec4(newVelocity, 0.0);
+}
+
+bool IsPinned (uint linearIdx) {
+	return verticesIn[linearIdx].pinned.x >= 0.5;
+}
+
+float random (vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+}
+
+vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx, vec3 position) 
+{
+	vec3 totalForce = vec3(0,0,0);
+
+	
+
+	// NOTE: x = column; y = row;
+
+	// STRUCTURE - Horizonal / Vertical
+	// Structure Spring - Up
+	totalForce = (globalIdx.y < particleGridDims.y - 1) ? 
+		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x].pos.xyz, restLenVertical)) :
+		totalForce;
+	// Structure Spring - Down
+	totalForce = (globalIdx.y > 0) ?
+		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x].pos.xyz, restLenVertical)) :
+		totalForce;
+	// Structure Spring - Left
+	totalForce = (globalIdx.x > 0) ?
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx-1].pos.xyz, restLenHorizontal) :
+		totalForce;
+	// Structure Spring - Right
+	totalForce = (globalIdx.x < particleGridDims.x - 1) ?
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + 1].pos.xyz, restLenHorizontal) :
+		totalForce;
+
+	// SHEAR - Diagonal
+	// Shear Spring - Upper-Left
+	totalForce = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz, restLenDiagonal) :
+		totalForce;
+	// Shear Spring - Lower-Left
+	totalForce = ((globalIdx.x > 0) && (globalIdx.y > 0)) ?
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz, restLenDiagonal) :
+		totalForce;
+	// Shear Spring - Upper-Right
+	totalForce = ((globalIdx.x < particleGridDims.x - 1) && (globalIdx.y < particleGridDims.y - 1)) ?
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz, restLenDiagonal) :
+		totalForce;
+	// Shear Spring - Lower-Right
+	totalForce = (globalIdx.x < particleGridDims.x - 1) && (globalIdx.y > 0) ?
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz, restLenDiagonal) :
+		totalForce;
+
+	// BEND - Distance 2  Horizonal / Vertical 
+	// Bend Spring - Up
+	totalForce = (globalIdx.y < particleGridDims.y - 2) ?
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
+		totalForce;
+
+	// Bend Spring - Down
+	totalForce = (globalIdx.y > 1) ?
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
+		totalForce;
+		
+	// Bend Spring - Left
+	totalForce = (globalIdx.x > 1) ?
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2].pos.xyz, restLenHorizontal * 2) :
+		totalForce;
+
+	// Bend Spring - Right
+	totalForce = (globalIdx.x < particleGridDims.x - 2) ?
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHorizontal * 2) :
+		totalForce;
+
+	return totalForce;
+}
+
+void main() 
+{
+	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
+	uvec3 globalIdx = gl_GlobalInvocationID; 
+	uint linearIdx = globalIdx.x + (globalIdx.y * particleGridDims.x);
+	
+	// Safety check
+	if (globalIdx.x >= particleGridDims.x || globalIdx.y >= particleGridDims.y) 
+		return;
+
+	// Keep pinned particles fixed
+	if (IsPinned(linearIdx)) {
+		verticesOut[linearIdx].pos = verticesIn[linearIdx].pos;
+		verticesOut[linearIdx].oldPos = verticesIn[linearIdx].oldPos;
+		verticesOut[linearIdx].vel = vec4(0.0);
+		return;
+	}
+	
+	vec3 totalForce = vec3(0,0,0);
+
+	vec3 position = verticesIn[linearIdx].pos.xyz;
+	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
+	vec3 velocity = verticesIn[linearIdx].vel.xyz;
+
+	vec3 gravity = gravityAcceleration.xyz;
+	vec3 gravityForce = gravity * particleMass;
+	
+	totalForce += gravityForce;
+	
+	totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
+
+	totalForce -= velocity * damping;
+
+	vec3 acceleration = totalForce / particleMass;
+
+	EulerIntegrator(linearIdx, acceleration, velocity, position);
+}
