@@ -32,19 +32,24 @@ uniform float particleMass = 100;
 uniform vec4 gravityAcceleration = vec4(0, -9.81, 0, 1);
 uniform float deltaTime = 0.016;
 
+uniform vec4 gridDims;
+
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
 	vec3 vectorToOther = otherPosition - myPosition;
+	float maxDist=restLength*1.1;
+	float minDist=restLength*0.9;
 	float distance=length(vectorToOther);
+	
 
 	vec3 force=elasticStiffness * (distance - restLength) * normalize(vectorToOther);
 	
-	float maxDist=restLength*1.1;
-	float minDist=restLength*0.9;
-	if(distance>maxDist /* || distance<minDist */){
+	/*
+	if(distance>maxDist || distance<minDist ){
 		//Deactivate string
 		force *= 0;
 	}
+	*/
 	
 	return force;
 }
@@ -52,7 +57,33 @@ vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength)
 void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosition) 
 {
 	vec3 deltaAcceleration = acceleration * deltaTime * deltaTime;
+
+	/*
+	float maxAccelLength=0.0028;
+	float accelLength=length(deltaAcceleration);
+
+	float ratioAccel = accelLength/maxAccelLength;
+
+	if(ratioAccel>1){
+		deltaAcceleration *= 1/ratioAccel;
+	}
+	*/
+
+	
+	
+
 	vec3 deltaPosition = (position - oldPosition) * damping;
+	/*
+
+	float mazDeltaPos=0.0612;
+
+	float ratioPos = length(deltaPosition)/mazDeltaPos;
+
+	if(ratioPos>1){
+		deltaPosition *= 1/ratioPos;
+	}
+	*/
+
 
 	vec3 nextPosition =	position + deltaPosition + deltaAcceleration;
 
@@ -245,12 +276,13 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 
 void main() 
 {
-	uvec3 particleGridDims = gl_NumWorkGroups * gl_WorkGroupSize;
+	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
+	//uvec3 particleGridDims = gl_NumWorkGroups * gl_WorkGroupSize;
 	uvec3 globalIdx = gl_GlobalInvocationID; 
 	uint linearIdx = globalIdx.x + (globalIdx.y * particleGridDims.x);
 	
 	// Safety check
-	if (linearIdx > particleGridDims.x * particleGridDims.y) 
+	if (globalIdx.x >= particleGridDims.x || globalIdx.y >= particleGridDims.y) 
 		return;
 
 	// Keep pinned particles fixed

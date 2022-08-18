@@ -23,6 +23,8 @@ uniform float restLenHorizontal = 0.5;
 uniform float restLenVertical = 0.5;
 uniform float restLenDiagonal = 0.707;
 
+uniform vec4 gridDims;
+
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
 }
@@ -53,13 +55,13 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) 
 {
 	vec3 totalCorrection = vec3(0,0,0);
-/*
-*/
+
 // Bend Spring - Up
 	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
 		totalCorrection+ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
 		totalCorrection;
-
+/*
+*/
 	// Bend Spring - Down
 	totalCorrection = (globalIdx.y > 1) ?
 		totalCorrection+ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
@@ -126,12 +128,13 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 
 void main() 
 {
-	uvec3 particleGridDims = gl_NumWorkGroups * gl_WorkGroupSize;
+	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
+	//uvec3 particleGridDims = gl_NumWorkGroups * gl_WorkGroupSize;
 	uvec3 globalIdx = gl_GlobalInvocationID; 
 	uint linearIdx = globalIdx.x + (globalIdx.y * particleGridDims.x);
 	
 	// Safety check
-	if (linearIdx > particleGridDims.x * particleGridDims.y) 
+	if (globalIdx.x >= particleGridDims.x || globalIdx.y >= particleGridDims.y) 
 		return;
 
 	// Keep pinned particles fixed
@@ -149,11 +152,14 @@ void main()
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx);
 
 		
-	float mult=0.25;
-	position += correction*mult;
+	float mult=1.0;
+	vec3 correctedPosition = position + correction*mult;
 	
+	vec2 interpolationWheights = vec2(0.8, 0.2);
+	vec3 interpPosition=(interpolationWheights.x * position) + (interpolationWheights.y * correctedPosition);
+
 	//Update pos 
-	verticesOut[linearIdx].pos = vec4(position, 1.0);
+	verticesOut[linearIdx].pos = vec4(interpPosition, 1.0);
 	verticesOut[linearIdx].oldPos = vec4(oldPosition, 1.0);
 	verticesOut[linearIdx].vel = verticesIn[linearIdx].vel;
 

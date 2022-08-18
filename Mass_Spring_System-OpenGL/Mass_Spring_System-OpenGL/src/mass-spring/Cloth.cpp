@@ -10,47 +10,45 @@ Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight) :
 	GameObject("Cloth")
 {
 	density = 2.56f;
-	float vertexCount=density*(m_Width*m_Height);
-	float desiredMass=500;
-	particleMass=desiredMass/vertexCount;
+	float vertexCount = density * (m_Width * m_Height);
+	float desiredMass = 500;
+	particleMass = desiredMass / vertexCount;
 	clothMass = vertexCount * particleMass;
 
-	m_PointsByWidth=static_cast<int>(sqrt(vertexCount));
-	m_PointsByHeight=m_PointsByWidth;
+	m_PointsByWidth = static_cast<int>(sqrt(vertexCount));
+	m_PointsByHeight = m_PointsByWidth;
 	
+
 	InitializeVertices();
 	InitializeIndices();
 
 	//Pin the 4 outern vertices
 	auto& vertices = m_Mesh.GetVertices();
 
-	auto& topLeft = vertices[LinearIndex(m_PointsByHeight -2, m_PointsByWidth/10, m_PointsByWidth)];
-	auto& topRight = vertices[LinearIndex(m_PointsByHeight -2, m_PointsByWidth * 9/10, m_PointsByWidth)];
-	auto& topCenter = vertices[LinearIndex(m_PointsByHeight -2, m_PointsByWidth/2, m_PointsByWidth)];
-	
+	auto& topLeft = vertices[LinearIndex(m_PointsByHeight -1, 0, m_PointsByWidth)];
+	auto& topRight = vertices[LinearIndex(m_PointsByHeight -1, m_PointsByWidth -1, m_PointsByWidth)];
+	auto& topCenter = vertices[LinearIndex(m_PointsByHeight -1, m_PointsByWidth/2, m_PointsByWidth)];
+
+
+	for (int i = 0 ; i < m_PointsByWidth; i+=6)
+	{
+		int base = LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth);
+		vertices[i + base].pinned={1,0,0,0};
+		vertices[i + base + 1].pinned={1,0,0,0};
+	}
+
+
 	restLengthVertical = m_Height / m_PointsByHeight;
 	restLengthHorizontal = m_Width / m_PointsByWidth;
 	restLengthDiagonal = static_cast<GLfloat>(sqrt(pow(restLengthVertical, 2) + pow(restLengthHorizontal, 2)));
-	stiffness = 5000.f;
+	stiffness = 50000.f;
 	kSheering = 1.5;
 	kBending = kSheering * 0.2f;
-	
 
 
-	topLeft.pinned = {1, 0, 0, 0};
-	topRight.pinned = {1, 0, 0, 0};
-	topCenter.pinned = {1, 0, 0, 0};
-	
-	// bottomRight.pinned = {1, 0, 0, 0};
-	// bottomLeft.pinned = {1, 0, 0, 0};
-
-	// topLeft.position.x -= m_Width * 2.f;
-	// topRight.position.x += m_Width * 2.f;
-	//
-	// bottomLeft.position.x -= m_Width * 2.f;
-	// bottomRight.position.x += m_Width * 2.f;
-	// bottomLeft.position.y -= m_Height * 5.f;
-	// bottomRight.position.y -= m_Height * 5.f;
+	// topLeft.pinned = {1, 0, 0, 0};
+	// topRight.pinned = {1, 0, 0, 0};
+	// topCenter.pinned = {1, 0, 0, 0};
 }
 
 void Cloth::InitializeVertices()
@@ -68,8 +66,8 @@ void Cloth::InitializeVertices()
 		{
 			glm::vec3 initialPosition{
 				column * spacingWidth,
-				row * spacingHeight,
-				row * 0.3f
+				0,
+				row * spacingHeight
 			};
 
 			Vertex vertex{{initialPosition.x, initialPosition.y, initialPosition.z, 0}};
@@ -127,6 +125,8 @@ void Cloth::Create()
 
 	firstStageComputeShader.SetUniform<glm::vec4>("gravityAcceleration", m_Parameters.gravityAccel);
 
+	firstStageComputeShader.SetUniform<glm::vec4>("gridDims", glm::vec4(m_PointsByWidth, m_PointsByHeight, 0, 0));
+
 	firstStageComputeShader.SetUniform<GLfloat>("elasticStiffness", stiffness);
 
 	firstStageComputeShader.SetUniform<GLfloat>("restLenHorizontal", restLengthHorizontal);
@@ -141,17 +141,20 @@ void Cloth::Create()
 
 	firstStageComputeShader.SetUniform<GLfloat>("constBendMult", kBending);
 
-	// secondStageComputeShader.Use();
+	secondStageComputeShader.Use();
 
-	// secondStageComputeShader.SetUniform<GLfloat>("restLenHorizontal", m_Parameters.restLengthHorizontal);
-	//
-	// secondStageComputeShader.SetUniform<GLfloat>("restLenVertical", m_Parameters.restLengthVertical);
-	//
-	// secondStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", m_Parameters.restLengthDiagonal);
+	secondStageComputeShader.SetUniform<glm::vec4>("gridDims", glm::vec4(m_PointsByWidth, m_PointsByHeight, 0, 0));
+
+	secondStageComputeShader.SetUniform<GLfloat>("restLenHorizontal", restLengthHorizontal);
+
+	secondStageComputeShader.SetUniform<GLfloat>("restLenVertical", restLengthVertical);
+
+	secondStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", restLengthDiagonal);
 }
 
 void Cloth::Update()
 {
+	
 	firstStageComputeShader.Use();
 	BindComputeBuffers(0, 1);
 
@@ -165,6 +168,7 @@ void Cloth::Update()
 
 	secondStageComputeShader.Compute();
 	secondStageComputeShader.Wait();
+	
 
 
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);

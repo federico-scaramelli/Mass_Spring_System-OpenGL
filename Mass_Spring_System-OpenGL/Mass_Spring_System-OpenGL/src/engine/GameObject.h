@@ -12,7 +12,7 @@ static std::uniform_real_distribution<float> unif{ 0, 1.0 };
 
 //Will be used as uniform
 struct PhysicsParameters {
-	GLfloat deltaTime = 0.016f;
+	GLfloat deltaTime = 0.025f;
 	GLfloat damping = 0.98f;
 	glm::vec4 gravityAccel{ 0.f, - 9.81f, 0.f, 0.f };
 };

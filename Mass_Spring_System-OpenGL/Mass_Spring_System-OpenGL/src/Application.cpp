@@ -96,14 +96,19 @@ void run() {
 
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
-		renderer.Clear();
+		int maxIterations = 50;
 
-		scene.Update();
+		for (int i = 0; i < maxIterations; i++)
+		{
+			renderer.Clear();
 
-		renderer.DrawUI();
+			scene.Update();
 
-		glfwSwapBuffers(glfwWindow);
-		glfwPollEvents();
+			renderer.DrawUI();
+
+			glfwSwapBuffers(glfwWindow);
+			glfwPollEvents();
+		}
 	}
 }
 
