@@ -11,10 +11,8 @@ Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight) :
 {
 	density = 2.56f;
 	float vertexCount = density * (m_Width * m_Height);
-	float desiredMass = 500;
-	particleMass = desiredMass / vertexCount;
-	clothMass = vertexCount * particleMass;
-
+	clothMass = 5000;
+	particleMass = clothMass / vertexCount;
 	m_PointsByWidth = static_cast<int>(sqrt(vertexCount));
 	m_PointsByHeight = m_PointsByWidth;
 	
@@ -68,6 +66,7 @@ void Cloth::InitializeVertices()
 				column * spacingWidth,
 				0,
 				row * spacingHeight
+				
 			};
 
 			Vertex vertex{{initialPosition.x, initialPosition.y, initialPosition.z, 0}};
@@ -135,7 +134,7 @@ void Cloth::Create()
 
 	firstStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", restLengthDiagonal);
 
-	firstStageComputeShader.SetUniform<GLfloat>("particleMass", clothMass);
+	firstStageComputeShader.SetUniform<GLfloat>("particleMass", particleMass);
 
 	firstStageComputeShader.SetUniform<GLfloat>("constShearMult", kSheering);
 
@@ -156,7 +155,7 @@ void Cloth::Create()
 
 void Cloth::Update()
 {
-	int maxIterations = 100;
+	int maxIterations = 20;
 
 	for (int i = 0; i < maxIterations; i++)
 	{

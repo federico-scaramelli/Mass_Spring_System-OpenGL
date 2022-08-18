@@ -52,7 +52,7 @@ void run() {
 	vertexBufferLayout.Push<GLfloat>(4); //5
 
 	// CLOTH
-	int size=20;
+	int size=50;
 	Cloth cloth(size, size);
 
 	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });

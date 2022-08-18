@@ -182,7 +182,7 @@ void main()
 	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
 	vec3 velocity = verticesIn[linearIdx].vel.xyz;
 
-	float correctionDamp = 0.6;
+	float correctionDamp = 0.5;
 	vec3 correction = vec3(0,0,0);
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
 
