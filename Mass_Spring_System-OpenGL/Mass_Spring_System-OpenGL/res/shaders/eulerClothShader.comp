@@ -171,7 +171,7 @@ void main()
 	totalForce += gravityForce;
 
 	// Springs
-	//totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
+	totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
 
 	// Air friction
 	totalForce -= velocity * damping;// * random(vec2(linearIdx, globalIdx.x)) / 5;

@@ -76,6 +76,8 @@ void run ()
 	cloth.SetComputeBuffers();
 	scene.AddGameObject (&cloth);
 
+
+
 	// ROPE
 	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
 	Rope rope (50, 10, 1);

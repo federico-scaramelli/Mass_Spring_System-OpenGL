@@ -35,6 +35,8 @@ Window::Window()
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glfwSetFramebufferSizeCallback(window, ResizeCallback);
 
+	glfwSwapInterval( 0 );
+
 	InitializeImGui ();
 }
 
