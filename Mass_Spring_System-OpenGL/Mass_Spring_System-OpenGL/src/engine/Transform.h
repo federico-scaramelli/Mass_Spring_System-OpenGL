@@ -114,7 +114,7 @@ public:
 		GenerateRotationUI (renderer);
 	}
 
-	void GeneratePositionUI(Renderer& renderer, float min = -100, float max = 100)
+	void GeneratePositionUI(Renderer& renderer, float min = -250, float max = 250)
 	{
 		strcpy_s (UILabel_Position, name);
 		strcat_s (UILabel_Position, " position");

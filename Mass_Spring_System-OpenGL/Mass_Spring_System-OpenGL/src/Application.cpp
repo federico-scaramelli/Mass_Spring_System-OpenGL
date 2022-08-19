@@ -56,7 +56,7 @@ void run ()
 	int size = 50;
 	Cloth cloth (size, size, 5.f);
 
-	cloth.PinTopPoints();
+	cloth.PinCenter();
 
 	cloth.GetMesh().SetBuffers (vertexBufferLayout);
 	cloth.GetMaterial().CreateShaderProgram ({
@@ -78,12 +78,14 @@ void run ()
 
 
 	// SPHERE
-	Primitive sphere ("Sphere", SPHERE, 300);
+	Primitive sphere ("Sphere", SPHERE, 30);
 	sphere.GetMesh().SetBuffers (vertexBufferLayout);
 	sphere.GetMaterial().CreateShaderProgram ({
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&sphere);
+
+	cloth.SetCollidingSphere (&sphere);
 
 
 	// CUBE
@@ -112,6 +114,9 @@ void run ()
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddLightSource (&lightSource);
+
+	lightSource.GetTransform().AddPosition ( {122.5, -80, 122.5} );
+	sphere.GetTransform().AddPosition ( {122.5, -80, 122.5} );
 
 #pragma endregion
 

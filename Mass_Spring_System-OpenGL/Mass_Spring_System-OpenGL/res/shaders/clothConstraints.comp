@@ -25,6 +25,10 @@ uniform float restLenDiagonal;
 uniform vec4 gridDims;
 uniform float deltaTime;
 
+uniform vec4 sphereCenter;
+uniform float sphereRadius;
+
+
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
 }
@@ -54,7 +58,7 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	return correction;
 }
 
-vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) 
+vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) 
 {
 	vec3 totalCorrection = vec3(0,0,0);
 
@@ -191,6 +195,16 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 	verticesOut[linearIdx].normal = vec4(normalize(normal), 0.0f);
 }
 
+void UpdateData(vec3 position, vec3 oldPosition, vec3 velocity, 
+				uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
+	//Update pos on buffer
+	verticesOut[linearIdx].pos = vec4(position, 1.0);
+	verticesOut[linearIdx].oldPos = vec4(oldPosition, 1.0);
+	verticesOut[linearIdx].vel = vec4(velocity, 0.0);
+
+	UpdateNormals(linearIdx, particleGridDims, globalIdx);
+}
+
 void main() 
 {
 	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
@@ -212,21 +226,38 @@ void main()
 	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
 	vec3 velocity = verticesIn[linearIdx].vel.xyz;
 
+	vec3 correctedPosition = position;
+	vec3 correctedVelocity = vec3(0,0,0);
+
+	// Distance constraints
 	float correctionDamp = .25f;
-	vec3 correction = vec3(0,0,0);
-	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
+	vec3 distCorrection = vec3(0,0,0);
+	distCorrection = ComputeDistanceCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
 
-	correction += ComputeSelfCollision(linearIdx, particleGridDims, restLenHV);
+	// Update position and velocity
+	correctedPosition += distCorrection;
+	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 
-	vec3 correctedPosition = position + correction;
+	//COLLISION DETECTION
+    vec3 sphereDist = correctedPosition - sphereCenter.xyz;
+    if (length(sphereDist) < sphereRadius + restLenHV * 0.33) 
+	{
+        // If the particle is inside the sphere, push it to the outer radius
+        correctedPosition = sphereCenter.xyz + normalize(sphereDist) * (sphereRadius + restLenHV * 0.33);
+        // Cancel out velocity
+        correctedVelocity *= 0.95f;
 
-	// Update derivatives
-	vec3 correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
+		UpdateData(correctedPosition, oldPosition, correctedVelocity, linearIdx, particleGridDims, globalIdx);
+		return;
+    }
 
-	//Update pos on buffer
-	verticesOut[linearIdx].pos = vec4(correctedPosition, 1.0);
-	verticesOut[linearIdx].oldPos = vec4(oldPosition, 1.0);
-	verticesOut[linearIdx].vel = vec4(correctedVelocity, 0.0);
+	// Self collisions
+	vec3 selfCollCorrection = vec3(0,0,0);
+	selfCollCorrection += ComputeSelfCollision(linearIdx, particleGridDims, restLenHV);
 
-	UpdateNormals(linearIdx, particleGridDims, globalIdx);
+	// Update position and velocity
+	correctedPosition += selfCollCorrection;
+	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
+
+	UpdateData(correctedPosition, oldPosition, correctedVelocity, linearIdx, particleGridDims, globalIdx);
 }

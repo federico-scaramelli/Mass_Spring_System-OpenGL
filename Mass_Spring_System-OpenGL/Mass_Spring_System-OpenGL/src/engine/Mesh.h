@@ -15,10 +15,6 @@ private:
 	std::vector<Vertex> m_Vertices;
 	std::vector<GLuint> m_Indices;
 
-	//TODO: move on Mass Spring class
-	//Map<indice vertice, se è pinnato>
-	//std::map<int, bool> pinnedVertices;
-
 	Material m_Material;
 
 public:

@@ -16,7 +16,7 @@ private:
 
 public:
 	LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1})
-	  :  Primitive ("Light", PrimitiveType::SPHERE, 10)
+	  :  Primitive ("Light", PrimitiveType::SPHERE, 30)
 	{
 		this->m_LightIntensity = lightIntensity;
 		this->m_LightAmbient = lightAmbient;

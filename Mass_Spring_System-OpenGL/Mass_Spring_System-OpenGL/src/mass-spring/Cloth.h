@@ -4,6 +4,7 @@
 #include "glm/vec3.hpp"
 
 #include "../engine/GameObject.h"
+#include "../engine/Primitive.h"
 
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 
@@ -47,6 +48,7 @@ public:
 	void InitializeIndices();
 
 	void Create() override;
+	void UpdateCollidingSphereUniforms ();
 	void Update() override;
 
 	void SetComputeBuffers();
@@ -61,6 +63,12 @@ public:
 
 	void PinAllEdges();
 	void PinTopEdge();
-	void PinCenter();
+	void PinCircleCenter();
+	void PinCenter ();
 	void PinTopPoints();
+
+	void SetCollidingSphere(Primitive* sphere) { collidingSphere = sphere; }
+
+private:
+	Primitive* collidingSphere = nullptr;
 };
