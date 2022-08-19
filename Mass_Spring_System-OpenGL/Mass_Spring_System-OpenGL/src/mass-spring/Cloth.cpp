@@ -113,6 +113,8 @@ void Cloth::Create()
 
 	secondStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", restLengthDiagonal);
 
+	secondStageComputeShader.SetUniform<GLfloat>("damping", m_Parameters.damping);
+
 	secondStageComputeShader.SetUniform<GLfloat>("deltaTime", m_Parameters.subStepDt);
 }
 

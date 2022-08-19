@@ -53,8 +53,8 @@ void run ()
 	vertexBufferLayout.Push<GLfloat> (4); //5
 
 	// CLOTH
-	int size = 100;
-	Cloth cloth (size, size, 2.5f);
+	int size = 50;
+	Cloth cloth (size, size, 5.f);
 
 	cloth.PinTopPoints();
 

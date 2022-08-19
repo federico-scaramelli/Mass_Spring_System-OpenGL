@@ -21,6 +21,7 @@ layout ( std430, binding = 1 ) buffer VertexBufferOut {
 
 uniform float restLenHV;
 uniform float restLenDiagonal;
+uniform float damping;
 
 uniform vec4 gridDims;
 uniform float deltaTime;
@@ -42,7 +43,8 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	vec3 correction = vec3(0,0,0);
 	float diff = distanceToOther - maxDistance;
 
-	if (diff > 0) {
+	if (diff > 0) 
+	{
 		correction = normalize(vectorToOther) * diff * 0.5;
 
 		correction = (IsPinned(otherIndex)) ? 
@@ -57,27 +59,27 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 {
 	vec3 totalCorrection = vec3(0,0,0);
 
-/*
+
 	// Bend Spring - Up
 	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenHV * 2) :
 		totalCorrection;
 
 	// Bend Spring - Down
 	totalCorrection = (globalIdx.y > 1) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenVertical * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 2 * particleGridDims.x, restLenHV * 2) :
 		totalCorrection;
 		
 	// Bend Spring - Left
 	totalCorrection = (globalIdx.x > 1) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 2, restLenHorizontal * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 2, restLenHV * 2) :
 		totalCorrection;
 
 	// Bend Spring - Right
 	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2, restLenHorizontal * 2) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2, restLenHV * 2) :
 		totalCorrection;
-*/
+
 	// Structure Spring - Down
 	totalCorrection = (globalIdx.y > 0) ?
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenHV)) :
@@ -99,7 +101,7 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenHV)) :
 		totalCorrection;
 
-/*
+
 	// Shear Spring - Upper-Left
 	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx + particleGridDims.x - 1, restLenDiagonal) :
@@ -119,8 +121,37 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 	totalCorrection = (globalIdx.x < particleGridDims.x - 1) && (globalIdx.y > 0) ?
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx - particleGridDims.x + 1, restLenDiagonal) :
 		totalCorrection;
-*/
+
 	return totalCorrection;
+}
+
+vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float restLen) {
+	vec3 correction = vec3(0,0,0);
+	uint size = particleGridDims.x * particleGridDims.y;
+	float epsilon = restLen * .8f;
+
+	for (int i = 0; i < size; i++) 
+	{
+		if (i == linearIdx) {
+			continue;
+		}
+
+		vec3 dir = verticesIn[i].pos.xyz - verticesIn[linearIdx].pos.xyz;
+		float dist = length(dir);
+		vec3 norm = -normalize(dir);
+		float correctionMult;
+		vec3 currentCorrection = vec3(0,0,0);
+		correctionMult = (IsPinned(i)) ? 
+							1 :
+							0.5;
+		currentCorrection = (dist < epsilon) ?
+								currentCorrection + norm * (epsilon - dist) * correctionMult :
+								currentCorrection; 
+
+		correction += currentCorrection;
+	}
+
+	return correction;
 }
 
 void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
@@ -185,6 +216,8 @@ void main()
 	float correctionDamp = .25f;
 	vec3 correction = vec3(0,0,0);
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
+
+	correction += ComputeSelfCollision(linearIdx, particleGridDims, restLenHV);
 
 	vec3 correctedPosition = position + correction;
 

@@ -120,7 +120,7 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	totalForce = (globalIdx.y < particleGridDims.y - 2) ?
 		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenHV * 2) :
 		totalForce;
-
+/*
 	// Bend Spring - Down
 	totalForce = (globalIdx.y > 1) ?
 		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenHV * 2) :
@@ -135,6 +135,7 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	totalForce = (globalIdx.x < particleGridDims.x - 2) ?
 		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHV * 2) :
 		totalForce;
+*/
 
 	return totalForce;
 }
@@ -173,7 +174,7 @@ void main()
 	//totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
 
 	// Air friction
-	totalForce -= velocity * damping * random(vec2(linearIdx, globalIdx.x));
+	totalForce -= velocity * damping;// * random(vec2(linearIdx, globalIdx.x)) / 5;
 
 
 	vec3 acceleration = totalForce / particleMass;

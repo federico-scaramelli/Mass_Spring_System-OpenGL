@@ -12,17 +12,17 @@ struct Vertex;
 //Will be used as uniform
 struct PhysicsParameters {
 	const GLfloat deltaTime = 0.016f;
-	const uint16_t subSteps = 32;
+	const uint16_t subSteps = 16;
 	const GLfloat subStepDt = deltaTime / static_cast<float>(subSteps);
 
-	const GLfloat damping = 0.98f;
-	//const glm::vec4 gravityAccel{ 0.f, - 9.81f, 0.f, 0.f };
+	const GLfloat damping = .98f;
+	//const glm::vec4 gravityAccel{ 0.f, -9.81f, 0.f, 0.f };
 	const glm::vec4 gravityAccel{ 0.f, -200, 0.f, 0.f };
-
+	GLfloat particleMass = 1.f;
+	
 	GLfloat stiffness = 10.f;
 	GLfloat kSheering = 1.f;
 	GLfloat kBending = kSheering * 0.2f;
-	GLfloat particleMass = 1.f;
 };
 
 class Cloth : public GameObject {
