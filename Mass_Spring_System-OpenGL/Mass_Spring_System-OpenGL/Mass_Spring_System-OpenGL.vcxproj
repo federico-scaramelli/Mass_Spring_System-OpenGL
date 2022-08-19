@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\Primitive.cpp" />
     <ClCompile Include="src\engine\ShaderProgramCompute.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
     <ClCompile Include="src\engine\Scene.cpp" />
@@ -197,6 +198,7 @@
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\engine\Primitive.h" />
     <ClInclude Include="src\engine\ShaderProgramCompute.h" />
     <ClInclude Include="src\engine\Material.h" />
     <ClInclude Include="src\engine\Scene.h" />

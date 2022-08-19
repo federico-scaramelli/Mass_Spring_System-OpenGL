@@ -10,9 +10,7 @@
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
 
-Scene::Scene(Renderer* renderer) : m_Renderer(renderer) {
-	m_Renderer->AddListBoxUI("Select object", &selectedObject, sceneObjects, 2);
-}
+Scene::Scene(Renderer* renderer) : m_Renderer(renderer) {}
 
 void Scene::AddCamera(Camera* camera) {
 	m_Camera = camera;

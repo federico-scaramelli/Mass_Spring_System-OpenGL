@@ -136,7 +136,6 @@ void Cloth::Update()
 		secondStageComputeShader.Wait();
 	}
 
-
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);
 	std::vector<Vertex> copy;
 	copy.resize (GetMesh().GetVertices().size());

@@ -11,20 +11,23 @@ class Camera;
 class GameObject;
 
 
-
-class Scene {
+class Scene
+{
 public:
-	Scene(Renderer* renderer);
-	
+	Scene (Renderer* renderer);
+
 	const char* sceneObjects[10];
 	int selectedObject = 0;
 
-	void AddCamera(Camera* camera);
-	void AddGameObject(GameObject* object);
-	void AddLightSource(LightSource* light);
+	void AddCamera (Camera* camera);
+	void AddGameObject (GameObject* object);
+	void AddLightSource (LightSource* light);
 
-	void Update();
-	
+	[[nodiscard]]
+	size_t GetGameObjectCount () const { return m_GameObjects.size(); }
+
+	void Update ();
+
 
 private:
 	Renderer* m_Renderer;
@@ -35,13 +38,13 @@ private:
 	LightSource* m_LightSource;
 
 	void SetShaderUniforms (GameObject* object);
-	void UpdateGameObjects();
+	void UpdateGameObjects ();
 
-	void UpdateCamera();
+	void UpdateCamera ();
 
-	void TransformLight();
-	void UpdateLight();
+	void TransformLight ();
+	void UpdateLight ();
 
-	void UpdateGameObject();
+	void UpdateGameObject ();
 	void DrawGameObject ();
 };

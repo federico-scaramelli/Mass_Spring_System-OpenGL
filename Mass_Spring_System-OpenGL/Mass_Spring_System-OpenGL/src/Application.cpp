@@ -58,6 +58,7 @@ void run ()
 
 	cloth.PinTopPoints();
 
+	cloth.GetMesh().SetBuffers (vertexBufferLayout);
 	cloth.GetMaterial().CreateShaderProgram ({
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
@@ -72,10 +73,26 @@ void run ()
 	cloth.secondStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
 	cloth.secondStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
 
-	cloth.GetMesh().SetBuffers (vertexBufferLayout);
 	cloth.SetComputeBuffers();
 	scene.AddGameObject (&cloth);
 
+
+	// SPHERE
+	Primitive sphere ("Sphere", SPHERE, 300);
+	sphere.GetMesh().SetBuffers (vertexBufferLayout);
+	sphere.GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
+	scene.AddGameObject (&sphere);
+
+
+	// CUBE
+	Primitive cube ("Cube", CUBE, 300);
+	cube.GetMesh().SetBuffers (vertexBufferLayout);
+	cube.GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
+	scene.AddGameObject (&cube);
 
 
 	// ROPE
@@ -86,6 +103,7 @@ void run ()
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&rope);
+
 
 	// LIGHT
 	LightSource lightSource{};
@@ -99,6 +117,9 @@ void run ()
 
 #pragma region UI Elements Creation
 
+	renderer.AddListBoxUI ("Select object",
+	                       &scene.selectedObject, scene.sceneObjects,
+	                       scene.GetGameObjectCount());
 	renderer.AddBoolCheckboxUI ("Wireframe", &renderer.wireframe);
 	renderer.AddBoolCheckboxUI ("Backface", &renderer.backface);
 

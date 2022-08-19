@@ -1,8 +1,8 @@
 #pragma once
-#include "GameObject.h"
+#include "Primitive.h"
 #include "Transform.h"
 
-class LightSource : public GameObject
+class LightSource : public Primitive
 {
 private:
 	glm::vec3 m_LightIntensity;
@@ -15,7 +15,8 @@ private:
 	char UILabel_Ambient[50];
 
 public:
-	LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1}) : GameObject ("Light ")
+	LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1})
+	  :  Primitive ("Light", PrimitiveType::SPHERE, 10)
 	{
 		this->m_LightIntensity = lightIntensity;
 		this->m_LightAmbient = lightAmbient;
