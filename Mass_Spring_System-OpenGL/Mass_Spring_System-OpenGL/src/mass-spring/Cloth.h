@@ -3,58 +3,34 @@
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
-#include "../engine/GameObject.h"
+#include "MassSpring.h"
 #include "../engine/Primitive.h"
 
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 
 struct Vertex;
 
-//Will be used as uniform
-struct PhysicsParameters {
-	const GLfloat deltaTime = 0.016f;
-	const uint16_t subSteps = 16;
-	const GLfloat subStepDt = deltaTime / static_cast<float>(subSteps);
-
-	const GLfloat damping = .98f;
-	//const glm::vec4 gravityAccel{ 0.f, -9.81f, 0.f, 0.f };
-	const glm::vec4 gravityAccel{ 0.f, -200, 0.f, 0.f };
-	GLfloat particleMass = 1.f;
-	
-	GLfloat stiffness = 10.f;
-	GLfloat kSheering = 1.f;
-	GLfloat kBending = kSheering * 0.2f;
-};
-
-class Cloth : public GameObject {
+class Cloth : public MassSpring {
 public:
 	GLint m_PointsByWidth;
 	GLint m_PointsByHeight;
 	GLfloat m_RestLengthHV;
-
-	PhysicsParameters m_Parameters;
-	ShaderProgramCompute firstStageComputeShader{};
-	ShaderProgramCompute secondStageComputeShader{};
-	GLuint m_ComputeTempVertexBuffer;
-
-	GLfloat restLengthDiagonal;
+	GLfloat m_RestLengthDiagonal;
 	
-	GLfloat clothMass;
-
+	GLuint m_ComputeTempVertexBuffer;
+	
 	Cloth(uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV);
 
-	void InitializeVertices();
-
-	void InitializeIndices();
+	void InitializeVertices() override;
+	void InitializeIndices() override;
 
 	void Create() override;
-	void UpdateCollidingSphereUniforms ();
 	void Update() override;
 
-	void SetComputeBuffers();
-	void BindComputeBuffers(int vboBind, int tempBind);
+	void UpdateCollidingSphereUniforms ();
 
-	void SwapComputeBuffers();
+	void SetComputeBuffers() override;
+	void BindComputeBuffers(int vboBind, int tempBind) override;
 
 	glm::vec2 GetClothSize()
 	{
@@ -66,9 +42,4 @@ public:
 	void PinCircleCenter();
 	void PinCenter ();
 	void PinTopPoints();
-
-	void SetCollidingSphere(Primitive* sphere) { collidingSphere = sphere; }
-
-private:
-	Primitive* collidingSphere = nullptr;
 };

@@ -16,6 +16,7 @@
 #include "mass-spring/Rope.h"
 #include "engine/Scene.h"
 #include "engine/LightSource.h"
+#include "engine/Sphere.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -64,28 +65,26 @@ void run ()
 	});
 
 	// Compute stage 1: compute new positions without constraints
-	cloth.firstStageComputeShader.CreateProgram ({ "eulerClothShader.comp", ShaderType::COMPUTE });
-	cloth.firstStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
-	cloth.firstStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
+	cloth.simulationStageComputeShader.CreateProgram ({ "eulerClothShader.comp", ShaderType::COMPUTE });
+	cloth.simulationStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
+	cloth.simulationStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
 
 	// Compute stage 2: apply constraints
-	cloth.secondStageComputeShader.CreateProgram ({ "clothConstraints.comp", ShaderType::COMPUTE });
-	cloth.secondStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
-	cloth.secondStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
+	cloth.constraintsStageComputeShader.CreateProgram ({ "clothConstraints.comp", ShaderType::COMPUTE });
+	cloth.constraintsStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
+	cloth.constraintsStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
 
 	cloth.SetComputeBuffers();
 	scene.AddGameObject (&cloth);
 
 
 	// SPHERE
-	Primitive sphere ("Sphere", SPHERE, 30);
+	Sphere sphere ("Sphere", 30);
 	sphere.GetMesh().SetBuffers (vertexBufferLayout);
 	sphere.GetMaterial().CreateShaderProgram ({
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&sphere);
-
-	cloth.SetCollidingSphere (&sphere);
 
 
 	// CUBE
@@ -105,7 +104,6 @@ void run ()
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&rope);
-
 
 	// LIGHT
 	LightSource lightSource{};

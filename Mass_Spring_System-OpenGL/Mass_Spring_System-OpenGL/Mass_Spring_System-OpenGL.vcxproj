@@ -168,10 +168,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\engine\Primitive.cpp" />
-    <ClCompile Include="src\engine\ShaderProgramCompute.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
     <ClCompile Include="src\engine\Scene.cpp" />
-    <ClCompile Include="src\engine\LightSource.cpp" />
+    <ClCompile Include="src\mass-spring\PhysicsSolver.cpp" />
     <ClCompile Include="src\mass-spring\Rope.cpp" />
     <ClCompile Include="src\mass-spring\Cloth.cpp" />
     <ClCompile Include="libraries\include\imgui\imgui.cpp" />
@@ -205,6 +204,9 @@
     <ClInclude Include="src\engine\LightSource.h" />
     <ClInclude Include="src\engine\Mesh.h" />
     <ClInclude Include="src\engine\GameObject.h" />
+    <ClInclude Include="src\engine\Sphere.h" />
+    <ClInclude Include="src\mass-spring\MassSpring.h" />
+    <ClInclude Include="src\mass-spring\PhysicsSolver.h" />
     <ClInclude Include="src\mass-spring\Rope.h" />
     <ClInclude Include="src\mass-spring\Cloth.h" />
     <ClInclude Include="libraries\include\imgui\imconfig.h" />
@@ -518,6 +520,7 @@
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
     <ClInclude Include="src\engine\Vertex.h" />
     <ClInclude Include="src\engine\Transform.h" />
+    <ClInclude Include="src\engine\SphereCollider.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\glm\detail\func_common.inl" />

@@ -6,15 +6,15 @@
 #include "../engine/Vertex.h"
 
 Cloth::Cloth (uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
-	GameObject ("Cloth"), m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
+	MassSpring ("Cloth", 
+				MassSpringParameters( 0.016f, 16, 0.98f, { 0.f, -200, 0.f, 0.f }, 1.0f, 10.0f, 1.0f )),
+	m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
 	m_RestLengthHV (restLenghtHV)
 {
-	float vertexCount = m_PointsByWidth * m_PointsByHeight;
-
 	InitializeVertices();
 	InitializeIndices();
 
-	restLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
+	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
 }
 
 void Cloth::InitializeVertices ()
@@ -67,84 +67,62 @@ void Cloth::InitializeIndices ()
 			indices.push_back (vUp);
 			indices.push_back (vUpLeft);
 			indices.push_back (vLeft);
-
-			// indices.push_back (vLeft);
-			// indices.push_back (vUpLeft);
-			// indices.push_back (vUp);
-			//
-			// indices.push_back (vUp);
-			// indices.push_back (v);
-			// indices.push_back (vLeft);
 		}
 	}
 }
 
 void Cloth::Create ()
 {
-	firstStageComputeShader.Use();
+	simulationStageComputeShader.Use();
 
-	firstStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 
-	firstStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
 
-	firstStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", m_Parameters.gravityAccel);
+	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", m_Parameters.gravityAccel);
 
-	firstStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
+	simulationStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
 
-	firstStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
+	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 
-	firstStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
+	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
 
-	firstStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", restLengthDiagonal);
+	simulationStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", m_RestLengthDiagonal);
 
-	firstStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
+	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 
-	firstStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
+	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
 
-	firstStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
+	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
-	secondStageComputeShader.Use();
+	constraintsStageComputeShader.Use();
 
-	secondStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
+	constraintsStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
 
-	secondStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
 
-	secondStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", restLengthDiagonal);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", m_RestLengthDiagonal);
 
-	secondStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
-
-	if (collidingSphere != nullptr) { UpdateCollidingSphereUniforms(); }
-}
-
-void Cloth::UpdateCollidingSphereUniforms ()
-{
-	auto spherePos = glm::inverse (GetTransform().GetModelMatrix())
-		* glm::vec4 (collidingSphere->GetTransform().GetPosition(), 1);
-
-	secondStageComputeShader.Use();
-	secondStageComputeShader.SetUniform<glm::vec4> ("sphereCenter", spherePos);
-	secondStageComputeShader.SetUniform<GLfloat> ("sphereRadius", collidingSphere->size);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 }
 
 void Cloth::Update ()
 {
-	if (collidingSphere != nullptr) { UpdateCollidingSphereUniforms(); }
-
 	for (int i = 0; i < m_Parameters.subSteps; i++)
 	{
-		firstStageComputeShader.Use();
+		simulationStageComputeShader.Use();
 		BindComputeBuffers (0, 1);
 
-		firstStageComputeShader.Compute();
-		firstStageComputeShader.Wait();
+		simulationStageComputeShader.Compute();
+		simulationStageComputeShader.Wait();
 
 		// SwapComputeBuffers();
 
-		secondStageComputeShader.Use();
+		constraintsStageComputeShader.Use();
 		BindComputeBuffers (1, 0);
 
-		secondStageComputeShader.Compute();
-		secondStageComputeShader.Wait();
+		constraintsStageComputeShader.Compute();
+		constraintsStageComputeShader.Wait();
 	}
 
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);
@@ -162,7 +140,7 @@ void Cloth::SetComputeBuffers ()
 {
 	glGenBuffers (1, &m_ComputeTempVertexBuffer);
 
-	firstStageComputeShader.Use();
+	simulationStageComputeShader.Use();
 	//In
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_Mesh.m_vbo.GetID());
 	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
@@ -176,16 +154,6 @@ void Cloth::BindComputeBuffers (int vboBind, int tempBind)
 {
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, vboBind, m_Mesh.m_vbo.GetID());
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, tempBind, m_ComputeTempVertexBuffer);
-}
-
-void Cloth::SwapComputeBuffers ()
-{
-	static int swapped = 0;
-
-	swapped = 1 - swapped;
-
-	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, swapped, m_Mesh.m_vbo.GetID());
-	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1 - swapped, m_ComputeTempVertexBuffer);
 }
 
 void Cloth::PinAllEdges ()

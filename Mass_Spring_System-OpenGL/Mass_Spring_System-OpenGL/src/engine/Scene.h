@@ -5,11 +5,12 @@
 #include "GameObject.h"
 #include "LightSource.h"
 #include "Renderer.h"
+#include "Sphere.h"
+#include "../mass-spring/PhysicsSolver.h"
 class Renderer;
 class LightSource;
 class Camera;
 class GameObject;
-
 
 class Scene
 {
@@ -31,6 +32,7 @@ public:
 
 private:
 	Renderer* m_Renderer;
+	PhysicsSolver physicsSolver {};
 
 	Camera* m_Camera;
 	std::vector<GameObject*> m_GameObjects;
@@ -47,4 +49,9 @@ private:
 
 	void UpdateGameObject ();
 	void DrawGameObject ();
+
+
+
+	//TODO temp
+	Sphere* activeTempSphere;
 };

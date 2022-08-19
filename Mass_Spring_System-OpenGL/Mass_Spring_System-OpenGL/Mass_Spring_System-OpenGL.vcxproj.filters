@@ -78,19 +78,16 @@
     <ClCompile Include="src\mass-spring\Rope.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\LightSource.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="src\engine\Scene.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="src\engine\Material.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\ShaderProgramCompute.cpp">
+    <ClCompile Include="src\engine\Primitive.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="src\engine\Primitive.cpp">
+    <ClCompile Include="src\mass-spring\PhysicsSolver.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1056,6 +1053,18 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\engine\Primitive.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mass-spring\MassSpring.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mass-spring\PhysicsSolver.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\SphereCollider.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\Sphere.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

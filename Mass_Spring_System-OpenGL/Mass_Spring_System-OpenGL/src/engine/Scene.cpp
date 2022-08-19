@@ -6,6 +6,7 @@
 #include "GameObject.h"
 #include "LightSource.h"
 #include "Renderer.h"
+#include "Sphere.h"
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
@@ -25,7 +26,17 @@ void Scene::SetShaderUniforms(GameObject* object) {
 		("projectionMatrix", m_Camera->GetProjectionMatrix());
 }
 
-void Scene::AddGameObject(GameObject* object) {
+void Scene::AddGameObject(GameObject* object)
+{
+	// TODO: temp
+	if (dynamic_cast<Sphere*>(object) != nullptr)
+	{
+		physicsSolver.SetActiveCollider (&dynamic_cast<Sphere*>(object)->collider);
+		activeTempSphere = dynamic_cast<Sphere*>(object);
+	}
+
+
+
 	m_GameObjects.push_back(object);
 
 	SetShaderUniforms(object);
@@ -102,12 +113,23 @@ void Scene::Update() {
 	if (!m_GameObjects.empty() && !(selectedObject > m_GameObjects.size())) {
 		UpdateGameObjects();
 	}
+	activeTempSphere->Update();
+
+	physicsSolver.Update();
 }
 
 void Scene::UpdateGameObjects() {
 	// TODO: loop on game objects list to update all the active ones
 	m_currentGameObject = m_GameObjects[selectedObject];
 
+
+	//TODO: temp
+	if (dynamic_cast<MassSpring*>(m_currentGameObject) != nullptr)
+	{
+		physicsSolver.SetActiveMassSpring (dynamic_cast<MassSpring*>(m_currentGameObject));
+	}
+
+	
 	// Custom update behavior of game object
 	m_currentGameObject->Update();
 
