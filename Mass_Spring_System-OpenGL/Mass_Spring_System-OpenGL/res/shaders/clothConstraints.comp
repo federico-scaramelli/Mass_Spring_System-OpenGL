@@ -19,12 +19,11 @@ layout ( std430, binding = 1 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
 
-uniform float restLenHorizontal = 0.5;
-uniform float restLenVertical = 0.5;
-uniform float restLenDiagonal = 0.707;
+uniform float restLenHV;
+uniform float restLenDiagonal;
 
 uniform vec4 gridDims;
-uniform float deltaTime = 0.016;
+uniform float deltaTime;
 
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
@@ -35,15 +34,16 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	vec3 position = verticesIn[myIndex].pos.xyz;
 	vec3 otherPosition = verticesIn[otherIndex].pos.xyz;
 
-	vec3 VectorToOther = otherPosition - position;
-	float DistanceToOther = length(VectorToOther);
+	vec3 vectorToOther = otherPosition - position;
+	float distanceToOther = length(vectorToOther);
 
-	float maxDistance = restLen*1.1;
+	float maxDistance = restLen * 1.05;
 
 	vec3 correction = vec3(0,0,0);
-	float diff = DistanceToOther - maxDistance;
+	float diff = distanceToOther - maxDistance;
+
 	if (diff > 0) {
-		correction = normalize(VectorToOther) * diff * 0.5;
+		correction = normalize(vectorToOther) * diff * 0.5;
 
 		correction = (IsPinned(otherIndex)) ? 
 			correction * 2 :
@@ -80,23 +80,23 @@ vec3 ComputeTotalCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globa
 */
 	// Structure Spring - Down
 	totalCorrection = (globalIdx.y > 0) ?
-		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenVertical)) :
+		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenHV)) :
 		totalCorrection;
 
 	// Structure Spring - Left
 	totalCorrection = (globalIdx.x > 0) ?
-		totalCorrection + ApplyConstraints(linearIdx, linearIdx-1, restLenHorizontal) :
+		totalCorrection + ApplyConstraints(linearIdx, linearIdx - 1, restLenHV) :
 		totalCorrection;
 
 
 	// Structure Spring - Right
 	totalCorrection = (globalIdx.x < particleGridDims.x - 1) ?
-		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + 1, restLenHorizontal)) :
+		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + 1, restLenHV)) :
 		totalCorrection;
 
 	// Structure Spring - Up
 	totalCorrection = (globalIdx.y < particleGridDims.y - 1) ? 
-		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenVertical)) :
+		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenHV)) :
 		totalCorrection;
 
 /*
@@ -182,14 +182,16 @@ void main()
 	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
 	vec3 velocity = verticesIn[linearIdx].vel.xyz;
 
-	float correctionDamp = 0.5;
+	float correctionDamp = .25f;
 	vec3 correction = vec3(0,0,0);
 	correction = ComputeTotalCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
 
 	vec3 correctedPosition = position + correction;
+
+	// Update derivatives
 	vec3 correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 
-	//Update pos 
+	//Update pos on buffer
 	verticesOut[linearIdx].pos = vec4(correctedPosition, 1.0);
 	verticesOut[linearIdx].oldPos = vec4(oldPosition, 1.0);
 	verticesOut[linearIdx].vel = vec4(correctedVelocity, 0.0);

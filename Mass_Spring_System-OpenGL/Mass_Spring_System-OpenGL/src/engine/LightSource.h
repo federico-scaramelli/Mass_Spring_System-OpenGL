@@ -8,8 +8,8 @@ private:
 	glm::vec3 m_LightIntensity;
 	glm::vec3 m_LightAmbient;
 	
-	float UI_LightIntensity[3] = {1, 1, 1};
-	float UI_LightAmbient[3] = {1, 1, 1};
+	float UI_LightIntensity[3] = {1, 1, .5f};
+	float UI_LightAmbient[3] = {0, 0, 0};
 
 	char UILabel_Intensity[50];
 	char UILabel_Ambient[50];

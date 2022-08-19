@@ -30,94 +30,99 @@ GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
 Scene scene{ &renderer };
 
-void init() {
+void init ()
+{
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
 }
 
-void run() {
-
+void run ()
+{
 #pragma region Scene Creation
 	//Camera
-	Camera camera(window.GetAspectRatio());
-	scene.AddCamera(&camera);
+	Camera camera (window.GetAspectRatio());
+	scene.AddCamera (&camera);
 
 	//Layout
 	VertexBufferLayout vertexBufferLayout;
-	vertexBufferLayout.Push<GLfloat>(4); //0
-	vertexBufferLayout.Push<GLfloat>(4); //1
-	vertexBufferLayout.Push<GLfloat>(4); //2
-	vertexBufferLayout.Push<GLfloat>(4); //3
-	vertexBufferLayout.Push<GLfloat>(4); //4
-	vertexBufferLayout.Push<GLfloat>(4); //5
+	vertexBufferLayout.Push<GLfloat> (4); //0
+	vertexBufferLayout.Push<GLfloat> (4); //1
+	vertexBufferLayout.Push<GLfloat> (4); //2
+	vertexBufferLayout.Push<GLfloat> (4); //3
+	vertexBufferLayout.Push<GLfloat> (4); //4
+	vertexBufferLayout.Push<GLfloat> (4); //5
 
 	// CLOTH
-	int size=50;
-	Cloth cloth(size, size);
+	int size = 100;
+	Cloth cloth (size, size, 2.5f);
 
-	cloth.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
+	cloth.PinTopPoints();
+
+	cloth.GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
 
 	// Compute stage 1: compute new positions without constraints
-	cloth.firstStageComputeShader.CreateProgram ( {"eulerClothShader.comp", ShaderType::COMPUTE} );
-	cloth.firstStageComputeShader.SetWorkGroupSize({ 16, 16, 1 });
-	cloth.firstStageComputeShader.SetWorkGroupNum( { cloth.GetClothSize(), 1 } );
+	cloth.firstStageComputeShader.CreateProgram ({ "eulerClothShader.comp", ShaderType::COMPUTE });
+	cloth.firstStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
+	cloth.firstStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
 
 	// Compute stage 2: apply constraints
-	cloth.secondStageComputeShader.CreateProgram ( {"clothConstraints.comp", ShaderType::COMPUTE} );
-	cloth.secondStageComputeShader.SetWorkGroupSize({ 16, 16, 1 });
-	cloth.secondStageComputeShader.SetWorkGroupNum( { cloth.GetClothSize(), 1 } );
+	cloth.secondStageComputeShader.CreateProgram ({ "clothConstraints.comp", ShaderType::COMPUTE });
+	cloth.secondStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
+	cloth.secondStageComputeShader.SetWorkGroupNum ({ cloth.GetClothSize(), 1 });
 
-	cloth.GetMesh().SetBuffers(vertexBufferLayout);
+	cloth.GetMesh().SetBuffers (vertexBufferLayout);
 	cloth.SetComputeBuffers();
-
-	scene.AddGameObject(&cloth);
+	scene.AddGameObject (&cloth);
 
 	// ROPE
 	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
-	Rope rope(50, 10, 1);
-	rope.GetMesh().SetBuffers(vertexBufferLayout);
-	rope.GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
-	scene.AddGameObject(&rope);
+	Rope rope (50, 10, 1);
+	rope.GetMesh().SetBuffers (vertexBufferLayout);
+	rope.GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
+	scene.AddGameObject (&rope);
 
 	// LIGHT
 	LightSource lightSource{};
-	lightSource.GetMesh().SetBuffers(vertexBufferLayout);
-	lightSource.GetMesh().GetMaterial().CreateShaderProgram({ {"shader.vert", ShaderType::VERTEX}, {"blinnPhongShader.frag", ShaderType::FRAGMENT} });
-	scene.AddLightSource(&lightSource);
+	lightSource.GetMesh().SetBuffers (vertexBufferLayout);
+	lightSource.GetMesh().GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
+	scene.AddLightSource (&lightSource);
 
 #pragma endregion
 
 #pragma region UI Elements Creation
 
-	renderer.AddBoolCheckboxUI("Wireframe", &renderer.wireframe);
-	renderer.AddBoolCheckboxUI("Backface", &renderer.backface);
+	renderer.AddBoolCheckboxUI ("Wireframe", &renderer.wireframe);
+	renderer.AddBoolCheckboxUI ("Backface", &renderer.backface);
 
 #pragma endregion
 
-	while (!glfwWindowShouldClose(glfwWindow))
+	while (!glfwWindowShouldClose (glfwWindow))
 	{
 		renderer.Clear();
-		
+
 		scene.Update();
-		
+
 		renderer.DrawUI();
 
-		glfwSwapBuffers(glfwWindow);
+		glfwSwapBuffers (glfwWindow);
 		glfwPollEvents();
-	
 	}
 }
 
-int main() {
+int main ()
+{
 	try
 	{
 		init();
 		run();
 	}
-	catch (std::runtime_error& e)
-	{
-		std::cout << e.what() << std::endl;
-	}
+	catch (std::runtime_error& e) { std::cout << e.what() << std::endl; }
 
 	return 0;
 }

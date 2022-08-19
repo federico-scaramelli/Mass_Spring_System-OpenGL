@@ -5,48 +5,18 @@
 
 #include "../engine/Vertex.h"
 
-Cloth::Cloth(GLfloat clothWidth, GLfloat clothHeight) :
-	m_Width(clothWidth), m_Height(clothHeight),
-	GameObject("Cloth")
+Cloth::Cloth(uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
+	GameObject("Cloth"), m_PointsByWidth(pointsByWidth), m_PointsByHeight(pointsByHeight),
+	m_RestLengthHV (restLenghtHV)
 {
-	density = 2.56f;
-	float vertexCount = density * (m_Width * m_Height);
-	clothMass = 5000;
-	particleMass = clothMass / vertexCount;
-	m_PointsByWidth = static_cast<int>(sqrt(vertexCount));
-	m_PointsByHeight = m_PointsByWidth;
-	
+	float vertexCount = m_PointsByWidth * m_PointsByHeight;
 
 	InitializeVertices();
 	InitializeIndices();
 
-	//Pin the 4 outern vertices
-	auto& vertices = m_Mesh.GetVertices();
+	restLengthDiagonal = static_cast<GLfloat>(sqrt(pow(m_RestLengthHV, 2) * 2));
 
-	auto& topLeft = vertices[LinearIndex(m_PointsByHeight -1, 0, m_PointsByWidth)];
-	auto& topRight = vertices[LinearIndex(m_PointsByHeight -1, m_PointsByWidth -1, m_PointsByWidth)];
-	auto& topCenter = vertices[LinearIndex(m_PointsByHeight -1, m_PointsByWidth/2, m_PointsByWidth)];
-
-
-	for (int i = 0 ; i < m_PointsByWidth; i+=6)
-	{
-		int base = LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth);
-		vertices[i + base].pinned={1,0,0,0};
-		vertices[i + base + 1].pinned={1,0,0,0};
-	}
-
-
-	restLengthVertical = m_Height / m_PointsByHeight;
-	restLengthHorizontal = m_Width / m_PointsByWidth;
-	restLengthDiagonal = static_cast<GLfloat>(sqrt(pow(restLengthVertical, 2) + pow(restLengthHorizontal, 2)));
-	stiffness = 5000.f;
-	kSheering = 1.5;
-	kBending = kSheering * 0.2f;
-
-
-	// topLeft.pinned = {1, 0, 0, 0};
-	// topRight.pinned = {1, 0, 0, 0};
-	// topCenter.pinned = {1, 0, 0, 0};
+	
 }
 
 void Cloth::InitializeVertices()
@@ -55,17 +25,14 @@ void Cloth::InitializeVertices()
 
 	vertices.clear();
 
-	float spacingWidth = m_Width / m_PointsByWidth;
-	float spacingHeight = m_Height / m_PointsByHeight;
-
 	for (auto row = 0; row < m_PointsByHeight; row++)
 	{
 		for (auto column = 0; column < m_PointsByWidth; column++)
 		{
 			glm::vec3 initialPosition{
-				column * spacingWidth,
+				column * m_RestLengthHV,
 				0,
-				row * spacingHeight
+				row * m_RestLengthHV
 				
 			};
 
@@ -118,7 +85,7 @@ void Cloth::Create()
 {
 	firstStageComputeShader.Use();
 
-	firstStageComputeShader.SetUniform<GLfloat>("deltaTime", m_Parameters.deltaTime);
+	firstStageComputeShader.SetUniform<GLfloat>("deltaTime", m_Parameters.subStepDt);
 
 	firstStageComputeShader.SetUniform<GLfloat>("damping", m_Parameters.damping);
 
@@ -126,39 +93,34 @@ void Cloth::Create()
 
 	firstStageComputeShader.SetUniform<glm::vec4>("gridDims", glm::vec4(m_PointsByWidth, m_PointsByHeight, 0, 0));
 
-	firstStageComputeShader.SetUniform<GLfloat>("elasticStiffness", stiffness);
+	firstStageComputeShader.SetUniform<GLfloat>("elasticStiffness", m_Parameters.stiffness);
 
-	firstStageComputeShader.SetUniform<GLfloat>("restLenHorizontal", restLengthHorizontal);
-
-	firstStageComputeShader.SetUniform<GLfloat>("restLenVertical", restLengthVertical);
+	firstStageComputeShader.SetUniform<GLfloat>("restLenHV", m_RestLengthHV);
 
 	firstStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", restLengthDiagonal);
 
-	firstStageComputeShader.SetUniform<GLfloat>("particleMass", particleMass);
+	firstStageComputeShader.SetUniform<GLfloat>("particleMass", m_Parameters.particleMass);
 
-	firstStageComputeShader.SetUniform<GLfloat>("constShearMult", kSheering);
+	firstStageComputeShader.SetUniform<GLfloat>("constShearMult", m_Parameters.kSheering);
 
-	firstStageComputeShader.SetUniform<GLfloat>("constBendMult", kBending);
+	firstStageComputeShader.SetUniform<GLfloat>("constBendMult", m_Parameters.kBending);
 
 	secondStageComputeShader.Use();
 
 	secondStageComputeShader.SetUniform<glm::vec4>("gridDims", glm::vec4(m_PointsByWidth, m_PointsByHeight, 0, 0));
 
-	secondStageComputeShader.SetUniform<GLfloat>("restLenHorizontal", restLengthHorizontal);
-
-	secondStageComputeShader.SetUniform<GLfloat>("restLenVertical", restLengthVertical);
+	secondStageComputeShader.SetUniform<GLfloat>("restLenHV", m_RestLengthHV);
 
 	secondStageComputeShader.SetUniform<GLfloat>("restLenDiagonal", restLengthDiagonal);
 
-	secondStageComputeShader.SetUniform<GLfloat>("deltaTime", m_Parameters.deltaTime);
+	secondStageComputeShader.SetUniform<GLfloat>("deltaTime", m_Parameters.subStepDt);
 }
 
 void Cloth::Update()
 {
-	int maxIterations = 20;
-
-	for (int i = 0; i < maxIterations; i++)
+  	for (int i = 0; i < m_Parameters.subSteps; i++)
 	{
+
 		firstStageComputeShader.Use();
 		BindComputeBuffers(0, 1);
 
@@ -198,12 +160,6 @@ void Cloth::SetComputeBuffers()
 	// Out
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_ComputeTempVertexBuffer);
 	glBufferData(GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
-
-	// secondStageComputeShader.Use();
-	// //In
-	// glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_ComputeTempVertexBuffer);
-	// //Out
-	// glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 3, m_Mesh.m_vbo.GetID());
 }
 
 void Cloth::BindComputeBuffers(int vboBind, int tempBind)
@@ -220,4 +176,54 @@ void Cloth::SwapComputeBuffers()
 
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, swapped, m_Mesh.m_vbo.GetID());
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1 - swapped, m_ComputeTempVertexBuffer);
+}
+
+void Cloth::PinAllEdges ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+
+	for (int i = 0 ; i < vertices.size(); i += m_PointsByWidth * 2)
+	{
+		vertices[i + m_PointsByWidth - 1].pinned = {1, 0, 0, 0};
+		vertices[i].pinned = {1, 0, 0, 0};
+	}
+
+	for (int i = 0 ; i < m_PointsByWidth; i += 2)
+	{
+		int base = LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth);
+		vertices[i + base].pinned = {1, 0, 0, 0};
+		vertices[i].pinned = {1, 0, 0, 0};
+	}
+}
+void Cloth::PinTopEdge ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+
+	for (int i = 0 ; i < m_PointsByWidth; i += 2)
+	{
+		int base = LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth);
+		vertices[i + base].pinned = {1, 0, 0, 0};
+	}
+}
+void Cloth::PinCenter ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+
+	vertices[LinearIndex (m_PointsByHeight / 2, m_PointsByWidth / 2, m_PointsByWidth)].pinned = {1, 0, 0, 0};
+	vertices[LinearIndex (m_PointsByHeight / 2 + 10, m_PointsByWidth / 2, m_PointsByWidth)].pinned = {1, 0, 0, 0};
+	vertices[LinearIndex (m_PointsByHeight / 2 - 10, m_PointsByWidth / 2, m_PointsByWidth)].pinned = {1, 0, 0, 0};
+	vertices[LinearIndex (m_PointsByHeight / 2, m_PointsByWidth / 2 + 10, m_PointsByWidth)].pinned = {1, 0, 0, 0};
+	vertices[LinearIndex (m_PointsByHeight / 2, m_PointsByWidth / 2 - 10, m_PointsByWidth)].pinned = {1, 0, 0, 0};
+}
+void Cloth::PinTopPoints ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+
+	auto& topLeft = vertices[LinearIndex(m_PointsByHeight * 0.9f, 10, m_PointsByWidth)];
+	auto& topRight = vertices[LinearIndex(m_PointsByHeight * 0.9f, -11, m_PointsByWidth)];
+	auto& topCenter = vertices[LinearIndex(m_PointsByHeight * 0.9f, m_PointsByWidth / 2, m_PointsByWidth)];
+
+	topLeft.pinned = {1, 0, 0, 0};
+	topRight.pinned = {1, 0, 0, 0};
+	topCenter.pinned = {1, 0, 0, 0};
 }

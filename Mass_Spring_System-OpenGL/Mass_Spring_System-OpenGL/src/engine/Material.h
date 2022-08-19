@@ -23,7 +23,7 @@ private:
 	float UI_Diffuse[3] = {0.5f, 0.5f, 0.5f};
 	float UI_Specular[3] = {0.5f, 0.5f, 0.5f};
 	float UI_Ambient[3] = {0.5f, 0.5f, 0.5f};
-	float UI_Shininess = 1;
+	float UI_Shininess = 200;
 
 	char UILabel_Diffuse[50];
 	char UILabe_Specular[50];
@@ -73,7 +73,7 @@ public:
 		
 		strcpy_s (UILabe_Shininess, name);
 		strcat_s (UILabe_Shininess, " shininess");
-		renderer.AddFloatSliderUI (UILabe_Shininess, &UI_Shininess, 0, 100);
+		renderer.AddFloatSliderUI (UILabe_Shininess, &UI_Shininess, 0, 1000);
 	}
 
 	void UpdateWithUI ()

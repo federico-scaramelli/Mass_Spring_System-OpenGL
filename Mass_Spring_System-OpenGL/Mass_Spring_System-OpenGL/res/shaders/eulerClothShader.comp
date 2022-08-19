@@ -19,18 +19,17 @@ layout ( std430, binding = 1 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
 
-uniform float restLenHorizontal = 0.5;
-uniform float restLenVertical = 0.5;
-uniform float restLenDiagonal = 0.707;
+uniform float restLenHV;
+uniform float restLenDiagonal;
 
-uniform float constShearMult = 1.0;
-uniform float constBendMult = 0.2;
+uniform float constShearMult;
+uniform float constBendMult;
 
-uniform float elasticStiffness = 100000;
-uniform float damping = 0.98;
-uniform float particleMass = 100;
-uniform vec4 gravityAcceleration = vec4(0, -9.81, 0, 1);
-uniform float deltaTime = 0.016;
+uniform float elasticStiffness;
+uniform float damping;
+uniform float particleMass;
+uniform vec4 gravityAcceleration;
+uniform float deltaTime;
 
 uniform vec4 gridDims;
 
@@ -78,26 +77,24 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 {
 	vec3 totalForce = vec3(0,0,0);
 
-	
-
 	// NOTE: x = column; y = row;
 
 	// STRUCTURE - Horizonal / Vertical
 	// Structure Spring - Up
 	totalForce = (globalIdx.y < particleGridDims.y - 1) ? 
-		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x].pos.xyz, restLenVertical)) :
+		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x].pos.xyz, restLenHV)) :
 		totalForce;
 	// Structure Spring - Down
 	totalForce = (globalIdx.y > 0) ?
-		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x].pos.xyz, restLenVertical)) :
+		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x].pos.xyz, restLenHV)) :
 		totalForce;
 	// Structure Spring - Left
 	totalForce = (globalIdx.x > 0) ?
-		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx-1].pos.xyz, restLenHorizontal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx-1].pos.xyz, restLenHV) :
 		totalForce;
 	// Structure Spring - Right
 	totalForce = (globalIdx.x < particleGridDims.x - 1) ?
-		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + 1].pos.xyz, restLenHorizontal) :
+		totalForce + constShearMult * ElasticForce(position, verticesIn[linearIdx + 1].pos.xyz, restLenHV) :
 		totalForce;
 
 	// SHEAR - Diagonal
@@ -121,22 +118,22 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	// BEND - Distance 2  Horizonal / Vertical 
 	// Bend Spring - Up
 	totalForce = (globalIdx.y < particleGridDims.y - 2) ?
-		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenHV * 2) :
 		totalForce;
 
 	// Bend Spring - Down
 	totalForce = (globalIdx.y > 1) ?
-		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenVertical * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenHV * 2) :
 		totalForce;
 		
 	// Bend Spring - Left
 	totalForce = (globalIdx.x > 1) ?
-		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2].pos.xyz, restLenHorizontal * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2].pos.xyz, restLenHV * 2) :
 		totalForce;
 
 	// Bend Spring - Right
 	totalForce = (globalIdx.x < particleGridDims.x - 2) ?
-		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHorizontal * 2) :
+		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHV * 2) :
 		totalForce;
 
 	return totalForce;
@@ -169,13 +166,16 @@ void main()
 	vec3 gravity = gravityAcceleration.xyz;
 	vec3 gravityForce = gravity * particleMass;
 	
+	// Gravity
 	totalForce += gravityForce;
-	
-	totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
 
-	totalForce -= velocity * damping;
+	// Springs
+	//totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
+
+	// Air friction
+	totalForce -= velocity * damping * random(vec2(linearIdx, globalIdx.x));
+
 
 	vec3 acceleration = totalForce / particleMass;
-
 	EulerIntegrator(linearIdx, acceleration, velocity, position);
 }

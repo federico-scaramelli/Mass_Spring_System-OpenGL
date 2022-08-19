@@ -18,7 +18,7 @@ void Scene::AddCamera(Camera* camera) {
 	m_Camera = camera;
 
 	camera->GenerateUI(*m_Renderer);
-	camera->GetTransform().SetPosition({ 0, 0, 100 });
+	camera->GetTransform().SetPosition({ 0, -100, 700 });
 }
 
 void Scene::SetShaderUniforms(GameObject* object) {
