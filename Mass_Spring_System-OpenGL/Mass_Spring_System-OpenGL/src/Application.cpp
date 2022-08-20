@@ -33,6 +33,7 @@ Renderer renderer;
 PhysicsSolver physicsSolver;
 Scene scene{ &renderer, &physicsSolver };
 
+
 void init ()
 {
 	glfwWindow = window.GetGLFWWindow();
@@ -79,7 +80,7 @@ void run ()
 
 	cloth.SetComputeBuffers();
 	scene.AddGameObject (&cloth);
-	cloth.GetTransform().AddPosition ( {-(size * linkLenght / 2), 0, -(size * linkLenght / 2)} );
+	cloth.GetTransform().AddPosition ({ -(size * linkLenght / 2), 0, -(size * linkLenght / 2) });
 
 
 	// SPHERE
@@ -89,7 +90,7 @@ void run ()
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&sphere);
-	sphere.GetTransform().AddPosition ( {0, -100, 0} );
+	sphere.GetTransform().AddPosition ({ 0, -200, 0 });
 
 	// SPHERE
 	CollidingSphere sphere2 ("Sphere2", 50);
@@ -98,7 +99,7 @@ void run ()
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&sphere2);
-	sphere2.GetTransform().AddPosition ( {-150, -100, 0} );
+	sphere2.GetTransform().AddPosition ({ -150, -100, 0 });
 
 	// SPHERE
 	CollidingSphere sphere3 ("Sphere3", 50);
@@ -107,7 +108,7 @@ void run ()
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&sphere3);
-	sphere3.GetTransform().AddPosition ( {150, -100, 0} );
+	sphere3.GetTransform().AddPosition ({ 150, -100, 0 });
 
 	// CUBE
 	Primitive cube ("Cube", CUBE, 300);
@@ -134,12 +135,18 @@ void run ()
 	});
 	scene.AddLightSource (&lightSource);
 
-	lightSource.GetTransform().AddPosition ( {122.5, -80, 122.5} );
+	lightSource.GetTransform().AddPosition ({ 122.5, -80, 122.5 });
 
 #pragma endregion
 
+	physicsSolver.lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose (glfwWindow))
 	{
+		physicsSolver.nowTime = glfwGetTime();
+		PhysicsSolver::deltaTime += (physicsSolver.nowTime - physicsSolver.lastTime)
+			/ physicsSolver.fixedDeltaTime;
+		physicsSolver.lastTime = physicsSolver.nowTime;
+
 		renderer.Clear();
 
 		scene.Update();

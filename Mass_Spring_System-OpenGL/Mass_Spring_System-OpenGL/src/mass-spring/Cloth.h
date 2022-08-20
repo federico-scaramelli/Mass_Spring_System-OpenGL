@@ -3,7 +3,7 @@
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
-#include "MassSpring.h"
+#include "PhysicsSolver.h"
 #include "../engine/Primitive.h"
 
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
@@ -26,8 +26,6 @@ public:
 
 	void Create() override;
 	void Update() override;
-
-	void UpdateCollidingSphereUniforms ();
 
 	void SetComputeBuffers() override;
 	void BindComputeBuffers(int vboBind, int tempBind) override;

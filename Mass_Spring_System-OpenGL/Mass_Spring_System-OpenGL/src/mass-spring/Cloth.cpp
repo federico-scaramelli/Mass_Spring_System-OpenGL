@@ -108,21 +108,27 @@ void Cloth::Create ()
 
 void Cloth::Update ()
 {
-	for (int i = 0; i < m_Parameters.subSteps; i++)
+	if (PhysicsSolver::deltaTime >= 1.0)
 	{
-		simulationStageComputeShader.Use();
-		BindComputeBuffers (0, 1);
+		
+		for (int i = 0; i < m_Parameters.subSteps; i++)
+		{
+			simulationStageComputeShader.Use();
+			BindComputeBuffers (0, 1);
 
-		simulationStageComputeShader.Compute();
-		simulationStageComputeShader.Wait();
+			simulationStageComputeShader.Compute();
+			simulationStageComputeShader.Wait();
 
-		// SwapComputeBuffers();
+			// SwapComputeBuffers();
 
-		constraintsStageComputeShader.Use();
-		BindComputeBuffers (1, 0);
+			constraintsStageComputeShader.Use();
+			BindComputeBuffers (1, 0);
 
-		constraintsStageComputeShader.Compute();
-		constraintsStageComputeShader.Wait();
+			constraintsStageComputeShader.Compute();
+			constraintsStageComputeShader.Wait();
+		}
+
+		PhysicsSolver::deltaTime--;
 	}
 
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);
