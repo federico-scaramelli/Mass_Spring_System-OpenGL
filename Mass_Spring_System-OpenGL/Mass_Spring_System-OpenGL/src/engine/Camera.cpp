@@ -1,11 +1,19 @@
 #include "Camera.h"
+
+#include "TransformUI.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
-Camera::Camera(GLfloat aspect)
+Camera::Camera(GLfloat aspect) //: m_TransformUI ("Camera")
 {
 	SetPerspectiveProjection(FOV, aspect, NEAR_PLANE, FAR_PLANE);
 	m_Transform = {"Camera"};
+	m_TransformUI = new TransformUI("Camera");
+}
+
+Camera::~Camera ()
+{
+	delete m_TransformUI;
 }
 
 void Camera::SetPerspectiveProjection(const GLfloat fovy, const GLfloat aspect, const GLfloat near, const GLfloat far)

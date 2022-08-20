@@ -1,4 +1,5 @@
 #pragma once
+#include "MassSpringUI.h"
 #include "../engine/GameObject.h"
 
 struct MassSpringParameters
@@ -32,20 +33,23 @@ class MassSpring : public GameObject
 protected:
 	MassSpring (const char* name, MassSpringParameters parameters) :
 	  GameObject (name),
-	  m_Parameters (std::move (parameters)) {}
+	  m_Parameters (std::move (parameters))
+	{
+		m_GameObjectUI = new MassSpringUI(name);
+	}
 
 	MassSpringParameters m_Parameters;
 
 	virtual void InitializeVertices () = 0;
 	virtual void InitializeIndices () = 0;
 
-	void Create () override = 0;
-	void Update () override = 0;
-
 	virtual void SetComputeBuffers () = 0;
 	virtual void BindComputeBuffers (int vboBind, int tempBind) = 0;
 
 public:
-	ShaderProgramCompute simulationStageComputeShader{};
+	ShaderProgramCompute simulationStageComputeShader {};
 	ShaderProgramCompute constraintsStageComputeShader {};
+
+	void Create () override = 0;
+	void Update () override = 0;
 };

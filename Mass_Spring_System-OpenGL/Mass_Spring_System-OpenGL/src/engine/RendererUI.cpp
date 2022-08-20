@@ -1,0 +1,72 @@
+#include "RendererUI.h"
+
+#include "Camera.h"
+#include "LightSource.h"
+#include "../mass-spring/MassSpring.h"
+#include "Scene.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
+void RendererUI::DrawUI ()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGui::Begin ("Scene");
+
+	// Additional settings
+	if (ImGui::CollapsingHeader ("Settings", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::Checkbox ("Wireframe mode", &scene->GetRenderer()->wireframe);
+		ImGui::Checkbox ("Backface culling", &scene->GetRenderer()->backface);
+	}
+
+	ImGui::Dummy ({ 0, 10 });
+	ImGui::Separator();
+	ImGui::Dummy ({ 0, 10 });
+
+	// Camera UI
+	if (ImGui::CollapsingHeader ("Camera")) { scene->GetCamera()->GetUI()->Draw(); }
+
+	ImGui::Dummy ({ 0, 10 });
+	ImGui::Separator();
+	ImGui::Dummy ({ 0, 10 });
+
+	// Light UI
+	if (ImGui::CollapsingHeader ("Light")) { scene->GetLightSource()->GetUI().Draw(); }
+	ImGui::End();
+
+	ImGui::Begin ("Objects");
+	if (ImGui::CollapsingHeader ("Primitives", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		// GameObjects UI
+		for (int i = 0; i < scene->GetGameObjectCount(); i++)
+		{
+			GameObject* gameObject = scene->GetGameObjects()[i];
+
+			ImGui::Checkbox (gameObject->GetUI().m_Name, &gameObject->m_IsActive);
+
+			if (!gameObject->m_IsActive) continue;
+
+			if (ImGui::CollapsingHeader (gameObject->GetUI().m_Name)) { gameObject->GetUI().Draw(); }
+			ImGui::Dummy ({ 0, 15 });
+		}
+	}
+	ImGui::Dummy ({ 0, 20 });
+	ImGui::Separator();
+	ImGui::Dummy ({ 0, 20 });
+	if (ImGui::CollapsingHeader ("Mass Springs", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::ListBox ("Select Mass Spring Object",
+		                &MassSpringUI::selectedMassSpring,
+		                MassSpringUI::sceneMassSprings,
+		                scene->m_MassSprings.size());
+		scene->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
+	}
+
+
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData (ImGui::GetDrawData());
+}

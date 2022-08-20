@@ -90,6 +90,9 @@
     <ClCompile Include="src\mass-spring\PhysicsSolver.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\RendererUI.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -1061,15 +1064,32 @@
     <ClInclude Include="src\mass-spring\PhysicsSolver.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\SphereCollider.h">
+    <ClInclude Include="src\engine\CollidingSphere.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\Sphere.h">
+    <ClInclude Include="src\engine\GameObjectUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\TransformUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\MaterialUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\UIElements.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\RendererUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\LightUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mass-spring\MassSpringUI.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\shader.vert" />
     <None Include="libraries\include\glm\gtx\associated_min_max.inl">
       <Filter>File di intestazione</Filter>
@@ -1488,7 +1508,6 @@
     <None Include="libraries\include\glm\detail\type_vec4_simd.inl">
       <Filter>File di intestazione</Filter>
     </None>
-    <None Include="res\shaders\shader.comp" />
     <None Include="res\shaders\verletClothShader.comp" />
     <None Include="res\shaders\clothConstraints.comp" />
     <None Include="res\shaders\blinnPhongShader.frag" />

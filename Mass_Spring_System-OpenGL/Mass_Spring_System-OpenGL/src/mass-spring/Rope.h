@@ -7,9 +7,11 @@
 #include <array>
 #include <utility>
 
-class Rope : public GameObject {
+#include "MassSpring.h"
+
+class Rope : public MassSpring {
 private:
-	GLfloat m_Length;
+	GLfloat m_RestLength;
 	GLint m_PointsByLength;
 	GLfloat m_Radius;
 
@@ -29,7 +31,7 @@ private:
 	};
 
 public:
-	Rope(GLfloat length, GLint pointsByLength, GLfloat radius = 10.f);
+	Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius);
 
 	void InitializeNodes();
 
@@ -42,6 +44,9 @@ public:
 	void CreateMidSurfaceIndices();
 
 	void CreateBackSurfaceIndices();
+
+	void SetComputeBuffers() override {}
+	void BindComputeBuffers(int vboBind, int tempBind) override {}
 
 	void Create() override {}
 	void Update() override {}

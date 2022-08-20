@@ -58,7 +58,7 @@ public:
 	template<typename T>
 	void SetUniform(const char* name, T value);
 	template<typename T>
-	void SetUniform(const char* name, T v1, T v2, T v3);
+	void SetUniformArray(const char* name, T value);
 	
 	void LoadUniformLocations();
 	void PrintActiveUniforms();

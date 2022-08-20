@@ -2,6 +2,7 @@
 
 #include <random>
 
+#include "GameObjectUI.h"
 #include "Mesh.h"
 #include "Renderer.h"
 #include "Transform.h"
@@ -14,14 +15,14 @@ class GameObject {
 protected:
 	Transform m_Transform;
 	Mesh m_Mesh{};
+	GameObjectUI* m_GameObjectUI;
 
 public:
-	virtual ~GameObject () = default;
+	virtual ~GameObject () { delete m_GameObjectUI; }
 	const char* name;
+	bool m_IsActive = true;
 	
-	GameObject(const char* name) : name(name) {
-		m_Transform = { name };
-	}
+	GameObject(const char* name) : m_Transform (name), name (name) {}
 
 	Transform& GetTransform() {
 		return m_Transform;
@@ -31,12 +32,10 @@ public:
 		return m_Mesh;
 	}
 
-	virtual void GenerateUI(Renderer& renderer) {
-		//TODO: generate text with GO's name to define its section on the GUI
-
-		m_Transform.GenerateUI(renderer);
-
-		m_Mesh.GetMaterial().GenerateUI(renderer, name);
+	virtual void GenerateUI()
+	{
+		m_Transform.GenerateUI(m_GameObjectUI->m_TransformUI);
+		GetMaterial().GenerateUI (m_GameObjectUI->m_MaterialUI);
 	}
 
 	virtual void UpdateWithUI() {
@@ -68,6 +67,8 @@ public:
 	ShaderProgram& GetShader() {
 		return m_Mesh.GetMaterial().GetShader();
 	}
+
+	GameObjectUI& GetUI() { return *m_GameObjectUI; }
 
 	virtual void Create() = 0;
 	virtual void Update() = 0;

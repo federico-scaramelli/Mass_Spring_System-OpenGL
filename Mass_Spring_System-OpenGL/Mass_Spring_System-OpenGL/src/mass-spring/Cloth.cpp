@@ -190,8 +190,8 @@ void Cloth::PinCircleCenter ()
 	auto& vertices = m_Mesh.GetVertices();
 
 	vertices[LinearIndex (m_PointsByHeight / 2, m_PointsByWidth / 2, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
-	vertices[LinearIndex (m_PointsByHeight / 2 + 10, m_PointsByWidth / 2, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
-	vertices[LinearIndex (m_PointsByHeight / 2 - 10, m_PointsByWidth / 2, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
+	vertices[LinearIndex (m_PointsByHeight / 2 + m_PointsByHeight * 0.2, m_PointsByWidth / 2, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
+	vertices[LinearIndex (m_PointsByHeight / 2 - m_PointsByHeight * 0.2, m_PointsByWidth / 2, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
 	vertices[LinearIndex (m_PointsByHeight / 2, m_PointsByWidth / 2 + 10, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
 	vertices[LinearIndex (m_PointsByHeight / 2, m_PointsByWidth / 2 - 10, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
 }

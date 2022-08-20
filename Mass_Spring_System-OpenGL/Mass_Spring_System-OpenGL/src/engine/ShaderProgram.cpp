@@ -196,21 +196,45 @@ void ShaderProgram::SetUniform<GLfloat>(const char* name, GLfloat val)
     glUniform1f(loc, val);
 }
 
+template<>
+void ShaderProgram::SetUniform<GLuint>(const char* name, GLuint val)
+{
+	GLint loc = GetUniformLocation(name);
+    glUniform1ui(loc, val);
+}
+
+template<>
+void ShaderProgram::SetUniform<GLboolean>(const char* name, GLboolean val)
+{
+	GLint loc = GetUniformLocation(name);
+    glUniform1i(loc, val);
+}
+
 template<typename T>
-void ShaderProgram::SetUniform(const char* name, T v1, T v2, T v3)
+void ShaderProgram::SetUniformArray(const char* name, T value)
 {
 	static_assert(Utils::falseTemplate<T>);
 }
 
 template<>
-void ShaderProgram::SetUniform<GLfloat>(const char* name, GLfloat x, GLfloat y, GLfloat z)
+void ShaderProgram::SetUniformArray<glm::vec4>(const char* name, glm::vec4 val)
 {
 	GLint loc = GetUniformLocation(name);
-	if(loc<0)
-	{
-		return;
-	}
-    glUniform3f(loc, x, y, z);
+	glUniform4fv(loc, 1, glm::value_ptr (val));	
+}
+
+template<>
+void ShaderProgram::SetUniformArray<GLfloat>(const char* name, GLfloat val)
+{
+	GLint loc = GetUniformLocation(name);
+	glUniform1fv(loc, 1, &val);	
+}
+
+template<>
+void ShaderProgram::SetUniformArray<GLuint>(const char* name, GLuint val)
+{
+	GLint loc = GetUniformLocation(name);
+	glUniform1uiv(loc, 1, &val);	
 }
 
 GLint ShaderProgram::GetUniformLocation(const char* name)

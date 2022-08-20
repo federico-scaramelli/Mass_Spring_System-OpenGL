@@ -3,20 +3,23 @@
 #include <iostream>
 
 #include "Camera.h"
-#include "GameObject.h"
 #include "LightSource.h"
 #include "Renderer.h"
-#include "Sphere.h"
+#include "CollidingSphere.h"
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
+#include "../mass-spring/PhysicsSolver.h"
 
-Scene::Scene(Renderer* renderer) : m_Renderer(renderer) {}
+Scene::Scene(Renderer* renderer, PhysicsSolver* physicsSolver) : m_Renderer(renderer), m_PhysicsSolver (physicsSolver)
+{
+	m_Renderer->UI.SetScene (this);
+}
 
 void Scene::AddCamera(Camera* camera) {
 	m_Camera = camera;
 
-	camera->GenerateUI(*m_Renderer);
+	camera->GenerateUI();
 	camera->GetTransform().SetPosition({ 0, -100, 700 });
 }
 
@@ -28,23 +31,23 @@ void Scene::SetShaderUniforms(GameObject* object) {
 
 void Scene::AddGameObject(GameObject* object)
 {
-	// TODO: temp
-	if (dynamic_cast<Sphere*>(object) != nullptr)
+	auto massSpring = dynamic_cast<MassSpring*>(object);
+	if (massSpring != nullptr)
 	{
-		physicsSolver.SetActiveCollider (&dynamic_cast<Sphere*>(object)->collider);
-		activeTempSphere = dynamic_cast<Sphere*>(object);
+		MassSpringUI::sceneMassSprings[m_MassSprings.size()] = massSpring->name;
+		m_MassSprings.push_back( massSpring);
+	} else {
+		m_Primitives.push_back(object);
+		auto sphere = dynamic_cast<CollidingSphere*>(object);
+		if (sphere != nullptr)
+		{
+			m_PhysicsSolver->AddCollider (sphere);
+		}
 	}
 
-
-
-	m_GameObjects.push_back(object);
-
 	SetShaderUniforms(object);
-
 	object->Create();
-
-	object->GenerateUI(*m_Renderer);
-	sceneObjects[m_GameObjects.size() - 1] = object->name;
+	object->GenerateUI();
 }
 
 void Scene::AddLightSource(LightSource* light) {
@@ -52,7 +55,7 @@ void Scene::AddLightSource(LightSource* light) {
 
 	m_LightSource = light;
 
-	light->GenerateUI(*m_Renderer);
+	light->GenerateUI();
 }
 
 void Scene::UpdateCamera() {
@@ -110,75 +113,75 @@ void Scene::Update() {
 		UpdateLight();
 	}
 
-	if (!m_GameObjects.empty() && !(selectedObject > m_GameObjects.size())) {
+	if (!m_Primitives.empty() || !m_MassSprings.empty()) {
 		UpdateGameObjects();
 	}
-	activeTempSphere->Update();
-
-	physicsSolver.Update();
+	
+	m_PhysicsSolver->Update();
 }
 
-void Scene::UpdateGameObjects() {
-	// TODO: loop on game objects list to update all the active ones
-	m_currentGameObject = m_GameObjects[selectedObject];
-
-
-	//TODO: temp
-	if (dynamic_cast<MassSpring*>(m_currentGameObject) != nullptr)
+void Scene::UpdateGameObjects()
+{
+	for (auto primitive : m_Primitives)
 	{
-		physicsSolver.SetActiveMassSpring (dynamic_cast<MassSpring*>(m_currentGameObject));
+		if (!primitive->m_IsActive) continue;
+
+		// Custom update behavior of game object
+		primitive->Update();
+
+		UpdateGameObject(primitive);
+
+		DrawGameObject(primitive);
 	}
 
-	
-	// Custom update behavior of game object
-	m_currentGameObject->Update();
-
-	m_currentGameObject->GetShader().Use();
-	UpdateGameObject();
-
-	DrawGameObject();
+	auto massSpring = m_MassSprings[MassSpringUI::selectedMassSpring];
+	m_PhysicsSolver->SetActiveMassSpring (massSpring);
+	massSpring->Update();
+	UpdateGameObject (massSpring);
+	DrawGameObject (massSpring);
 }
 
-void Scene::UpdateGameObject() {
+void Scene::UpdateGameObject(GameObject* gameObject) {
 	glm::mat4 viewMatrix = m_Camera->GetUpdatedViewMatrix();
 	glm::mat4 modelViewMatrix = glm::mat4(1.f);
 
-	m_currentGameObject->UpdateWithUI();
+	gameObject->GetShader().Use();
+	gameObject->UpdateWithUI();
 
 	// Light parameters loaded in object uniforms
 	if (m_LightSource != nullptr) {
-		m_currentGameObject->GetShader().SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
+		gameObject->GetShader().SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
 
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("lightPosition",
+		gameObject->GetShader().SetUniform<glm::vec3>("lightPosition",
 			m_LightSource->GetTransform().
 			GetPosition());
 
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("lightAmbient",
+		gameObject->GetShader().SetUniform<glm::vec3>("lightAmbient",
 			m_LightSource->GetAmbient());
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("lightDiffuse",
+		gameObject->GetShader().SetUniform<glm::vec3>("lightDiffuse",
 			m_LightSource->GetIntensity());
 
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("matAmbient",
-			m_currentGameObject->GetMesh().GetMaterial().
+		gameObject->GetShader().SetUniform<glm::vec3>("matAmbient",
+			gameObject->GetMesh().GetMaterial().
 			GetAmbient());
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("matDiffuse",
-			m_currentGameObject->GetMesh().GetMaterial().
+		gameObject->GetShader().SetUniform<glm::vec3>("matDiffuse",
+			gameObject->GetMesh().GetMaterial().
 			GetDiffuse());
-		m_currentGameObject->GetShader().SetUniform<glm::vec3>("matSpecular",
-			m_currentGameObject->GetMesh().GetMaterial().
+		gameObject->GetShader().SetUniform<glm::vec3>("matSpecular",
+			gameObject->GetMesh().GetMaterial().
 			GetSpecular());
-		m_currentGameObject->GetShader().SetUniform<GLfloat>("matShininess",
-			m_currentGameObject->GetMesh().GetMaterial().GetShininess());
+		gameObject->GetShader().SetUniform<GLfloat>("matShininess",
+			gameObject->GetMesh().GetMaterial().GetShininess());
 	}
 
-	modelViewMatrix = viewMatrix * m_currentGameObject->GetTransform().GetUpdatedModelMatrix();
-	m_currentGameObject->GetShader().SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
-	m_currentGameObject->GetShader().SetUniform<glm::mat3>("normalMatrix",
+	modelViewMatrix = viewMatrix * gameObject->GetTransform().GetUpdatedModelMatrix();
+	gameObject->GetShader().SetUniform<glm::mat4>("modelViewMatrix", modelViewMatrix);
+	gameObject->GetShader().SetUniform<glm::mat3>("normalMatrix",
 		glm::inverseTranspose(glm::mat3(modelViewMatrix)));
 }
 
-void Scene::DrawGameObject() {
-	m_Renderer->Draw(m_currentGameObject->GetMesh().m_vao,
-		m_currentGameObject->GetMesh().m_indexBuffer,
-		m_currentGameObject->GetShader());
+void Scene::DrawGameObject(GameObject* gameObject) {
+	m_Renderer->Draw(gameObject->GetMesh().m_vao,
+		gameObject->GetMesh().m_indexBuffer,
+		gameObject->GetShader());
 }

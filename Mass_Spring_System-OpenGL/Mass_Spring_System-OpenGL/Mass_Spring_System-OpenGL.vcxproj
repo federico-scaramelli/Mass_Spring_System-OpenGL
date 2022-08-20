@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="src\engine\Primitive.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
+    <ClCompile Include="src\engine\RendererUI.cpp" />
     <ClCompile Include="src\engine\Scene.cpp" />
     <ClCompile Include="src\mass-spring\PhysicsSolver.cpp" />
     <ClCompile Include="src\mass-spring\Rope.cpp" />
@@ -197,15 +198,22 @@
     <Library Include="libraries\lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\engine\GameObjectUI.h" />
+    <ClInclude Include="src\engine\LightUI.h" />
+    <ClInclude Include="src\engine\MaterialUI.h" />
     <ClInclude Include="src\engine\Primitive.h" />
+    <ClInclude Include="src\engine\RendererUI.h" />
     <ClInclude Include="src\engine\ShaderProgramCompute.h" />
     <ClInclude Include="src\engine\Material.h" />
     <ClInclude Include="src\engine\Scene.h" />
     <ClInclude Include="src\engine\LightSource.h" />
     <ClInclude Include="src\engine\Mesh.h" />
     <ClInclude Include="src\engine\GameObject.h" />
-    <ClInclude Include="src\engine\Sphere.h" />
+    <ClInclude Include="src\engine\CollidingSphere.h" />
+    <ClInclude Include="src\engine\TransformUI.h" />
+    <ClInclude Include="src\engine\UIElements.h" />
     <ClInclude Include="src\mass-spring\MassSpring.h" />
+    <ClInclude Include="src\mass-spring\MassSpringUI.h" />
     <ClInclude Include="src\mass-spring\PhysicsSolver.h" />
     <ClInclude Include="src\mass-spring\Rope.h" />
     <ClInclude Include="src\mass-spring\Cloth.h" />
@@ -520,7 +528,6 @@
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
     <ClInclude Include="src\engine\Vertex.h" />
     <ClInclude Include="src\engine\Transform.h" />
-    <ClInclude Include="src\engine\SphereCollider.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\glm\detail\func_common.inl" />
@@ -667,8 +674,6 @@
     <None Include="res\shaders\blinnPhongShader.frag" />
     <None Include="res\shaders\eulerClothShader.comp" />
     <None Include="res\shaders\normalShader.frag" />
-    <None Include="res\shaders\shader.comp" />
-    <None Include="res\shaders\shader.frag" />
     <None Include="res\shaders\shader.vert" />
   </ItemGroup>
   <ItemGroup>

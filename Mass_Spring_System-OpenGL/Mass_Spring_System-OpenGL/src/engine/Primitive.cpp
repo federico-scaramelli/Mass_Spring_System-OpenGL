@@ -123,6 +123,8 @@ void BuildSphereMesh(Mesh& mesh, float radius)
 
 Primitive::Primitive (const char* name, PrimitiveType type, float size) : GameObject (name)
 {
+	m_GameObjectUI = new GameObjectUI(name);
+
 	this->size = size;
 
 	switch (type)

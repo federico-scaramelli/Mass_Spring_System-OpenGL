@@ -1,5 +1,7 @@
 #version 460
 
+#define MAX_SPHERES 5
+
 //Worksize
 layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 
@@ -25,9 +27,12 @@ uniform float restLenDiagonal;
 uniform vec4 gridDims;
 uniform float deltaTime;
 
-uniform vec4 sphereCenter;
-uniform float sphereRadius;
-
+struct Sphere {
+	vec4 sphereCenter;
+	float sphereRadius;
+	bool sphereActive;
+};
+uniform Sphere spheres[MAX_SPHERES];
 
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
@@ -236,28 +241,38 @@ void main()
 
 	// Update position and velocity
 	correctedPosition += distCorrection;
-	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
+	//correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 
-	//COLLISION DETECTION
-    vec3 sphereDist = correctedPosition - sphereCenter.xyz;
-    if (length(sphereDist) < sphereRadius + restLenHV * 0.33) 
-	{
-        // If the particle is inside the sphere, push it to the outer radius
-        correctedPosition = sphereCenter.xyz + normalize(sphereDist) * (sphereRadius + restLenHV * 0.33);
-        // Cancel out velocity
-        correctedVelocity *= 0.95f;
-
-		UpdateData(correctedPosition, oldPosition, correctedVelocity, linearIdx, particleGridDims, globalIdx);
-		return;
-    }
 
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
 	selfCollCorrection += ComputeSelfCollision(linearIdx, particleGridDims, restLenHV);
-
 	// Update position and velocity
 	correctedPosition += selfCollCorrection;
 	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 
+
+	//COLLISION DETECTION
+	for (int i = 0; i < MAX_SPHERES; i++)
+	{
+		//bool currSphereActive = sphereActive[i];
+		if (spheres[i].sphereActive)
+		{
+			//vec3 currSpherePos = sphereCenter[i].xyz;
+			//float currSphereRadius = sphereRadius[i];
+
+			vec3 sphereDist = correctedPosition - spheres[i].sphereCenter.xyz;
+
+			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * 0.33) 
+			{
+				// If the particle is inside the sphere, push it to the outer radius
+				correctedPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
+									* (spheres[i].sphereRadius + restLenHV * 0.33);
+				// Cancel out velocity
+				correctedVelocity *= 0.95f;
+			}
+		}
+	}
+    
 	UpdateData(correctedPosition, oldPosition, correctedVelocity, linearIdx, particleGridDims, globalIdx);
 }

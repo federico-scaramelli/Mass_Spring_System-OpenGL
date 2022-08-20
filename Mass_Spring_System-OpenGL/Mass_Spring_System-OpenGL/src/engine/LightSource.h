@@ -1,42 +1,27 @@
 #pragma once
+#include "LightUI.h"
 #include "Primitive.h"
-#include "Transform.h"
 
 class LightSource : public Primitive
 {
 private:
-	glm::vec3 m_LightIntensity;
-	glm::vec3 m_LightAmbient;
-	
-	float UI_LightIntensity[3] = {1, 1, .5f};
-	float UI_LightAmbient[3] = {0, 0, 0};
-
-	char UILabel_Intensity[50];
-	char UILabel_Ambient[50];
+	glm::vec3 m_LightIntensity {1, 1, .5f};
+	glm::vec3 m_LightAmbient {0, 0, 0};
 
 public:
 	LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1})
-	  :  Primitive ("Light", PrimitiveType::SPHERE, 30)
+	  :  Primitive ("Light", PrimitiveType::SPHERE, 10)
 	{
+		delete m_GameObjectUI;
+		m_GameObjectUI = new LightUI(name);
+
 		this->m_LightIntensity = lightIntensity;
 		this->m_LightAmbient = lightAmbient;
 	}
 
-	void GenerateUI(Renderer& renderer) override
+	void GenerateUI() override
 	{
-		m_Transform.GeneratePositionUI (renderer);
-		GenerateLightUI (renderer);
-	}
-
-	void GenerateLightUI (Renderer& renderer, float min = 0.f, float max = 1.f)
-	{
-		strcpy_s (UILabel_Intensity, name);
-		strcat_s (UILabel_Intensity, " intensity");
-		renderer.AddFloat3SliderUI (UILabel_Intensity, UI_LightIntensity, min, max);
-		
-		strcpy_s (UILabel_Ambient, name);
-		strcat_s (UILabel_Ambient, " ambient");
-		renderer.AddFloat3SliderUI (UILabel_Ambient, UI_LightAmbient, min, max);
+		Primitive::GenerateUI();
 	}
 
 	void Create() override {}
@@ -45,8 +30,11 @@ public:
 	void UpdateWithUI() override
 	{
 		m_Transform.UpdatePositionWithUI();
-		m_LightIntensity = {UI_LightIntensity[0], UI_LightIntensity[1], UI_LightIntensity[2]};
-		m_LightAmbient = {UI_LightAmbient[0], UI_LightAmbient[1], UI_LightAmbient[2]};
+		m_Mesh.GetMaterial().UpdateWithUI();
+
+		auto lightUI = dynamic_cast<LightUI*>(m_GameObjectUI);
+		m_LightIntensity = {lightUI->m_LightDiffuseData[0], lightUI->m_LightDiffuseData[1], lightUI->m_LightDiffuseData[2]};
+		m_LightAmbient = {lightUI->m_LightAmbientData[0], lightUI->m_LightAmbientData[1], lightUI->m_LightAmbientData[2]};
 	}
 		
 	const glm::vec3& GetIntensity() const { return m_LightIntensity; } 

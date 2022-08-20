@@ -16,20 +16,22 @@
 #include "mass-spring/Rope.h"
 #include "engine/Scene.h"
 #include "engine/LightSource.h"
-#include "engine/Sphere.h"
+#include "engine/CollidingSphere.h"
 
 #include "glm/glm.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/gtc/type_ptr.inl"
 #include "imgui/imgui.h"
+#include "mass-spring/PhysicsSolver.h"
 
 #pragma endregion
 
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
-Scene scene{ &renderer };
+PhysicsSolver physicsSolver;
+Scene scene{ &renderer, &physicsSolver };
 
 void init ()
 {
@@ -55,9 +57,10 @@ void run ()
 
 	// CLOTH
 	int size = 50;
-	Cloth cloth (size, size, 5.f);
+	float linkLenght = 10;
+	Cloth cloth (size, size, linkLenght);
 
-	cloth.PinCenter();
+	//cloth.PinCenter();
 
 	cloth.GetMesh().SetBuffers (vertexBufferLayout);
 	cloth.GetMaterial().CreateShaderProgram ({
@@ -76,16 +79,35 @@ void run ()
 
 	cloth.SetComputeBuffers();
 	scene.AddGameObject (&cloth);
+	cloth.GetTransform().AddPosition ( {-(size * linkLenght / 2), 0, -(size * linkLenght / 2)} );
 
 
 	// SPHERE
-	Sphere sphere ("Sphere", 30);
+	CollidingSphere sphere ("Sphere", 100);
 	sphere.GetMesh().SetBuffers (vertexBufferLayout);
 	sphere.GetMaterial().CreateShaderProgram ({
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
 	scene.AddGameObject (&sphere);
+	sphere.GetTransform().AddPosition ( {0, -100, 0} );
 
+	// SPHERE
+	CollidingSphere sphere2 ("Sphere2", 50);
+	sphere2.GetMesh().SetBuffers (vertexBufferLayout);
+	sphere2.GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
+	scene.AddGameObject (&sphere2);
+	sphere2.GetTransform().AddPosition ( {-150, -100, 0} );
+
+	// SPHERE
+	CollidingSphere sphere3 ("Sphere3", 50);
+	sphere3.GetMesh().SetBuffers (vertexBufferLayout);
+	sphere3.GetMaterial().CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
+	});
+	scene.AddGameObject (&sphere3);
+	sphere3.GetTransform().AddPosition ( {150, -100, 0} );
 
 	// CUBE
 	Primitive cube ("Cube", CUBE, 300);
@@ -93,12 +115,11 @@ void run ()
 	cube.GetMaterial().CreateShaderProgram ({
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
 	});
-	scene.AddGameObject (&cube);
+	//scene.AddGameObject (&cube);
 
 
 	// ROPE
-	//TODO: binding deve essere diverso sennò sovrascrive le robe del cloth -> serve un altro shader per la rope
-	Rope rope (50, 10, 1);
+	Rope rope (50, 5, 10);
 	rope.GetMesh().SetBuffers (vertexBufferLayout);
 	rope.GetMaterial().CreateShaderProgram ({
 		{ "shader.vert", ShaderType::VERTEX }, { "blinnPhongShader.frag", ShaderType::FRAGMENT }
@@ -114,17 +135,6 @@ void run ()
 	scene.AddLightSource (&lightSource);
 
 	lightSource.GetTransform().AddPosition ( {122.5, -80, 122.5} );
-	sphere.GetTransform().AddPosition ( {122.5, -80, 122.5} );
-
-#pragma endregion
-
-#pragma region UI Elements Creation
-
-	renderer.AddListBoxUI ("Select object",
-	                       &scene.selectedObject, scene.sceneObjects,
-	                       scene.GetGameObjectCount());
-	renderer.AddBoolCheckboxUI ("Wireframe", &renderer.wireframe);
-	renderer.AddBoolCheckboxUI ("Backface", &renderer.backface);
 
 #pragma endregion
 
