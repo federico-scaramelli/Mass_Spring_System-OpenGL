@@ -52,7 +52,7 @@ void run()
 	int sizeHeight = 30;
 	float linkLenght = 10;
 	Cloth cloth(sizeWidth, sizeHeight, linkLenght);
-	// cloth.PinCenter();
+	cloth.PinCenter();
 	// cloth.PinLeftEdge();
 	scene.AddGameObject(&cloth);
 	cloth.GetTransform().AddPosition({-(sizeWidth * linkLenght / 2), 0, -(sizeHeight * linkLenght / 2)});

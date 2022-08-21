@@ -251,6 +251,7 @@ void main()
 	correctedPosition += selfCollCorrection;
 	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 
+	correctedVelocity = (length(correctedVelocity) >= 50000) ? correctedVelocity * 0.0001 : correctedVelocity;
 
 	//COLLISION DETECTION
 	for (int i = 0; i < MAX_SPHERES; i++)
