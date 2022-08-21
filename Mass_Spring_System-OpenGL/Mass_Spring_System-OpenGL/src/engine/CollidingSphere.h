@@ -4,6 +4,10 @@
 class CollidingSphere : public Primitive
 {
 public:
+	CollidingSphere(const char* name, GLfloat radius) : Primitive(name, SPHERE, radius)
+	{
+		this->radius = radius;
+	}
 
-	CollidingSphere(const char* name, GLfloat size) : Primitive(name, SPHERE, size) {}
+	GLuint radius;
 };

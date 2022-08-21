@@ -1,6 +1,8 @@
 #include "Primitive.h"
 
-void BuildCubeMesh(Mesh& mesh, float size)
+#include "glm/ext/scalar_constants.hpp"
+
+void BuildCubeMesh(Mesh& mesh, GLfloat size)
 {
 	auto& vertices = mesh.GetVertices();
 	vertices.clear();
@@ -46,26 +48,25 @@ void BuildCubeMesh(Mesh& mesh, float size)
 	};
 }
 
-void BuildSphereMesh(Mesh& mesh, float radius)
+void BuildSphereMesh(Mesh& mesh, GLfloat radius)
 {
-	//Vertici
+	// Vertices
 	auto& vertices = mesh.GetVertices();
 	vertices.clear();
-
-	float PI = 3.14f;
+	
 	int stackCount = 8;
 	int sectorCount = stackCount * 3;
 
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
 
-	float sectorStep = 2 * PI / sectorCount;
-	float stackStep = PI / stackCount;
+	float sectorStep = 2 * glm::pi<GLfloat>() / sectorCount;
+	float stackStep = glm::pi<GLfloat>() / stackCount;
 	float sectorAngle, stackAngle;
 
 	for (int i = 0; i <= stackCount; ++i)
 	{
-		stackAngle = PI / 2 - i * stackStep;        // starting from pi/2 to -pi/2
+		stackAngle = glm::pi<GLfloat>() / 2 - i * stackStep;        // starting from pi/2 to -pi/2
 		xy = radius * cosf(stackAngle);          // r * cos(u)
 		z = radius * sinf(stackAngle);           // r * sin(u)
 
@@ -78,19 +79,19 @@ void BuildSphereMesh(Mesh& mesh, float radius)
 			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
 			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
 
-			vertex.position = { x,y,z, 0 };
+			vertex.position = { x, y, z, 0 };
 
 			nx = x * lengthInv;
 			ny = y * lengthInv;
 			nz = z * lengthInv;
 
-			vertex.normal = { nx,ny,nz, 0 };
+			vertex.normal = { nx, ny, nz, 0 };
 
 			vertices.push_back(vertex);
 		}
 	}
 
-	//Indici
+	// Indices
 	auto& indices = mesh.GetIndices();
 	indices.clear();
 
@@ -121,11 +122,47 @@ void BuildSphereMesh(Mesh& mesh, float radius)
 	}
 }
 
-Primitive::Primitive (const char* name, PrimitiveType type, float size) : GameObject (name)
+void BuildConeMesh (Mesh& mesh, GLuint resolution, GLfloat radius, GLfloat height)
+{
+	// Vertices
+	auto& vertices = mesh.GetVertices();
+	vertices.clear();
+	
+	for (GLuint i = 0; i < resolution; i++) 
+	{
+		auto ratio = static_cast<GLfloat>(i) / resolution;
+		GLfloat r = ratio * (glm::pi<GLfloat>() * 2.0f);
+		GLfloat x = std::cos(r) * radius;
+		GLfloat y = std::sin(r) * radius;
+
+		Vertex vertex {};
+		vertex.position = {x, 0, y, 0};
+		vertices.push_back (vertex);
+	}
+
+	Vertex topVertex {};
+	topVertex.position = {0, height, 0, 0};
+	vertices.push_back (topVertex);
+
+	// Indices
+	auto& indices = mesh.GetIndices();
+	indices.clear();
+
+	// Generate triangular faces indices
+	for (GLuint i = 0; i < resolution; i++) 
+	{
+		auto ii = (i + 1) % resolution;
+		indices.push_back (resolution);
+		indices.push_back (i);
+		indices.push_back (ii);
+	}
+	
+	// TODO: add polygonal base triangles
+}
+
+Primitive::Primitive (const char* name, PrimitiveType type, GLuint size) : GameObject (name)
 {
 	m_GameObjectUI = new GameObjectUI(name);
-
-	this->size = size;
 
 	switch (type)
 	{
@@ -135,8 +172,23 @@ Primitive::Primitive (const char* name, PrimitiveType type, float size) : GameOb
 	case SPHERE:
 	  BuildSphereMesh (m_Mesh, size);
 	  break;
+	default:
+	  throw std::runtime_error("Primitive constructor called with uncompatibility between parameters and PrimitiveType");
 	}
 }
+
+Primitive::Primitive (const char* name, PrimitiveType type, 
+					  GLuint resolution, GLfloat radius, GLfloat height) : GameObject (name)
+{
+	if(type != CONE)
+	{
+		throw std::runtime_error("Primitive cone constructor called with another PrimtiveType");
+	}
+
+	m_GameObjectUI = new GameObjectUI(name);
+	BuildConeMesh (m_Mesh, resolution, radius, height);
+}
+
 
 void Primitive::Create() {}
 void Primitive::Update() {}

@@ -2,7 +2,7 @@
 #include "WindUI.h"
 
 Wind::Wind (GLfloat fullForceRadius, GLfloat attenuationRadius, GLfloat forceMult) :
-	Primitive ("Wind", PrimitiveType::CUBE, 10)
+	Primitive ("Wind", CONE, 20, 10, 30)
 {
 	delete m_GameObjectUI;
 	m_GameObjectUI = new WindUI (name);
