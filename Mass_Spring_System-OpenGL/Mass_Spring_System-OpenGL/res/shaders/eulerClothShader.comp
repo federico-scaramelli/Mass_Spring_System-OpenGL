@@ -12,6 +12,16 @@ struct Vertex {
 	vec4 pinned;
 };
 
+struct WindInfo {
+	vec4 position;
+	vec4 forward;
+	vec4 right;
+	vec4 up;
+	float forceMult;
+	float fullForceRadius;
+	float attenuationRadius;
+};
+
 layout ( std430, binding = 0 ) buffer VertexBufferIn {
 	Vertex verticesIn[];
 };
@@ -31,8 +41,9 @@ uniform float particleMass;
 uniform vec4 gravityAcceleration;
 uniform float deltaTime;
 
-
 uniform vec4 gridDims;
+
+uniform WindInfo wind;
 
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
@@ -121,7 +132,7 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	totalForce = (globalIdx.y < particleGridDims.y - 2) ?
 		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenHV * 2) :
 		totalForce;
-/*
+
 	// Bend Spring - Down
 	totalForce = (globalIdx.y > 1) ?
 		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx - 2 * particleGridDims.x].pos.xyz, restLenHV * 2) :
@@ -136,9 +147,36 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	totalForce = (globalIdx.x < particleGridDims.x - 2) ?
 		totalForce + constBendMult * ElasticForce(position, verticesIn[linearIdx + 2].pos.xyz, restLenHV * 2) :
 		totalForce;
+/*
+
 */
 
 	return totalForce;
+}
+
+vec3 ComputeWindForce(vec3 position) {
+	vec3 vectorToVertex = position - wind.position.xyz;
+	
+	vec3 windDir = wind.forward.xyz;
+	
+	if ( dot(windDir, normalize(vectorToVertex)) < 0 ) {
+		return vec3(0,0,0);
+	}
+	
+	float windMult = wind.forceMult;
+
+	float compX = dot(wind.right.xyz, vectorToVertex);
+	float compY = dot(wind.up.xyz, vectorToVertex);
+
+	float distance = length( vec3(compX, compY, 0.0) );
+
+	if(distance > wind.fullForceRadius) {
+		float ratio = (distance - wind.fullForceRadius) / wind.attenuationRadius;
+
+		windMult = ratio > 1 ? 0 : (windMult * ratio);
+	}
+
+	return windDir * windMult;
 }
 
 void main() 
@@ -170,6 +208,9 @@ void main()
 	
 	// Gravity
 	totalForce += gravityForce;
+
+	// Wind
+	totalForce += ComputeWindForce(position);
 
 	// Springs
 	totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);

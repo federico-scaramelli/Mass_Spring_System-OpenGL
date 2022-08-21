@@ -2,6 +2,7 @@
 #include <vector>
 #include "MassSpring.h"
 
+class Wind;
 class CollidingSphere;
 
 #define FIXED_DELTAT (1.0 / 120.0)
@@ -17,13 +18,19 @@ public:
 	double nowTime = 0;
 
 	void SetActiveMassSpring (MassSpring* massSpring) { this->massSpring = massSpring; }
+	void SetActiveWind (Wind* wind) { this->wind = wind; }
+
 	void AddCollider (CollidingSphere* collider) { colliders.push_back (collider); }
 
 	void Update()
 	{
-		if ( massSpring == nullptr || colliders.empty() ) return;
+		if ( massSpring == nullptr ) return;
 
-		UpdateCollidingSphereUniforms ();
+		if(!colliders.empty())
+			UpdateCollidingSphereUniforms ();
+
+		if(wind != nullptr)
+			UpdateWindUniforms ();
 	}
 
 	std::vector<CollidingSphere*> colliders;
@@ -31,5 +38,9 @@ public:
 private:
 	MassSpring* massSpring = nullptr;
 
+	Wind* wind = nullptr;
+
 	void UpdateCollidingSphereUniforms ();
+
+	void UpdateWindUniforms ();
 };

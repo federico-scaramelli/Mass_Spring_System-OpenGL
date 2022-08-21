@@ -41,4 +41,5 @@ public:
 	virtual void Update () = 0;
 
 	Material& GetMaterial () { return m_Mesh.GetMaterial(); }
+	
 };

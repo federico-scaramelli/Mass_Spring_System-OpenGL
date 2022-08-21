@@ -39,7 +39,15 @@ public:
 		return modelMatrix;
 	}
 
+	glm::mat4 GetUpdatedCustomRotationModelMatrix (glm::vec3 customRotation)
+	{
+		UpdateModelMatrix(customRotation);
+		return modelMatrix;
+	}
+
 	void UpdateModelMatrix ();
+
+	void UpdateModelMatrix (glm::vec3 customRotation);
 
 #pragma endregion
 

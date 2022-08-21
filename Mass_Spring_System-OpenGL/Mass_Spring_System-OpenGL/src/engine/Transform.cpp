@@ -16,6 +16,19 @@ void Transform::UpdateModelMatrix ()
 	modelMatrix = glm::scale (modelMatrix, glm::vec3(scale));
 }
 
+void Transform::UpdateModelMatrix(glm::vec3 customRotation)
+{
+	modelMatrix = glm::mat4(1.0f);
+	
+	modelMatrix = glm::translate(modelMatrix, position);
+
+	modelMatrix = glm::rotate (modelMatrix, glm::radians (customRotation.x), rightDirection);
+	modelMatrix = glm::rotate (modelMatrix, glm::radians (customRotation.y), upDirection);
+	modelMatrix = glm::rotate (modelMatrix, glm::radians (customRotation.z), forwardDirection);
+
+	modelMatrix = glm::scale (modelMatrix, glm::vec3(scale));
+}
+
 void Transform::SetPosition (glm::vec3 newPosition)
 {
 	position = newPosition;

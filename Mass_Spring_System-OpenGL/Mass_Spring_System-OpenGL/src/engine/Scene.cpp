@@ -109,7 +109,7 @@ void Scene::TransformWind ()
 
 	m_Wind->UpdateWithUI();
 
-	modelViewMatrix = viewMatrix * m_Wind->GetTransform().GetUpdatedModelMatrix();
+	modelViewMatrix = viewMatrix * m_Wind->GetTransform().GetUpdatedCustomRotationModelMatrix(m_Wind->alternativeRotation);
 	m_Wind->GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
 
 	m_Wind->GetShader().SetUniform<glm::vec3> ("solidColor",
@@ -119,6 +119,7 @@ void Scene::TransformWind ()
 void Scene::UpdateWind ()
 {
 	m_Wind->GetMesh().GetMaterial().GetShader().Use();
+	m_Wind->Update();
 	TransformWind();
 	m_Renderer->Draw (m_Wind->GetMesh().m_vao, m_Wind->GetMesh().m_indexBuffer,
 	                  m_Wind->GetMesh().GetMaterial().GetShader());
@@ -154,7 +155,10 @@ void Scene::UpdateGameObjects ()
 	}
 
 	auto massSpring = m_MassSprings[MassSpringUI::selectedMassSpring];
+
 	m_PhysicsSolver->SetActiveMassSpring (massSpring);
+	m_PhysicsSolver->SetActiveWind (m_Wind);
+
 	massSpring->Update();
 	UpdateGameObject (massSpring);
 	DrawGameObject (massSpring);

@@ -16,6 +16,20 @@ Wind::Wind (GLfloat fullForceRadius, GLfloat attenuationRadius, GLfloat forceMul
 
 void Wind::GenerateUI () { Primitive::GenerateUI(); }
 
+void Wind::Update()
+{
+	//Update the alternative rotation
+	glm::vec3 offset = {
+		(Utils::unif(Utils::generator) * 2) - 1,
+		(Utils::unif(Utils::generator) * 2) - 1,
+		(Utils::unif(Utils::generator) * 2) - 1
+	};
+	offset *= maxOffsetValue;
+
+	alternativeRotation = GetTransform().GetRotation() + offset;
+	//---
+}
+
 void Wind::UpdateWithUI ()
 {
 	m_Transform.UpdateWithUI();

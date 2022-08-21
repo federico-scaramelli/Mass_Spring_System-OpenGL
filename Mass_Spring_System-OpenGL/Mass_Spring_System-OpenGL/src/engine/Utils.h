@@ -21,7 +21,7 @@
 namespace Utils
 {
 	static std::random_device rd;
-	static std::mt19937 cpuGenerator(rd());
+	static std::mt19937 generator(rd());
 	static std::uniform_real_distribution<float> unif{ 0, 1.0 };
 
     template <class... E>

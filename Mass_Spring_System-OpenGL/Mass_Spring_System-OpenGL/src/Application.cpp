@@ -52,9 +52,11 @@ void run ()
 	int size = 50;
 	float linkLenght = 10;
 	Cloth cloth (size, size, linkLenght); 
-	cloth.PinCenter();
+	// cloth.PinCenter();
+	cloth.PinTopEdge();
 	scene.AddGameObject (&cloth);
 	cloth.GetTransform().AddPosition ({ -(size * linkLenght / 2), 0, -(size * linkLenght / 2) });
+	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
 	// SPHERE
 	CollidingSphere sphere ("Sphere", 100);

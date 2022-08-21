@@ -19,9 +19,9 @@ public:
 		m_TransformUI->Draw();
 
 		ImGui::Text ("Wind parameters");
-		ImGui::SliderFloat (m_LabelFullForceRadius, &m_FullForceRadiusData, 0.1f, 20);
-		ImGui::SliderFloat (m_LabelAttenuationRadius, &m_AttenuationRadiusData, 0, 200);
-		ImGui::SliderFloat (m_LabelForce, &m_ForceData, 0, 200);
+		ImGui::SliderFloat (m_LabelFullForceRadius, &m_FullForceRadiusData, 0.1f, 250);
+		ImGui::SliderFloat (m_LabelAttenuationRadius, &m_AttenuationRadiusData, 0, 500);
+		ImGui::SliderFloat (m_LabelForce, &m_ForceData, 0, 10000);
 	}
 
 	float m_FullForceRadiusData = 5;
