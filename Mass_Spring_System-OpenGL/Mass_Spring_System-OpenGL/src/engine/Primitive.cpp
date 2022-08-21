@@ -136,12 +136,12 @@ void BuildConeMesh (Mesh& mesh, GLuint resolution, GLfloat radius, GLfloat heigh
 		GLfloat y = std::sin(r) * radius;
 
 		Vertex vertex {};
-		vertex.position = {x, 0, y, 0};
+		vertex.position = {x, y, 0, 0};
 		vertices.push_back (vertex);
 	}
 
 	Vertex topVertex {};
-	topVertex.position = {0, height, 0, 0};
+	topVertex.position = {0, 0, -height, 0};
 	vertices.push_back (topVertex);
 
 	// Indices
