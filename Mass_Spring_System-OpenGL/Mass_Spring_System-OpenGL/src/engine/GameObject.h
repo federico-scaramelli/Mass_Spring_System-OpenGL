@@ -6,74 +6,39 @@
 #include "Mesh.h"
 #include "Renderer.h"
 #include "Transform.h"
+#include "VertexBufferLayout.h"
 
-static std::random_device rd;
-static std::mt19937 cpuGenerator(rd());
-static std::uniform_real_distribution<float> unif{ 0, 1.0 };
-
-class GameObject {
+class GameObject
+{
 protected:
 	Transform m_Transform;
 	Mesh m_Mesh{};
-	GameObjectUI* m_GameObjectUI;
+	GameObjectUI* m_GameObjectUI = nullptr;
+	VertexBufferLayout vertexBufferLayout{};
 
 public:
 	virtual ~GameObject () { delete m_GameObjectUI; }
 	const char* name;
 	bool m_IsActive = true;
-	
-	GameObject(const char* name) : m_Transform (name), name (name) {}
 
-	Transform& GetTransform() {
-		return m_Transform;
-	}
+	GameObject (const char* name) : m_Transform (name), name (name) {}
 
-	Mesh& GetMesh() {
-		return m_Mesh;
-	}
+	Transform& GetTransform () { return m_Transform; }
 
-	virtual void GenerateUI()
-	{
-		m_Transform.GenerateUI(m_GameObjectUI->m_TransformUI);
-		GetMaterial().GenerateUI (m_GameObjectUI->m_MaterialUI);
-	}
+	Mesh& GetMesh () { return m_Mesh; }
 
-	virtual void UpdateWithUI() {
-		m_Transform.UpdateWithUI();
+	virtual void GenerateUI ();
 
-		m_Mesh.GetMaterial().UpdateWithUI();
-	}
+	virtual void UpdateWithUI ();
 
-	glm::vec3 GetRandomColor() {
-		return {
-			unif(cpuGenerator),
-			unif(cpuGenerator),
-			unif(cpuGenerator)
-		};
-	}
+	ShaderProgram& GetShader () { return m_Mesh.GetMaterial().GetShader(); }
 
-	void SetColor(glm::vec3 color) {
-		/*this->m_Mesh.GetMaterial().m_DiffuseColor = color;
-		this->m_Mesh.GetMaterial().m_AmbientColor = color;
+	GameObjectUI& GetUI () { return *m_GameObjectUI; }
 
-		for (Vertex& v : m_Mesh.GetVertices())
-		{
-			v.color = color;
-		}
+	void SetupGraphicsShader ();
 
-		m_Mesh.UpdateBuffers();*/
-	}
+	virtual void Create () = 0;
+	virtual void Update () = 0;
 
-	ShaderProgram& GetShader() {
-		return m_Mesh.GetMaterial().GetShader();
-	}
-
-	GameObjectUI& GetUI() { return *m_GameObjectUI; }
-
-	virtual void Create() = 0;
-	virtual void Update() = 0;
-
-	Material& GetMaterial() {
-		return m_Mesh.GetMaterial();
-	}
+	Material& GetMaterial () { return m_Mesh.GetMaterial(); }
 };

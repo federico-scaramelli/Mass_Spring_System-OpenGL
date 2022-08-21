@@ -31,25 +31,19 @@ struct MassSpringParameters
 class MassSpring : public GameObject
 {
 protected:
-	MassSpring (const char* name, MassSpringParameters parameters) :
-	  GameObject (name),
-	  m_Parameters (std::move (parameters))
-	{
-		m_GameObjectUI = new MassSpringUI(name);
-	}
-
+	MassSpring (const char* name, MassSpringParameters parameters);
 	MassSpringParameters m_Parameters;
 
 	virtual void InitializeVertices () = 0;
 	virtual void InitializeIndices () = 0;
 
-	virtual void SetComputeBuffers () = 0;
 	virtual void BindComputeBuffers (int vboBind, int tempBind) = 0;
 
 public:
 	ShaderProgramCompute simulationStageComputeShader {};
 	ShaderProgramCompute constraintsStageComputeShader {};
 
+	virtual void SetComputeBuffers () = 0;
 	void Create () override = 0;
 	void Update () override = 0;
 };

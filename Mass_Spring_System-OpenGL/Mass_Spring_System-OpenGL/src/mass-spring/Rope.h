@@ -3,10 +3,8 @@
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
-#include "../engine/GameObject.h"
 #include <array>
 #include <utility>
-
 #include "MassSpring.h"
 
 class Rope : public MassSpring {
@@ -35,9 +33,9 @@ public:
 
 	void InitializeNodes();
 
-	void InitializeVertices();
+	void InitializeVertices() override;
 
-	void InitializeIndices();
+	void InitializeIndices() override;
 
 	void CreateFrontSurfaceIndices();
 
@@ -47,7 +45,7 @@ public:
 
 	void SetComputeBuffers() override {}
 	void BindComputeBuffers(int vboBind, int tempBind) override {}
-
+	
 	void Create() override {}
 	void Update() override {}
 };

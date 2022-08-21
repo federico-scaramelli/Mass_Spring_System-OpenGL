@@ -9,14 +9,12 @@ private:
 	glm::vec3 m_LightAmbient {0, 0, 0};
 
 public:
-	LightSource(glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1})
-	  :  Primitive ("Light", PrimitiveType::SPHERE, 10)
+	LightSource(const GLfloat size = 5, glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1})
+	  : Primitive ("Light", PrimitiveType::SPHERE, size),
+		m_LightIntensity (lightIntensity), m_LightAmbient (lightAmbient)
 	{
 		delete m_GameObjectUI;
 		m_GameObjectUI = new LightUI(name);
-
-		this->m_LightIntensity = lightIntensity;
-		this->m_LightAmbient = lightAmbient;
 	}
 
 	void GenerateUI() override

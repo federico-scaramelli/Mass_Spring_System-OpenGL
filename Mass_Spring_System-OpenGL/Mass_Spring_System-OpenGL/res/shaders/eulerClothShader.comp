@@ -31,6 +31,7 @@ uniform float particleMass;
 uniform vec4 gravityAcceleration;
 uniform float deltaTime;
 
+
 uniform vec4 gridDims;
 
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 

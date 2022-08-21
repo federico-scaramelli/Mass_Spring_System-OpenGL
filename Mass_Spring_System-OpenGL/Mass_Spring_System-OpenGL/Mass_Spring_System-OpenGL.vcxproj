@@ -167,10 +167,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\GameObject.cpp" />
     <ClCompile Include="src\engine\Primitive.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
     <ClCompile Include="src\engine\RendererUI.cpp" />
     <ClCompile Include="src\engine\Scene.cpp" />
+    <ClCompile Include="src\mass-spring\MassSpring.cpp" />
     <ClCompile Include="src\mass-spring\PhysicsSolver.cpp" />
     <ClCompile Include="src\mass-spring\Rope.cpp" />
     <ClCompile Include="src\mass-spring\Cloth.cpp" />
@@ -193,6 +195,7 @@
     <ClCompile Include="src\engine\VertexArray.cpp" />
     <ClCompile Include="src\engine\Window.cpp" />
     <ClCompile Include="src\engine\Transform.cpp" />
+    <ClCompile Include="src\mass-spring\Wind.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -211,7 +214,7 @@
     <ClInclude Include="src\engine\GameObject.h" />
     <ClInclude Include="src\engine\CollidingSphere.h" />
     <ClInclude Include="src\engine\TransformUI.h" />
-    <ClInclude Include="src\engine\UIElements.h" />
+    <ClInclude Include="src\mass-spring\WindUI.h" />
     <ClInclude Include="src\mass-spring\MassSpring.h" />
     <ClInclude Include="src\mass-spring\MassSpringUI.h" />
     <ClInclude Include="src\mass-spring\PhysicsSolver.h" />
@@ -528,6 +531,7 @@
     <ClInclude Include="src\engine\VertexBufferLayout.h" />
     <ClInclude Include="src\engine\Vertex.h" />
     <ClInclude Include="src\engine\Transform.h" />
+    <ClInclude Include="src\mass-spring\Wind.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libraries\include\glm\detail\func_common.inl" />
@@ -670,6 +674,7 @@
     <None Include="libraries\include\glm\gtx\vector_query.inl" />
     <None Include="libraries\include\glm\gtx\wrap.inl" />
     <None Include="res\shaders\clothConstraints.comp" />
+    <None Include="res\shaders\solidShader.frag" />
     <None Include="res\shaders\verletClothShader.comp" />
     <None Include="res\shaders\blinnPhongShader.frag" />
     <None Include="res\shaders\eulerClothShader.comp" />

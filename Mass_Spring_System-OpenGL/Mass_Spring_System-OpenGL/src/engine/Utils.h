@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <random>
 
 //TODO: check NDEBUG path with shaders
 #ifndef ENGINE_DIR
@@ -15,8 +16,14 @@
   #endif
 #endif
 
+
+
 namespace Utils
 {
+	static std::random_device rd;
+	static std::mt19937 cpuGenerator(rd());
+	static std::uniform_real_distribution<float> unif{ 0, 1.0 };
+
     template <class... E>
 	constexpr bool falseTemplate = false;
 

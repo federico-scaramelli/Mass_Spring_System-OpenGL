@@ -33,7 +33,15 @@ private:
 	GLsizei m_Stride;
 
 public:
-	VertexBufferLayout() : m_Stride(0) {}
+	VertexBufferLayout() : m_Stride(0)
+	{
+		Push<GLfloat> (4); //0
+		Push<GLfloat> (4); //1
+		Push<GLfloat> (4); //2
+		Push<GLfloat> (4); //3
+		Push<GLfloat> (4); //4
+		Push<GLfloat> (4); //5
+	}
 
 	const std::vector<VertexBufferElement> GetElements() const { return m_Elements; }
 	GLsizei GetStride() const { return m_Stride; }

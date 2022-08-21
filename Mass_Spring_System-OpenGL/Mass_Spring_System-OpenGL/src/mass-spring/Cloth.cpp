@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <random>
-
+#include "PhysicsSolver.h"
 #include "../engine/Vertex.h"
 
 Cloth::Cloth (uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
@@ -144,6 +144,16 @@ void Cloth::Update ()
 
 void Cloth::SetComputeBuffers ()
 {
+	// Compute stage 1: compute new positions without constraints
+	simulationStageComputeShader.CreateProgram ({ "eulerClothShader.comp", ShaderType::COMPUTE });
+	simulationStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
+	simulationStageComputeShader.SetWorkGroupNum ({ GetClothSize(), 1 });
+
+	// Compute stage 2: apply constraints
+	constraintsStageComputeShader.CreateProgram ({ "clothConstraints.comp", ShaderType::COMPUTE });
+	constraintsStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
+	constraintsStageComputeShader.SetWorkGroupNum ({ GetClothSize(), 1 });
+
 	glGenBuffers (1, &m_ComputeTempVertexBuffer);
 
 	simulationStageComputeShader.Use();

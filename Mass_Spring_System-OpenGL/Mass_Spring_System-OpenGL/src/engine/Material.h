@@ -9,6 +9,13 @@
 class MaterialUI;
 class ShaderProgram;
 
+enum FragmentShader
+{
+	BlinnPhong,
+	Normal,
+	Solid
+};
+
 class Material
 {
 private:
@@ -18,7 +25,7 @@ private:
 	glm::vec3 m_SpecularColor;
 	glm::vec3 m_AmbientColor;
 	float m_Shininess;
-
+	
 	MaterialUI* m_MaterialUI;
 
 public:
@@ -28,6 +35,15 @@ public:
 	          float shininess = 1) :
 		m_DiffuseColor (diffuseColor), m_SpecularColor (specularColor), m_AmbientColor (ambientColor),
 		m_Shininess (shininess) { }
+
+
+	inline static std::unordered_map<FragmentShader, const char*> fragShadersMap =
+	{
+		{BlinnPhong, "blinnPhongShader.frag"},
+		{Normal, "normalShader.frag"},
+		{Solid, "solidShader.frag"}
+	};
+	FragmentShader fragShader = BlinnPhong;
 
 	void SetProperties (glm::vec3 diffuseColor,
 	                    glm::vec3 specularColor,

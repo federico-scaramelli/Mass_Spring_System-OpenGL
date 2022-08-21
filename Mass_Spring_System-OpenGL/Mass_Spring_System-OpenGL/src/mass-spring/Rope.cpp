@@ -6,8 +6,8 @@ Rope::Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius) :
 	m_Radius (radius)
 {
 	InitializeNodes();
-	InitializeVertices();
-	InitializeIndices();
+	Rope::InitializeVertices();
+	Rope::InitializeIndices();
 }
 
 void Rope::InitializeNodes()
@@ -56,8 +56,6 @@ void Rope::InitializeVertices()
 			position += m_Nodes[i];
 
 			Vertex vertex{{position.x, position.y, position.z, 0}};
-			glm::vec3 color = GetRandomColor();
-			vertex.color = {color.x, color.y, color.z, 0};
 
 			vertices.push_back(vertex);
 		}

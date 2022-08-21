@@ -93,6 +93,15 @@
     <ClCompile Include="src\engine\RendererUI.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="src\mass-spring\Wind.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\engine\GameObject.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mass-spring\MassSpring.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -1076,9 +1085,6 @@
     <ClInclude Include="src\engine\MaterialUI.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\engine\UIElements.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="src\engine\RendererUI.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -1086,6 +1092,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\mass-spring\MassSpringUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mass-spring\Wind.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mass-spring\WindUI.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1513,6 +1525,7 @@
     <None Include="res\shaders\blinnPhongShader.frag" />
     <None Include="res\shaders\normalShader.frag" />
     <None Include="res\shaders\eulerClothShader.comp" />
+    <None Include="res\shaders\solidShader.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="libraries\include\glm\CMakeLists.txt" />

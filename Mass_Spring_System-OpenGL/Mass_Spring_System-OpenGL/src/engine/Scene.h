@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 
+class Wind;
 class MassSpring;
 class PhysicsSolver;
 class CollidingSphere;
@@ -17,6 +18,7 @@ public:
 	void AddCamera (Camera* camera);
 	void AddGameObject (GameObject* object);
 	void AddLightSource (LightSource* light);
+	void AddWind (Wind* wind);
 
 	[[nodiscard]] size_t GetGameObjectCount () const { return m_Primitives.size(); }
 
@@ -24,6 +26,7 @@ public:
 
 	[[nodiscard]] Camera* GetCamera() const { return m_Camera; }
 	[[nodiscard]] LightSource* GetLightSource() const { return m_LightSource; }
+	[[nodiscard]] Wind* GetWind() const { return m_Wind; }
 	[[nodiscard]] Renderer* GetRenderer() const { return m_Renderer; }
 
 	void Update ();
@@ -35,6 +38,7 @@ private:
 
 	Camera* m_Camera;
 	LightSource* m_LightSource;
+	Wind* m_Wind;
 
 	std::vector<GameObject*> m_Primitives;
 	std::vector<MassSpring*> m_MassSprings;
@@ -46,6 +50,9 @@ private:
 
 	void TransformLight ();
 	void UpdateLight ();
+
+	void TransformWind();
+	void UpdateWind();
 
 	void UpdateGameObject (GameObject* gameObject);
 	void DrawGameObject (GameObject* gameObject);

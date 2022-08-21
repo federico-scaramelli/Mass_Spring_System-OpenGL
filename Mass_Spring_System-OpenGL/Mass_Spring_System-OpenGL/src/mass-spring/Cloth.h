@@ -1,10 +1,9 @@
 #pragma once
 
+#include "MassSpring.h"
 #include "glad/glad.h"
 #include "glm/vec3.hpp"
 
-#include "PhysicsSolver.h"
-#include "../engine/Primitive.h"
 
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 

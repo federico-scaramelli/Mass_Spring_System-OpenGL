@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "LightSource.h"
+#include "../mass-spring/Wind.h"
 #include "../mass-spring/MassSpring.h"
 #include "Scene.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -34,6 +35,13 @@ void RendererUI::DrawUI ()
 
 	// Light UI
 	if (ImGui::CollapsingHeader ("Light")) { scene->GetLightSource()->GetUI().Draw(); }
+
+	ImGui::Dummy ({ 0, 10 });
+	ImGui::Separator();
+	ImGui::Dummy ({ 0, 10 });
+
+	// Wind UI
+	if (ImGui::CollapsingHeader ("Wind")) { scene->GetWind()->GetUI().Draw(); }
 	ImGui::End();
 
 	ImGui::Begin ("Objects");
@@ -57,11 +65,14 @@ void RendererUI::DrawUI ()
 	ImGui::Dummy ({ 0, 20 });
 	if (ImGui::CollapsingHeader ("Mass Springs", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::ListBox ("Select Mass Spring Object",
-		                &MassSpringUI::selectedMassSpring,
-		                MassSpringUI::sceneMassSprings,
-		                scene->m_MassSprings.size());
-		scene->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
+		if (!scene->m_MassSprings.empty())
+		{
+			ImGui::ListBox ("Select Mass Spring Object",
+						   &MassSpringUI::selectedMassSpring,
+						   MassSpringUI::sceneMassSprings,
+						   scene->m_MassSprings.size());
+			scene->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
+		}
 	}
 
 

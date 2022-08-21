@@ -1,6 +1,5 @@
 #pragma once
 #include "GameObjectUI.h"
-#include "glm/vec3.hpp"
 
 class LightUI : public GameObjectUI
 {
@@ -16,7 +15,7 @@ public:
 
 	void Draw() override
 	{
-		GameObjectUI::Draw();
+		m_TransformUI->Draw();
 
 		ImGui::Text ("Light");
 		ImGui::ColorEdit3 (m_LabelDiffuse, m_LightDiffuseData);
