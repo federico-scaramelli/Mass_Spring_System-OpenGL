@@ -19,7 +19,7 @@ void PhysicsSolver::UpdateCollidingSphereUniforms ()
   		massSpring->constraintsStageComputeShader.SetUniformArray<glm::vec4>
 						(("spheres[" + std::to_string(i) + "].sphereCenter").c_str(), spherePos);
 		massSpring->constraintsStageComputeShader.SetUniformArray<GLfloat>
-						(("spheres[" + std::to_string(i) + "].sphereRadius").c_str(), colliders[i]->size);
+						(("spheres[" + std::to_string(i) + "].sphereRadius").c_str(), colliders[i]->radius);
 		massSpring->constraintsStageComputeShader.SetUniformArray<GLuint>
 						(("spheres[" + std::to_string(i) + "].sphereActive").c_str(), colliders[i]->m_IsActive);
 	}

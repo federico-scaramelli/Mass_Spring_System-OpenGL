@@ -4,15 +4,18 @@
 enum PrimitiveType
 {
 	CUBE,
-	SPHERE
+	SPHERE,
+	CONE
 };
 
 class Primitive : public GameObject
 {
 public:
-	float size = 1;
+	//float size = 1;
+	
+	Primitive(const char* name, PrimitiveType type, GLuint size);
+	Primitive(const char* name, PrimitiveType type, GLuint resolution, GLfloat radius, GLfloat height);
 
-	Primitive(const char* name, PrimitiveType type, float size);
 	void Create() override;
 	void Update() override;
 };
