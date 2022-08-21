@@ -18,4 +18,6 @@ public:
 
 	void Create() override;
 	void Update() override;
+
+	void BuildSphereMesh(Mesh& mesh, GLfloat radius);
 };

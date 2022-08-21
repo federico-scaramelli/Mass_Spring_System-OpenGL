@@ -15,7 +15,7 @@ public:
 
 	void DrawUI();
 
-	bool wireframe = true;
+	bool wireframe = false;
 	bool backface = true;
 
 	RendererUI UI;

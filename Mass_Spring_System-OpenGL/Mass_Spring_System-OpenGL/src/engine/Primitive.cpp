@@ -48,59 +48,109 @@ void BuildCubeMesh(Mesh& mesh, GLfloat size)
 	};
 }
 
-void BuildSphereMesh(Mesh& mesh, GLfloat radius)
+// void Primitive::BuildSphereMesh(Mesh& mesh, GLfloat radius)
+// {
+// 	auto& vertices = mesh.GetVertices();
+// 	vertices.clear();
+// 	auto& indices = mesh.GetIndices();
+// 	indices.clear();
+//
+// 	double latitudeBands = 30;
+//     double longitudeBands = 30;
+//
+// 	float M_PI = 3.14;
+//
+//     for (double latNumber = 0; latNumber <= latitudeBands; latNumber++)
+//     {
+// 	    double theta = latNumber * M_PI / latitudeBands;
+//     	double sinTheta = sin(theta);
+//     	double cosTheta = cos(theta);
+//         
+//     	for (double longNumber = 0; longNumber <= longitudeBands; longNumber++) {
+//     		double phi = longNumber * 2 * M_PI / longitudeBands;
+//     		double sinPhi = sin(phi);
+//     		double cosPhi = cos(phi);
+//             
+//     		Vertex vs;
+//     		vs.normal.x = cosPhi * sinTheta;   // x
+//     		vs.normal.y = cosTheta;            // y
+//     		vs.normal.z = sinPhi * sinTheta;   // z
+//     		vs.position.x = radius * vs.normal.x;
+//     		vs.position.y = radius * vs.normal.y;
+//     		vs.position.z = radius * vs.normal.z;
+//             
+//     		vertices.push_back(vs);
+//     	}
+//         
+//     	for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
+//     		for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
+//     			int first = (latNumber * (longitudeBands + 1)) + longNumber;
+//     			int second = first + longitudeBands + 1;
+//                 
+//     			indices.push_back(first);
+//     			indices.push_back(second);
+//     			indices.push_back(first + 1);
+//                 
+//     			indices.push_back(second);
+//     			indices.push_back(second + 1);
+//     			indices.push_back(first + 1);
+//                 
+//     		}
+//     	}
+//     }
+// }
+
+void Primitive::BuildSphereMesh(Mesh& mesh, GLfloat radius)
 {
-	// Vertices
 	auto& vertices = mesh.GetVertices();
 	vertices.clear();
 	
-	int stackCount = 8;
-	int sectorCount = stackCount * 3;
-
+	int stackCount = 30;
+	int sectorCount = 30;
+	
 	float x, y, z, xy;                              // vertex position
 	float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
-
+	
 	float sectorStep = 2 * glm::pi<GLfloat>() / sectorCount;
 	float stackStep = glm::pi<GLfloat>() / stackCount;
 	float sectorAngle, stackAngle;
-
+	
 	for (int i = 0; i <= stackCount; ++i)
 	{
 		stackAngle = glm::pi<GLfloat>() / 2 - i * stackStep;        // starting from pi/2 to -pi/2
 		xy = radius * cosf(stackAngle);          // r * cos(u)
 		z = radius * sinf(stackAngle);           // r * sin(u)
-
+	
 		for (int j = 0; j <= sectorCount; ++j)
 		{
 			Vertex vertex{};
-
+	
 			sectorAngle = j * sectorStep;           // starting from 0 to 2pi
-
+	
 			x = xy * cosf(sectorAngle);             // r * cos(u) * cos(v)
 			y = xy * sinf(sectorAngle);             // r * cos(u) * sin(v)
-
+	
 			vertex.position = { x, y, z, 0 };
-
+	
 			nx = x * lengthInv;
 			ny = y * lengthInv;
 			nz = z * lengthInv;
-
+	
 			vertex.normal = { nx, ny, nz, 0 };
-
+	
 			vertices.push_back(vertex);
 		}
 	}
-
-	// Indices
+	
 	auto& indices = mesh.GetIndices();
 	indices.clear();
-
+	
 	int k1, k2;
 	for (int i = 0; i < stackCount; ++i)
 	{
 		k1 = i * (sectorCount + 1);     // beginning of current stack
 		k2 = k1 + sectorCount + 1;      // beginning of next stack
-
+	
 		for (int j = 0; j < sectorCount; ++j, ++k1, ++k2)
 		{
 			// k1 => k2 => k1+1
@@ -110,7 +160,7 @@ void BuildSphereMesh(Mesh& mesh, GLfloat radius)
 				indices.push_back(k2);
 				indices.push_back(k1 + 1);
 			}
-
+	
 			// k1+1 => k2 => k2+1
 			if (i != (stackCount - 1))
 			{

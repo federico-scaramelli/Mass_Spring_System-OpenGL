@@ -37,7 +37,7 @@ void Scene::AddGameObject (GameObject* object)
 	auto massSpring = dynamic_cast<MassSpring*> (object);
 	if (massSpring != nullptr)
 	{
-		object->GetMaterial().fragShader = Velocity;
+		object->GetMaterial().fragShader = BlinnPhong;
 		object->SetupGraphicsShader();
 
 		MassSpringUI::sceneMassSprings[m_MassSprings.size()] = massSpring->name;
