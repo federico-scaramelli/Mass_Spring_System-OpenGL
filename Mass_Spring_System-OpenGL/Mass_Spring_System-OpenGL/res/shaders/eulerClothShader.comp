@@ -159,21 +159,39 @@ vec3 ComputeWindForce(vec3 position) {
 	
 	vec3 windDir = wind.forward.xyz;
 	
-	if ( dot(windDir, normalize(vectorToVertex)) < 0 ) {
-		return vec3(0,0,0);
-	}
+	float dotWindZ = dot (windDir, normalize(vectorToVertex));
+
+	
 	
 	float windMult = wind.forceMult;
 
+	vec3 forwardMaxRadiusPoint = vec3(0, wind.fullForceRadius, 0) + windDir * 100;
+	float maxDot = dot(windDir, normalize(forwardMaxRadiusPoint));
+
+	vec3 forwardAttRadiusPoint = vec3(0, wind.fullForceRadius + wind.attenuationRadius, 0) + windDir * 100;
+	float attDot = dot(windDir, normalize(forwardAttRadiusPoint));
+
+	if ( dotWindZ < attDot ) {
+		return vec3(0,0,0);
+	}
+
+	/*
 	float compX = dot(wind.right.xyz, vectorToVertex);
 	float compY = dot(wind.up.xyz, vectorToVertex);
 
-	float distance = length( vec3(compX, compY, 0.0) );
+	float radiusDistance = length( vec3(compX, compY, 0.0) );
 
-	if(distance > wind.fullForceRadius) {
-		float ratio = (distance - wind.fullForceRadius) / wind.attenuationRadius;
+	if(radiusDistance > wind.fullForceRadius) {
+		float ratio = (radiusDistance - wind.fullForceRadius) / wind.attenuationRadius;
 
 		windMult = ratio > 1 ? 0 : (windMult * ratio);
+	}
+	*/
+
+	if(dotWindZ < maxDot) {
+		float ratio = (dotWindZ - attDot) / (maxDot - attDot);
+
+		windMult = windMult * ratio;
 	}
 
 	return windDir * windMult;

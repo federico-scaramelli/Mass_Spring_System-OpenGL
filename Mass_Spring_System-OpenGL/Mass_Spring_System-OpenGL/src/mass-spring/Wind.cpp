@@ -24,7 +24,7 @@ void Wind::Update()
 		(Utils::unif(Utils::generator) * 2) - 1,
 		(Utils::unif(Utils::generator) * 2) - 1
 	};
-	offset *= maxOffsetValue;
+	offset *= m_OffsetMaxValue;
 
 	alternativeRotation = GetTransform().GetRotation() + offset;
 	//---
@@ -38,6 +38,8 @@ void Wind::UpdateWithUI ()
 	m_FullForceRadius = windUI->m_FullForceRadiusData;
 	m_AttenuationRadius = windUI->m_AttenuationRadiusData;
 	m_ForceMultiplier = windUI->m_ForceData;
+
+	m_OffsetMaxValue = windUI->m_OffsetMaxValueData;
 }
 
 void Wind::SetFullForceRadius (GLfloat fullForceRadius)

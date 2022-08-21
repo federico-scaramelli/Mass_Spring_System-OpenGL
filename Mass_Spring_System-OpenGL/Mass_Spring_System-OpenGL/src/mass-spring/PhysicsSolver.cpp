@@ -34,6 +34,7 @@ void PhysicsSolver::UpdateWindUniforms()
 	massSpring->simulationStageComputeShader.Use();
 
 	glm::vec4 forwardWind = glm::vec4(0.0, 0.0, -1.0, 0.0);
+
 	
 	glm::mat4 rotationMatrix = glm::mat4(1.0f);
 	rotationMatrix = glm::rotate (rotationMatrix, glm::radians (wind->alternativeRotation.x), wind->GetTransform().GetRightDirection());
@@ -45,29 +46,31 @@ void PhysicsSolver::UpdateWindUniforms()
 
 	//Zw
 	glm::vec3 localForwardWind = (glm::normalize( inverseModel * forwardWind ));
+	/*
 	//Xw
 	glm::vec3 localRigthtWind = glm::normalize( glm::cross( localForwardWind, Transform::worldUpDirection ));
 	//Yw
 	glm::vec3 localUptWind = glm::normalize( glm::cross( localRigthtWind, localForwardWind ));
+	
+	glm::vec4 localRightWind4f = glm::vec4(localRigthtWind, 0.0f);
+	glm::vec4 localUpdWind4f = glm::vec4(localUptWind, 0.0f);
+	
+	massSpring->simulationStageComputeShader.SetUniform<glm::vec4>
+		("wind.right", localRightWind4f);
+
+	massSpring->simulationStageComputeShader.SetUniform<glm::vec4>
+		("wind.up", localUpdWind4f);
+*/
 
 	//Origin and axis in local space as vec4
 	glm::vec4 localPositionWind4f = inverseModel * glm::vec4(wind->GetTransform().GetPosition(), 1.0);
 	glm::vec4 localForwardWind4f = glm::vec4(localForwardWind, 0.0f);
-	glm::vec4 localRightWind4f = glm::vec4(localRigthtWind, 0.0f);
-	glm::vec4 localUpdWind4f = glm::vec4(localUptWind, 0.0f);
-
 
 	massSpring->simulationStageComputeShader.SetUniform<glm::vec4>
 		("wind.position", localPositionWind4f);
 
 	massSpring->simulationStageComputeShader.SetUniform<glm::vec4>
 		("wind.forward", localForwardWind4f);
-
-	massSpring->simulationStageComputeShader.SetUniform<glm::vec4>
-		("wind.right", localRightWind4f);
-
-	massSpring->simulationStageComputeShader.SetUniform<glm::vec4>
-		("wind.up", localUpdWind4f);
 
 	massSpring->simulationStageComputeShader.SetUniform<GLfloat>
 		("wind.forceMult", wind->GetForceMultiplier());

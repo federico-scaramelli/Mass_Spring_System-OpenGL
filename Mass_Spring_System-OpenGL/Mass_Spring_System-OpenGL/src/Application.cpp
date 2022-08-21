@@ -23,68 +23,69 @@ Window window{};
 GLFWwindow* glfwWindow = nullptr;
 Renderer renderer;
 PhysicsSolver physicsSolver;
-Scene scene{ &renderer, &physicsSolver };
+Scene scene{&renderer, &physicsSolver};
 
-
-void init ()
+void init()
 {
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
 }
 
-void run ()
+void run()
 {
 #pragma region Scene Creation
 	//Camera
-	Camera camera (window.GetAspectRatio());
-	scene.AddCamera (&camera);
+	Camera camera(window.GetAspectRatio());
+	scene.AddCamera(&camera);
 
 	// LIGHT
 	LightSource lightSource{};
-	scene.AddLightSource (&lightSource);
-	lightSource.GetTransform().AddPosition ({ 122.5, -80, 122.5 });
+	scene.AddLightSource(&lightSource);
+	lightSource.GetTransform().AddPosition({122.5, -80, 122.5});
 
 	// WIND
 	Wind wind{10, 50, 50};
-	scene.AddWind (&wind);
+	scene.AddWind(&wind);
 
 	// CLOTH
-	int size = 50;
+	int sizeWidth = 50;
+	int sizeHeight = 30;
 	float linkLenght = 10;
-	Cloth cloth (size, size, linkLenght); 
+	Cloth cloth(sizeWidth, sizeHeight, linkLenght);
 	// cloth.PinCenter();
-	cloth.PinTopEdge();
-	scene.AddGameObject (&cloth);
-	cloth.GetTransform().AddPosition ({ -(size * linkLenght / 2), 0, -(size * linkLenght / 2) });
+	// cloth.PinLeftEdge();
+	scene.AddGameObject(&cloth);
+	cloth.GetTransform().AddPosition({-(sizeWidth * linkLenght / 2), 0, -(sizeHeight * linkLenght / 2)});
+	cloth.GetTransform().SetRotation({90, 0, 0});
 	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
 	// SPHERE
-	CollidingSphere sphere ("Sphere", 100);
-	scene.AddGameObject (&sphere);
-	sphere.GetTransform().AddPosition ({ 0, -200, 0 });
+	CollidingSphere sphere("Sphere", 100);
+	scene.AddGameObject(&sphere);
+	sphere.GetTransform().AddPosition({0, -200, 0});
 
 	// SPHERE
-	CollidingSphere sphere2 ("Sphere2", 50);
-	scene.AddGameObject (&sphere2);
-	sphere2.GetTransform().AddPosition ({ -150, -100, 0 });
+	CollidingSphere sphere2("Sphere2", 50);
+	scene.AddGameObject(&sphere2);
+	sphere2.GetTransform().AddPosition({-150, -100, 0});
 
 	// SPHERE
-	CollidingSphere sphere3 ("Sphere3", 50);
-	scene.AddGameObject (&sphere3);
-	sphere3.GetTransform().AddPosition ({ 150, -100, 0 });
+	CollidingSphere sphere3("Sphere3", 50);
+	scene.AddGameObject(&sphere3);
+	sphere3.GetTransform().AddPosition({150, -100, 0});
 
 	// CUBE
-	Primitive cube ("Cube", CUBE, 300);
+	Primitive cube("Cube", CUBE, 300);
 	//scene.AddGameObject (&cube);
 
 	// ROPE
-	Rope rope (50, 5, 10);
-	scene.AddGameObject (&rope);
+	Rope rope(50, 5, 10);
+	scene.AddGameObject(&rope);
 
 #pragma endregion
 
 	physicsSolver.lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose (glfwWindow))
+	while (!glfwWindowShouldClose(glfwWindow))
 	{
 		physicsSolver.nowTime = glfwGetTime();
 		PhysicsSolver::deltaTime += (physicsSolver.nowTime - physicsSolver.lastTime)
@@ -97,19 +98,22 @@ void run ()
 
 		renderer.DrawUI();
 
-		glfwSwapBuffers (glfwWindow);
+		glfwSwapBuffers(glfwWindow);
 		glfwPollEvents();
 	}
 }
 
-int main ()
+int main()
 {
 	try
 	{
 		init();
 		run();
 	}
-	catch (std::runtime_error& e) { std::cout << e.what() << std::endl; }
+	catch (std::runtime_error& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 
 	return 0;
 }

@@ -27,7 +27,7 @@ public:
 	GLfloat GetAttenuatedRadius() { return m_AttenuationRadius; }
 
 private:
-	GLfloat maxOffsetValue = 5;
+	GLfloat m_OffsetMaxValue = 5;
 
 	GLfloat m_FullForceRadius;
 	GLfloat m_AttenuationRadius;

@@ -34,18 +34,21 @@ void Scene::SetShaderUniforms (GameObject* object)
 
 void Scene::AddGameObject (GameObject* object)
 {
-	object->GetMaterial().fragShader = BlinnPhong;
-	object->SetupGraphicsShader();
-
 	auto massSpring = dynamic_cast<MassSpring*> (object);
 	if (massSpring != nullptr)
 	{
+		object->GetMaterial().fragShader = Velocity;
+		object->SetupGraphicsShader();
+
 		MassSpringUI::sceneMassSprings[m_MassSprings.size()] = massSpring->name;
 		m_MassSprings.push_back (massSpring);
 		massSpring->SetComputeBuffers();
 	}
 	else
 	{
+		object->GetMaterial().fragShader = BlinnPhong;
+		object->SetupGraphicsShader();
+
 		m_Primitives.push_back (object);
 		auto sphere = dynamic_cast<CollidingSphere*> (object);
 		if (sphere != nullptr) { m_PhysicsSolver->AddCollider (sphere); }
@@ -203,6 +206,8 @@ void Scene::UpdateGameObject (GameObject* gameObject)
 	gameObject->GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
 	gameObject->GetShader().SetUniform<glm::mat3> ("normalMatrix",
 	                                               glm::inverseTranspose (glm::mat3 (modelViewMatrix)));
+
+	
 }
 
 void Scene::DrawGameObject (GameObject* gameObject)

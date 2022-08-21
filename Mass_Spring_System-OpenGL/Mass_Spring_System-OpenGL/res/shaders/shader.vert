@@ -9,6 +9,7 @@ layout(location = 5) in vec4 pinned;
 
 out vec3 position;
 out vec3 normal;
+out vec3 velocity;
 
 uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
@@ -21,6 +22,7 @@ void main()
 
 	normal = normalize (  normalMatrix * vertexNormal.xyz );
 	position = camSpaceCoords.xyz;
+	velocity = vertexVelocity.xyz;
 
 	gl_Position = clipSpaceCoordinates;
 }	

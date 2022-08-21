@@ -36,6 +36,7 @@ public:
 
 	void PinAllEdges();
 	void PinTopEdge();
+	void PinLeftEdge();
 	void PinCircleCenter();
 	void PinCenter ();
 	void PinTopPoints();

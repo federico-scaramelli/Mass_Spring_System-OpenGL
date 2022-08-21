@@ -29,8 +29,8 @@ void Cloth::InitializeVertices ()
 		{
 			glm::vec3 initialPosition{
 				column * m_RestLengthHV,
-				0,
-				row * m_RestLengthHV
+				row * m_RestLengthHV,
+				0
 
 			};
 
@@ -78,9 +78,7 @@ void Cloth::Create ()
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
-
-	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", m_Parameters.gravityAccel);
-
+	
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
@@ -130,6 +128,9 @@ void Cloth::Update ()
 
 		PhysicsSolver::deltaTime--;
 	}
+
+	simulationStageComputeShader.Use();
+	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
 
 	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);
 	std::vector<Vertex> copy;
@@ -198,6 +199,16 @@ void Cloth::PinTopEdge ()
 	{
 		int base = LinearIndex (m_PointsByHeight - 1, 0, m_PointsByWidth);
 		vertices[i + base].pinned = { 1, 0, 0, 0 };
+	}
+}
+
+void Cloth::PinLeftEdge ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+
+	for (int i = 0; i < m_PointsByHeight; i += 1)
+	{
+		vertices[LinearIndex(i, 0, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
 	}
 }
 

@@ -13,7 +13,8 @@ enum FragmentShader
 {
 	BlinnPhong,
 	Normal,
-	Solid
+	Solid,
+	Velocity
 };
 
 class Material
@@ -41,7 +42,8 @@ public:
 	{
 		{BlinnPhong, "blinnPhongShader.frag"},
 		{Normal, "normalShader.frag"},
-		{Solid, "solidShader.frag"}
+		{Solid, "solidShader.frag"},
+		{Velocity, "velocityShader.frag"}
 	};
 	FragmentShader fragShader = BlinnPhong;
 
