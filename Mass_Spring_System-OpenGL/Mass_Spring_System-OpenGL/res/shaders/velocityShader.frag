@@ -9,7 +9,7 @@ out vec4 fragColor;
 void main() 
 {
 	float absVelocity = length( vec3(abs(velocity.x), abs(velocity.y), abs(velocity.z)));
-	float maxVelocity=250;
+	float maxVelocity = 150;
 
 	//vec3 baseColor = normalize(absVelocity);
 	vec3 baseColor = vec3(0, 0, min( absVelocity/maxVelocity, 1));

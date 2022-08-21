@@ -46,18 +46,26 @@ void run()
 	// WIND
 	Wind wind{10, 50, 50};
 	scene.AddWind(&wind);
+	wind.GetTransform().AddPosition ( {-100, -100, 0} );
+	wind.GetTransform().AddRotation(  {0, -90, 0} );
 
 	// CLOTH
-	int sizeWidth = 50;
-	int sizeHeight = 30;
+	int size = 50;
 	float linkLenght = 10;
-	Cloth cloth(sizeWidth, sizeHeight, linkLenght);
+	Cloth cloth("Cloth", size, size, linkLenght);
 	cloth.PinCenter();
-	// cloth.PinLeftEdge();
 	scene.AddGameObject(&cloth);
-	cloth.GetTransform().AddPosition({-(sizeWidth * linkLenght / 2), 0, -(sizeHeight * linkLenght / 2)});
+	cloth.GetTransform().AddPosition({-(size * linkLenght / 2), 0, -(size * linkLenght / 2)});
 	cloth.GetTransform().SetRotation({90, 0, 0});
 	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
+
+	// FLAG
+	Cloth flag("Flag", size, size * 0.7 , linkLenght);
+	flag.PinLeftBorderVertices();
+	scene.AddGameObject(&flag);
+	flag.GetTransform().AddPosition({-(size * linkLenght / 2), 0, 0});
+	flag.GetUI().m_TransformUI->SetPositionRange({-700, 700});
+	flag.GetTransform().AddPosition ( {300, -100, 0} );
 
 	// SPHERE
 	CollidingSphere sphere("Sphere", 100);

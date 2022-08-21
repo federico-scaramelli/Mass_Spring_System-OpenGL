@@ -27,7 +27,6 @@ void Wind::Update()
 	offset *= m_OffsetMaxValue;
 
 	alternativeRotation = GetTransform().GetRotation() + offset;
-	//---
 }
 
 void Wind::UpdateWithUI ()

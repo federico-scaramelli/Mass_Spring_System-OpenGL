@@ -154,39 +154,24 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	return totalForce;
 }
 
-vec3 ComputeWindForce(vec3 position) {
-	vec3 vectorToVertex = position - wind.position.xyz;
-	
+vec3 ComputeWindForce(vec3 position) 
+{
+	vec3 vectorToVertex = position - wind.position.xyz;	
 	vec3 windDir = wind.forward.xyz;
-	
 	float dotWindZ = dot (windDir, normalize(vectorToVertex));
-
-	
-	
 	float windMult = wind.forceMult;
 
-	vec3 forwardMaxRadiusPoint = vec3(0, wind.fullForceRadius, 0) + windDir * 100;
+	float referenceDistance = 1000;
+
+	vec3 forwardMaxRadiusPoint = vec3(0, wind.fullForceRadius, 0) + windDir * referenceDistance;
 	float maxDot = dot(windDir, normalize(forwardMaxRadiusPoint));
 
-	vec3 forwardAttRadiusPoint = vec3(0, wind.fullForceRadius + wind.attenuationRadius, 0) + windDir * 100;
+	vec3 forwardAttRadiusPoint = vec3(0, wind.fullForceRadius + wind.attenuationRadius, 0) + windDir * referenceDistance;
 	float attDot = dot(windDir, normalize(forwardAttRadiusPoint));
 
 	if ( dotWindZ < attDot ) {
 		return vec3(0,0,0);
 	}
-
-	/*
-	float compX = dot(wind.right.xyz, vectorToVertex);
-	float compY = dot(wind.up.xyz, vectorToVertex);
-
-	float radiusDistance = length( vec3(compX, compY, 0.0) );
-
-	if(radiusDistance > wind.fullForceRadius) {
-		float ratio = (radiusDistance - wind.fullForceRadius) / wind.attenuationRadius;
-
-		windMult = ratio > 1 ? 0 : (windMult * ratio);
-	}
-	*/
 
 	if(dotWindZ < maxDot) {
 		float ratio = (dotWindZ - attDot) / (maxDot - attDot);

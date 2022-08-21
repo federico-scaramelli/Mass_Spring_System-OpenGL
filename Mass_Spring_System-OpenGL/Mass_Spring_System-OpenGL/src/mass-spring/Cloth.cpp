@@ -5,8 +5,8 @@
 #include "PhysicsSolver.h"
 #include "../engine/Vertex.h"
 
-Cloth::Cloth (uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
-	MassSpring ("Cloth", 
+Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
+	MassSpring (name, 
 				MassSpringParameters( 0.016f, 16, 0.98f, { 0.f, -200, 0.f, 0.f }, 1.0f, 10.0f, 1.0f )),
 	m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
 	m_RestLengthHV (restLenghtHV)
@@ -210,6 +210,14 @@ void Cloth::PinLeftEdge ()
 	{
 		vertices[LinearIndex(i, 0, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
 	}
+}
+
+void Cloth::PinLeftBorderVertices ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+	
+	vertices[LinearIndex(0, 0, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
+	vertices[LinearIndex(m_PointsByHeight - 1, 0, m_PointsByWidth)].pinned = { 1, 0, 0, 0 };
 }
 
 void Cloth::PinCircleCenter ()

@@ -30,7 +30,7 @@ public:
 	float m_FullForceRadiusData = 5;
 	float m_AttenuationRadiusData = 20;
 	float m_ForceData = 20;
-	float m_OffsetMaxValueData = 20;
+	float m_OffsetMaxValueData = 5;
 
 private:
 	char m_LabelFullForceRadius[50];

@@ -18,7 +18,7 @@ public:
 	
 	GLuint m_ComputeTempVertexBuffer;
 	
-	Cloth(uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV);
+	Cloth(const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV);
 
 	void InitializeVertices() override;
 	void InitializeIndices() override;
@@ -37,6 +37,7 @@ public:
 	void PinAllEdges();
 	void PinTopEdge();
 	void PinLeftEdge();
+	void PinLeftBorderVertices ();
 	void PinCircleCenter();
 	void PinCenter ();
 	void PinTopPoints();
