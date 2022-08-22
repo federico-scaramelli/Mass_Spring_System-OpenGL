@@ -47,6 +47,7 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	float distanceToOther = length(vectorToOther);
 
 	float maxDistance = restLen * 1.1;
+	float minDistance = restLen * 0.9;
 
 	vec3 correction = vec3(0,0,0);
 	float diff = distanceToOther - maxDistance;
@@ -60,6 +61,18 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 			correction;		
 	}
 
+	/*
+	diff = distanceToOther - minDistance;
+
+	if (diff < 0) 
+	{
+		correction = normalize(vectorToOther) * diff * 0.5;
+
+		correction = (IsPinned(otherIndex)) ? 
+			correction * 2 :
+			correction;		
+	}
+	*/
 	return correction;
 }
 

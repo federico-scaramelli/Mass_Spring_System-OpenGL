@@ -1533,6 +1533,8 @@
     <None Include="res\shaders\eulerClothShader.comp" />
     <None Include="res\shaders\solidShader.frag" />
     <None Include="res\shaders\velocityShader.frag" />
+    <None Include="res\shaders\eulerConstraintsRopeShader.comp" />
+    <None Include="res\shaders\ropeVertices.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="libraries\include\glm\CMakeLists.txt" />
