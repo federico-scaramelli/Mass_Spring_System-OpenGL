@@ -42,6 +42,8 @@ public:
 	// ShaderProgram(const ShaderProgram&) = delete;
 	// ShaderProgram& operator=(const ShaderProgram&) = delete;
 
+	void Setup();
+
 	void CompileShader (std::string fileName, ShaderType type);
 
 	void Use() const;

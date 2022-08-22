@@ -21,9 +21,8 @@
 
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
-Renderer renderer;
 PhysicsSolver physicsSolver;
-Scene scene{&renderer, &physicsSolver};
+
 
 void init()
 {
@@ -36,16 +35,16 @@ void run()
 #pragma region Scene Creation
 	//Camera
 	Camera camera(window.GetAspectRatio());
-	scene.AddCamera(&camera);
+	Scene::GetInstance()->AddCamera(&camera);
 
 	// LIGHT
 	LightSource lightSource{};
-	scene.AddLightSource(&lightSource);
+	Scene::GetInstance()->AddGameObject(&lightSource);
 	lightSource.GetTransform().AddPosition({122.5, -80, 122.5});
 
 	// WIND
 	Wind wind{10, 50, 50};
-	scene.AddWind(&wind);
+	Scene::GetInstance()->AddGameObject(&wind);
 	wind.GetTransform().AddPosition ( {-100, -100, 0} );
 	wind.GetTransform().AddRotation(  {0, -90, 0} );
 
@@ -54,7 +53,7 @@ void run()
 	float linkLenght = 10;
 	Cloth cloth("Cloth", size, size, linkLenght);
 	cloth.PinCenter();
-	scene.AddGameObject(&cloth);
+	Scene::GetInstance()->AddGameObject(&cloth);
 	cloth.GetTransform().AddPosition({-(size * linkLenght / 2), 0, -(size * linkLenght / 2)});
 	cloth.GetTransform().SetRotation({90, 0, 0});
 	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
@@ -62,24 +61,24 @@ void run()
 	// FLAG
 	Cloth flag("Flag", size, size * 0.7 , linkLenght);
 	flag.PinLeftBorderVertices();
-	scene.AddGameObject(&flag);
+	Scene::GetInstance()->AddGameObject(&flag);
 	flag.GetTransform().AddPosition({-(size * linkLenght / 2), 0, 0});
 	flag.GetUI().m_TransformUI->SetPositionRange({-700, 700});
 	flag.GetTransform().AddPosition ( {300, -100, 0} );
 
 	// SPHERE
 	CollidingSphere sphere("Sphere", 100);
-	scene.AddGameObject(&sphere);
+	Scene::GetInstance()->AddGameObject(&sphere);
 	sphere.GetTransform().AddPosition({0, -200, 0});
 
 	// SPHERE
 	CollidingSphere sphere2("Sphere2", 50);
-	scene.AddGameObject(&sphere2);
+	Scene::GetInstance()->AddGameObject(&sphere2);
 	sphere2.GetTransform().AddPosition({-150, -100, 0});
 
 	// SPHERE
 	CollidingSphere sphere3("Sphere3", 50);
-	scene.AddGameObject(&sphere3);
+	Scene::GetInstance()->AddGameObject(&sphere3);
 	sphere3.GetTransform().AddPosition({150, -100, 0});
 
 	// CUBE
@@ -88,7 +87,7 @@ void run()
 
 	// ROPE
 	Rope rope(50, 5, 10);
-	scene.AddGameObject(&rope);
+	Scene::GetInstance()->AddGameObject(&rope);
 
 #pragma endregion
 
@@ -100,11 +99,11 @@ void run()
 			/ physicsSolver.fixedDeltaTime;
 		physicsSolver.lastTime = physicsSolver.nowTime;
 
-		renderer.Clear();
+		Renderer::GetInstance()->Clear();
 
-		scene.Update();
+		Scene::GetInstance()->Update();
 
-		renderer.DrawUI();
+		Renderer::GetInstance()->DrawUI();
 
 		glfwSwapBuffers(glfwWindow);
 		glfwPollEvents();

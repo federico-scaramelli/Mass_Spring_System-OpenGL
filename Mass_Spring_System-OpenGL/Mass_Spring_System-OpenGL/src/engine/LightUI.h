@@ -16,6 +16,7 @@ public:
 	void Draw() override
 	{
 		m_TransformUI->Draw();
+		m_MaterialUI->Draw();
 
 		ImGui::Text ("Light");
 		ImGui::ColorEdit3 (m_LabelDiffuse, m_LightDiffuseData);

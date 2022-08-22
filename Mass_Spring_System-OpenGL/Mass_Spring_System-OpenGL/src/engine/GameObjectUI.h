@@ -15,13 +15,13 @@ public:
 	{
 		m_Name = name;
 		m_TransformUI = new TransformUI(name);
-		m_MaterialUI = new MaterialUI(name);
 	}
 
 	virtual void Draw()
 	{
 		m_TransformUI->Draw();
-		m_MaterialUI->Draw();
+		if (m_MaterialUI != nullptr)
+		  m_MaterialUI->Draw();
 	}
 
 	const char* m_Name;

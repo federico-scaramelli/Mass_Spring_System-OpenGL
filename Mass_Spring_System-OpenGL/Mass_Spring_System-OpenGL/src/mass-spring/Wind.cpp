@@ -1,5 +1,7 @@
 #include "Wind.h"
+#include "../engine/Scene.h"
 #include "WindUI.h"
+#include "../engine/Camera.h"
 
 Wind::Wind (GLfloat fullForceRadius, GLfloat attenuationRadius, GLfloat forceMult) :
 	Primitive ("Wind", CONE, 20, 10, 30)
@@ -27,6 +29,10 @@ void Wind::Update()
 	offset *= m_OffsetMaxValue;
 
 	alternativeRotation = GetTransform().GetRotation() + offset;
+
+	glm::mat4 viewMatrix = Scene::GetInstance()->GetCamera()->GetUpdatedViewMatrix();
+	auto modelViewMatrix = viewMatrix * GetTransform().GetUpdatedCustomRotationModelMatrix(alternativeRotation);
+	GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
 }
 
 void Wind::UpdateWithUI ()

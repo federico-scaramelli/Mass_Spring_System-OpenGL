@@ -102,6 +102,9 @@
     <ClCompile Include="src\mass-spring\MassSpring.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="src\engine\BlinnPhongMaterialUI.h">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Library Include="libraries\lib\glfw3.lib" />
@@ -1098,6 +1101,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="src\mass-spring\WindUI.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="src\engine\SolidMaterialUI.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

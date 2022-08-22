@@ -88,7 +88,7 @@ public:
 
 #pragma region Transform UI
 
-	void GenerateUI (TransformUI* transformUI);
+	void SetUIObject (TransformUI* transformUI);
 
 	void UpdateWithUI ();
 

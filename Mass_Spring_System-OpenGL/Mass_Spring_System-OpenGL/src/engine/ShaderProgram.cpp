@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include "Camera.h"
+#include "Scene.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.inl"
 
@@ -49,7 +51,6 @@ ShaderProgram::~ShaderProgram()
 	DetachAndDeleteShaderObjects();
 	glDeleteProgram(ID);
 }
-
 
 void ShaderProgram::CompileShader(std::string fileName, ShaderType type)
 {
@@ -294,6 +295,13 @@ void ShaderProgram::PrintActiveUniforms()
 }
 
 #pragma endregion
+
+void ShaderProgram::Setup ()
+{
+	Use();
+	SetUniform<glm::mat4>
+		("projectionMatrix", Scene::GetInstance()->GetCamera()->GetProjectionMatrix());
+}
 
 void ShaderProgram::DetachAndDeleteShaderObjects()
 {

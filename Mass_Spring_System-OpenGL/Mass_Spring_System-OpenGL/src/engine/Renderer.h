@@ -1,19 +1,27 @@
 #pragma once
-#include <vector>
-
 #include "RendererUI.h"
 
 class VertexArray;
 class IndexBuffer;
 class ShaderProgram;
 
-class Renderer {
+class Renderer
+{
+private:
+	Renderer () : UI() {}
+	~Renderer () { delete instance; }
+	static Renderer* instance;
+
 public:
+	Renderer (Renderer& other) = delete;
+	Renderer operator= (const Renderer&) = delete;
 
-	void Draw(const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const;
-	void Clear() const;
+	static Renderer* GetInstance ();
 
-	void DrawUI();
+	void Draw (const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const;
+	void Clear () const;
+
+	void DrawUI ();
 
 	bool wireframe = false;
 	bool backface = true;

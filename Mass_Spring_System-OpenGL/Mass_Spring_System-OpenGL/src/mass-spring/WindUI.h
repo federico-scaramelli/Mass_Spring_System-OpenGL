@@ -19,6 +19,7 @@ public:
 	void Draw() override
 	{
 		m_TransformUI->Draw();
+		m_MaterialUI->Draw();
 
 		ImGui::Text ("Wind parameters");
 		ImGui::SliderFloat (m_LabelFullForceRadius, &m_FullForceRadiusData, 0.0f, 250);

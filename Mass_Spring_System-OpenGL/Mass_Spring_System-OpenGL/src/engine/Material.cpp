@@ -1,23 +1,95 @@
 #include "Material.h"
-#include "MaterialUI.h"
 
-void Material::CreateShaderProgram(std::vector<std::pair<std::string, ShaderType>> pairList)
+#include "BlinnPhongMaterialUI.h"
+#include "Camera.h"
+#include "LightSource.h"
+#include "MaterialUI.h"
+#include "Scene.h"
+#include "SolidMaterialUI.h"
+
+Material::~Material ()
 {
-	for (auto& element : pairList)
-	{
-		m_Shader.CompileShader(element.first, element.second);
-	}
-	
-	m_Shader.Link();
-	m_Shader.Validate();
+	delete materialParams;
 }
 
-void Material::GenerateUI (MaterialUI* materialUI) { m_MaterialUI = materialUI; }
+void Material::Setup (FragmentShader fragmentPreset)
+{
+	fragShader = fragmentPreset;
+	CreateShaderProgram ({
+		{ "shader.vert", ShaderType::VERTEX },
+		{ fragShadersMap[fragShader], ShaderType::FRAGMENT }
+	});
+
+	switch (fragShader)
+	{
+	case BlinnPhong:
+		materialParams = new BlinnPhongParameters();
+		break;
+	case Solid:
+		materialParams = new SolidParameters();
+		break;
+	}
+}
+
+void Material::Update ()
+{
+	Scene* scene = Scene::GetInstance();
+	m_Shader.Use();
+
+	switch (fragShader)
+	{
+	case BlinnPhong:
+		if (scene->GetLightSource() != nullptr)
+		{
+			auto params = dynamic_cast<BlinnPhongParameters*>(materialParams);
+			m_Shader.SetUniform<glm::vec3> ("lightPosition",
+											scene->GetLightSource()->GetTransform().GetPosition());
+
+			m_Shader.SetUniform<glm::vec3> ("lightAmbient",
+											scene->GetLightSource()->GetAmbient());
+			m_Shader.SetUniform<glm::vec3> ("lightDiffuse",
+											scene->GetLightSource()->GetIntensity());
+
+			m_Shader.SetUniform<glm::vec3> ("matAmbient", params->ambientColor);
+			m_Shader.SetUniform<glm::vec3> ("matDiffuse",params->diffuseColor);
+			m_Shader.SetUniform<glm::vec3> ("matSpecular", params->specularColor);
+			m_Shader.SetUniform<GLfloat> ("matShininess", params->shininess);
+		}
+		break;
+	case Solid:
+		auto params = dynamic_cast<SolidParameters*>(materialParams);
+		m_Shader.SetUniform<glm::vec3> ("solidColor", params->color);
+		break;
+	}
+	
+}
+
+void Material::CreateShaderProgram (std::vector<std::pair<std::string, ShaderType>> pairList)
+{
+	for (auto& element : pairList) { m_Shader.CompileShader (element.first, element.second); }
+
+	m_Shader.Link();
+	m_Shader.Validate();
+	m_Shader.Setup();
+}
+
+void Material::GenerateUI (GameObjectUI* gameObjectUI)
+{
+	switch (fragShader)
+	{
+	case BlinnPhong:
+		m_MaterialUI = new BlinnPhongMaterialUI(gameObjectUI->m_Name);
+		break;
+	case Solid:
+		m_MaterialUI = new SolidMaterialUI(gameObjectUI->m_Name);
+		break;
+	default:
+	  return;
+	}
+	gameObjectUI->m_MaterialUI = m_MaterialUI;
+}
 
 void Material::UpdateWithUI ()
 {
-	m_DiffuseColor = { m_MaterialUI->m_DiffuseData[0], m_MaterialUI->m_DiffuseData[1], m_MaterialUI->m_DiffuseData[2] };
-	m_SpecularColor = { m_MaterialUI->m_SpecularData[0], m_MaterialUI->m_SpecularData[1], m_MaterialUI->m_SpecularData[2] };
-	m_AmbientColor = { m_MaterialUI->m_AmbientData[0], m_MaterialUI->m_AmbientData[1], m_MaterialUI->m_AmbientData[2] };
-	m_Shininess = m_MaterialUI->m_ShininessData;
+	materialParams->UpdateWithUI (m_MaterialUI);
 }

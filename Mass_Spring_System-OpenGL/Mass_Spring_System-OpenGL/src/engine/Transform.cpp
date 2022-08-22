@@ -63,7 +63,7 @@ void Transform::AddRotation (glm::vec3 rotation)
 	});
 }
 
-void Transform::GenerateUI (TransformUI* transformUI)
+void Transform::SetUIObject (TransformUI* transformUI)
 {
 	this->transformUI = transformUI;
 }

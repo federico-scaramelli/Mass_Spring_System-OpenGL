@@ -2,21 +2,19 @@
 
 void GameObject::GenerateUI()
 {
-	m_Transform.GenerateUI(m_GameObjectUI->m_TransformUI);
-	GetMaterial().GenerateUI (m_GameObjectUI->m_MaterialUI);
+	m_Transform.SetUIObject(m_GameObjectUI->m_TransformUI);
+	GetMaterial().GenerateUI (m_GameObjectUI);
 }
 
 void GameObject::UpdateWithUI()
 {
 	m_Transform.UpdateWithUI();
-	m_Mesh.GetMaterial().UpdateWithUI();
+	if (m_GameObjectUI->m_MaterialUI != nullptr)
+	  m_Mesh.GetMaterial().UpdateWithUI();
 }
 
-void GameObject::SetupGraphicsShader()
+void GameObject::SetupGraphicsShader(FragmentShader fragmentPreset)
 {
 	m_Mesh.SetBuffers (vertexBufferLayout);
-	m_Mesh.GetMaterial().CreateShaderProgram ( {
-	  { "shader.vert", ShaderType::VERTEX },
-		{ Material::fragShadersMap[m_Mesh.GetMaterial().fragShader], ShaderType::FRAGMENT }
-	});		
+	GetMaterial().Setup (fragmentPreset);
 }

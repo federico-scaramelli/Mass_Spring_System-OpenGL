@@ -7,6 +7,15 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+Renderer* Renderer::GetInstance ()
+{
+	if (instance == nullptr)
+	{
+		instance = new Renderer();
+	}
+	return instance;
+}
+
 void Renderer::Draw(const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const
 {
 	shader.Use();
@@ -47,3 +56,5 @@ void Renderer::DrawUI()
 {
 	UI.DrawUI();
 }
+
+Renderer* Renderer::instance = nullptr;

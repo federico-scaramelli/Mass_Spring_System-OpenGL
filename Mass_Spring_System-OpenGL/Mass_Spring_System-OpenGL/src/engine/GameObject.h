@@ -4,7 +4,6 @@
 
 #include "GameObjectUI.h"
 #include "Mesh.h"
-#include "Renderer.h"
 #include "Transform.h"
 #include "VertexBufferLayout.h"
 
@@ -35,7 +34,7 @@ public:
 
 	GameObjectUI& GetUI () { return *m_GameObjectUI; }
 
-	void SetupGraphicsShader ();
+	void SetupGraphicsShader (FragmentShader fragmentPreset);
 
 	virtual void Create () = 0;
 	virtual void Update () = 0;

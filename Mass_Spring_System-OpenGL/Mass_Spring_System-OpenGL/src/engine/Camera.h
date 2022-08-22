@@ -45,7 +45,7 @@ public:
 
 	void GenerateUI()
 	{
-		m_Transform.GenerateUI (m_TransformUI);
+		m_Transform.SetUIObject (m_TransformUI);
 		m_TransformUI->SetPositionRange ({ -1000, 1000});
 	}
 

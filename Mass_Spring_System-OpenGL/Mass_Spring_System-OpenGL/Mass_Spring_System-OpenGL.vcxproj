@@ -167,6 +167,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\engine\BlinnPhongMaterialUI.h" />
     <ClCompile Include="src\engine\GameObject.cpp" />
     <ClCompile Include="src\engine\Primitive.cpp" />
     <ClCompile Include="src\engine\Material.cpp" />
@@ -213,6 +214,7 @@
     <ClInclude Include="src\engine\Mesh.h" />
     <ClInclude Include="src\engine\GameObject.h" />
     <ClInclude Include="src\engine\CollidingSphere.h" />
+    <ClInclude Include="src\engine\SolidMaterialUI.h" />
     <ClInclude Include="src\engine\TransformUI.h" />
     <ClInclude Include="src\mass-spring\WindUI.h" />
     <ClInclude Include="src\mass-spring\MassSpring.h" />

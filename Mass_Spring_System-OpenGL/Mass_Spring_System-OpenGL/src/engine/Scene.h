@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
+#include "../mass-spring/PhysicsSolver.h"
 
+class Primitive;
 class Wind;
 class MassSpring;
-class PhysicsSolver;
 class CollidingSphere;
-class Renderer;
 class LightSource;
 class Camera;
 class GameObject;
@@ -13,28 +13,35 @@ class GameObject;
 class Scene
 {
 public:
-	Scene (Renderer* renderer, PhysicsSolver* physicsSolver);
+	Scene (Scene& other) = delete;
+	Scene operator= (const Scene&) = delete;
+
+	static Scene* GetInstance ();
 
 	void AddCamera (Camera* camera);
-	void AddGameObject (GameObject* object);
-	void AddLightSource (LightSource* light);
-	void AddWind (Wind* wind);
+	void AddGameObject (MassSpring* massSpring);
+	void AddGameObject (Primitive* primitive);
+	void AddGameObject (CollidingSphere* collidingSphere);
+	void AddGameObject (Wind* wind);
+	void AddGameObject (LightSource* light);
 
 	[[nodiscard]] size_t GetGameObjectCount () const { return m_Primitives.size(); }
 
 	std::vector<GameObject*>& GetGameObjects () { return m_Primitives; }
 
-	[[nodiscard]] Camera* GetCamera() const { return m_Camera; }
-	[[nodiscard]] LightSource* GetLightSource() const { return m_LightSource; }
-	[[nodiscard]] Wind* GetWind() const { return m_Wind; }
-	[[nodiscard]] Renderer* GetRenderer() const { return m_Renderer; }
+	[[nodiscard]] Camera* GetCamera () const { return m_Camera; }
+	[[nodiscard]] LightSource* GetLightSource () const { return m_LightSource; }
+	[[nodiscard]] Wind* GetWind () const { return m_Wind; }
 
 	void Update ();
 
 
 private:
-	Renderer* m_Renderer;
-	PhysicsSolver* m_PhysicsSolver;
+	Scene () : m_PhysicsSolver() {}
+	~Scene () { delete instance; }
+	static Scene* instance;
+
+	PhysicsSolver m_PhysicsSolver;
 
 	Camera* m_Camera;
 	LightSource* m_LightSource;
@@ -42,20 +49,13 @@ private:
 
 	std::vector<GameObject*> m_Primitives;
 	std::vector<MassSpring*> m_MassSprings;
-
-	void SetShaderUniforms (GameObject* object);
+	
 	void UpdateGameObjects ();
 
 	void UpdateCamera ();
 
-	void TransformLight ();
-	void UpdateLight ();
-
-	void TransformWind();
-	void UpdateWind();
-
-	void UpdateGameObject (GameObject* gameObject);
+	void UpdateTransform (GameObject* gameObject);
 	void DrawGameObject (GameObject* gameObject);
-	
+
 	friend class RendererUI;
 };

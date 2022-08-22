@@ -18,8 +18,8 @@ void RendererUI::DrawUI ()
 	// Additional settings
 	if (ImGui::CollapsingHeader ("Settings", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		ImGui::Checkbox ("Wireframe mode", &scene->GetRenderer()->wireframe);
-		ImGui::Checkbox ("Backface culling", &scene->GetRenderer()->backface);
+		ImGui::Checkbox ("Wireframe mode", &Renderer::GetInstance()->wireframe);
+		ImGui::Checkbox ("Backface culling", &Renderer::GetInstance()->backface);
 	}
 
 	ImGui::Dummy ({ 0, 10 });
@@ -27,30 +27,30 @@ void RendererUI::DrawUI ()
 	ImGui::Dummy ({ 0, 10 });
 
 	// Camera UI
-	if (ImGui::CollapsingHeader ("Camera")) { scene->GetCamera()->GetUI()->Draw(); }
+	if (ImGui::CollapsingHeader ("Camera")) { Scene::GetInstance()->GetCamera()->GetUI()->Draw(); }
 
 	ImGui::Dummy ({ 0, 10 });
 	ImGui::Separator();
 	ImGui::Dummy ({ 0, 10 });
 
 	// Light UI
-	if (ImGui::CollapsingHeader ("Light")) { scene->GetLightSource()->GetUI().Draw(); }
+	if (ImGui::CollapsingHeader ("Light")) { Scene::GetInstance()->GetLightSource()->GetUI().Draw(); }
 
 	ImGui::Dummy ({ 0, 10 });
 	ImGui::Separator();
 	ImGui::Dummy ({ 0, 10 });
 
 	// Wind UI
-	if (ImGui::CollapsingHeader ("Wind")) { scene->GetWind()->GetUI().Draw(); }
+	if (ImGui::CollapsingHeader ("Wind")) { Scene::GetInstance()->GetWind()->GetUI().Draw(); }
 	ImGui::End();
 
 	ImGui::Begin ("Objects");
 	if (ImGui::CollapsingHeader ("Primitives", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		// GameObjects UI
-		for (int i = 0; i < scene->GetGameObjectCount(); i++)
+		for (int i = 0; i < Scene::GetInstance()->GetGameObjectCount(); i++)
 		{
-			GameObject* gameObject = scene->GetGameObjects()[i];
+			GameObject* gameObject = Scene::GetInstance()->GetGameObjects()[i];
 
 			ImGui::Checkbox (gameObject->GetUI().m_Name, &gameObject->m_IsActive);
 
@@ -65,13 +65,13 @@ void RendererUI::DrawUI ()
 	ImGui::Dummy ({ 0, 20 });
 	if (ImGui::CollapsingHeader ("Mass Springs", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		if (!scene->m_MassSprings.empty())
+		if (!Scene::GetInstance()->m_MassSprings.empty())
 		{
 			ImGui::ListBox ("Select Mass Spring Object",
 						   &MassSpringUI::selectedMassSpring,
 						   MassSpringUI::sceneMassSprings,
-						   scene->m_MassSprings.size());
-			scene->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
+						   Scene::GetInstance()->m_MassSprings.size());
+			Scene::GetInstance()->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
 		}
 	}
 
