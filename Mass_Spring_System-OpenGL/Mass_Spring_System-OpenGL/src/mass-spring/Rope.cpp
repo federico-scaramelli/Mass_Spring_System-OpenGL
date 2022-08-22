@@ -10,7 +10,7 @@ struct Node {
 Rope::Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius) :
 	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, 
 													{ 0.f, -200, 0.f, 0.f }, 
-													1.0f, 10.0f, 1.0f)),
+													1.0f, 10.0f, 1.0f, 1.0f)),
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {

@@ -1,15 +1,17 @@
 #include "Cloth.h"
+#include "Cloth.h"
 
 #include <iostream>
 #include <random>
 #include "PhysicsSolver.h"
 #include "../engine/Vertex.h"
+#include "ClothUI.h"
 
 Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
 	MassSpring (name, 
-				MassSpringParameters( 0.032f, 16, 0.95f, 
+				MassSpringParameters( 0.016f, 16, 0.95f, 
 									{ 0.f, -1500, 0.f, 0.f }, 
-									1.0f, 1000.0f, 1.2f )),
+									1.0f, 10.0f, 1.0f, 1.0f)),
 	m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
 	m_RestLengthHV (restLenghtHV)
 {
@@ -17,6 +19,13 @@ Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight,
 	InitializeIndices();
 
 	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
+
+
+	delete m_GameObjectUI;
+	m_GameObjectUI = new ClothUI (name);
+
+	clothUI = dynamic_cast<ClothUI*> (m_GameObjectUI);
+
 }
 
 void Cloth::InitializeVertices ()
@@ -92,7 +101,7 @@ void Cloth::Create ()
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
-
+	
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
 	constraintsStageComputeShader.Use();
@@ -250,4 +259,18 @@ void Cloth::PinTopPoints ()
 	topLeft.pinned = { 1, 0, 0, 0 };
 	topRight.pinned = { 1, 0, 0, 0 };
 	topCenter.pinned = { 1, 0, 0, 0 };
+}
+
+void Cloth::GenerateUI()
+{
+	MassSpring::GenerateUI();
+
+
+}
+
+void Cloth::UpdateWithUI()
+{
+	MassSpring::UpdateWithUI();
+
+
 }

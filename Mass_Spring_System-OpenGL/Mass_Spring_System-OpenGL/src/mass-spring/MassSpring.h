@@ -5,13 +5,12 @@ struct MassSpringParameters
 {
 	MassSpringParameters(const GLfloat dT, const uint16_t subSteps, 
 						const GLfloat damping, const glm::vec4 gravityAcc, GLfloat particleMass, 
-						GLfloat stiffness, GLfloat kSheering) :
+						GLfloat stiffness, GLfloat kSheering, GLfloat kBending) :
 						deltaTime (dT), subSteps (subSteps),
 						damping (damping), gravityAccel (gravityAcc), particleMass (particleMass),
-						stiffness (stiffness), kSheering (kSheering)
+						stiffness (stiffness), kSheering (kSheering), kBending(kBending)
 	{
 		subStepDt = dT / static_cast<float> (subSteps);
-		kBending = kSheering * 0.2f;
 	}
 
 	const GLfloat deltaTime;

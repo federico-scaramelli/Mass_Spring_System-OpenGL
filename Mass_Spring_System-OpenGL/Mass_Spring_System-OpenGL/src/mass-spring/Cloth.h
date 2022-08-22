@@ -8,6 +8,7 @@
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 
 struct Vertex;
+class ClothUI;
 
 class Cloth : public MassSpring {
 public:
@@ -41,4 +42,11 @@ public:
 	void PinCircleCenter();
 	void PinCenter ();
 	void PinTopPoints();
+
+	void GenerateUI () override;
+
+	void UpdateWithUI () override;
+
+private:
+	ClothUI* clothUI;
 };
