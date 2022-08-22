@@ -1,7 +1,9 @@
 #include "Rope.h"
 
 Rope::Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius) :
-	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, { 0.f, -200, 0.f, 0.f }, 1.0f, 10.0f, 1.0f)),
+	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, 
+													{ 0.f, -200, 0.f, 0.f }, 
+													1.0f, 10.0f, 1.0f)),
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {
@@ -19,12 +21,14 @@ void Rope::InitializeNodes()
 		glm::vec3 initialPosition
 		{
 			i * m_RestLength,
-			0,
-			0
+			0.0f,
+			0.0f
 		};
 
-		m_Nodes.push_back(initialPosition);
+		m_Nodes.push_back({{initialPosition, 1.0f}});
 	}
+
+	m_Nodes[0].pinned = {1,0,0,0};
 }
 
 void Rope::InitializeVertices()
@@ -42,7 +46,7 @@ void Rope::InitializeVertices()
 		//Update axis for all nodes except last node, with next node position
 		if (i < m_Nodes.size() - 1)
 		{
-			nextNodeForwardDir = glm::normalize(m_Nodes[i + 1] - m_Nodes[i]);
+			nextNodeForwardDir = glm::normalize(m_Nodes[i + 1].position - m_Nodes[i].position);
 			nextNodeRightDir = glm::normalize(glm::cross(nextNodeForwardDir, Transform::worldUpDirection));
 			nextNodeUpDir = glm::normalize(glm::cross(nextNodeRightDir, nextNodeForwardDir));
 		}
@@ -147,4 +151,39 @@ void Rope::CreateBackSurfaceIndices()
 
 		i++;
 	}
+}
+
+void Rope::Create()
+{
+	simulationStageComputeShader.Use();
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	
+	simulationStageComputeShader.SetUniform<GLfloat> ("ropeDim", m_PointsByLength);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
+
+	constraintsStageComputeShader.Use();
+	
+	constraintsStageComputeShader.SetUniform<GLfloat> ("verticesDim", m_Mesh.GetVertices().size());
+	//
+	// constraintsStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
+	//
+	// constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+}
+
+void Rope::Update()
+{
+
+
 }

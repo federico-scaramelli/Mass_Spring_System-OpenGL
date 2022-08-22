@@ -55,18 +55,18 @@ void run()
 	Cloth cloth("Cloth", size, size, linkLenght);
 	// cloth.PinTopPoints();
 	cloth.PinCenter();
-	scene.AddGameObject(&cloth);
-	cloth.GetTransform().AddPosition({-(size * linkLenght / 2), 0, -(size * linkLenght / 2)});
-	cloth.GetTransform().SetRotation({90, 0, 0});
-	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
+	// scene.AddGameObject(&cloth);
+	// cloth.GetTransform().AddPosition({-(size * linkLenght / 2), 0, -(size * linkLenght / 2)});
+	// cloth.GetTransform().SetRotation({90, 0, 0});
+	// cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
 	// FLAG
 	Cloth flag("Flag", size, size * 0.7 , linkLenght);
 	flag.PinLeftBorderVertices();
-	scene.AddGameObject(&flag);
-	flag.GetTransform().AddPosition({-(size * linkLenght / 2), 0, 0});
-	flag.GetUI().m_TransformUI->SetPositionRange({-700, 700});
-	flag.GetTransform().AddPosition ( {300, -100, 0} );
+	// scene.AddGameObject(&flag);
+	// flag.GetTransform().AddPosition({-(size * linkLenght / 2), 0, 0});
+	// flag.GetUI().m_TransformUI->SetPositionRange({-700, 700});
+	// flag.GetTransform().AddPosition ( {300, -100, 0} );
 
 	// SPHERE
 	CollidingSphere sphere("Sphere", 100);
