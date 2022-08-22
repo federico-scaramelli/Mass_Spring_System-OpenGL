@@ -5,7 +5,8 @@
 class Wind;
 class CollidingSphere;
 
-#define FIXED_DELTAT (1.0 / 120.0)
+#define TARGET_FPS 30.0
+#define FIXED_DELTAT (1.0 / TARGET_FPS)
 
 class PhysicsSolver
 {
