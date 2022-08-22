@@ -19,7 +19,7 @@ struct MassSpringParameters
 	const uint16_t subSteps;
 	GLfloat subStepDt;
 
-	const GLfloat damping = .98f;
+	const GLfloat damping;
 	const glm::vec4 gravityAccel;
 	const GLfloat particleMass;
 

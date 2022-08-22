@@ -46,7 +46,7 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	vec3 vectorToOther = otherPosition - position;
 	float distanceToOther = length(vectorToOther);
 
-	float maxDistance = restLen * 1.05;
+	float maxDistance = restLen * 1.1;
 
 	vec3 correction = vec3(0,0,0);
 	float diff = distanceToOther - maxDistance;
@@ -67,7 +67,7 @@ vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 gl
 {
 	vec3 totalCorrection = vec3(0,0,0);
 
-
+/*
 	// Bend Spring - Up
 	totalCorrection = (globalIdx.y < particleGridDims.y - 2) ?
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2 * particleGridDims.x, restLenHV * 2) :
@@ -87,7 +87,7 @@ vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 gl
 	totalCorrection = (globalIdx.x < particleGridDims.x - 2) ?
 		totalCorrection + ApplyConstraints(linearIdx, linearIdx + 2, restLenHV * 2) :
 		totalCorrection;
-
+*/
 	// Structure Spring - Down
 	totalCorrection = (globalIdx.y > 0) ?
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx - particleGridDims.x, restLenHV)) :
@@ -108,6 +108,7 @@ vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 gl
 	totalCorrection = (globalIdx.y < particleGridDims.y - 1) ? 
 		totalCorrection + (ApplyConstraints(linearIdx, linearIdx + particleGridDims.x, restLenHV)) :
 		totalCorrection;
+
 
 	// Shear Spring - Upper-Left
 	totalCorrection = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
@@ -132,10 +133,9 @@ vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 gl
 	return totalCorrection;
 }
 
-vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float restLen) {
+vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float epsilon) {
 	vec3 correction = vec3(0,0,0);
 	uint size = particleGridDims.x * particleGridDims.y;
-	float epsilon = restLen;
 
 	for (int i = 0; i < size; i++) 
 	{
@@ -244,15 +244,18 @@ void main()
 
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
-	selfCollCorrection = ComputeSelfCollision(linearIdx, particleGridDims, restLenHV * .8);
+	float selfRepulsionDistance = restLenHV * 0.8;
+	selfCollCorrection = ComputeSelfCollision(linearIdx, particleGridDims, selfRepulsionDistance);
 
-	
 	correctedPosition += distCorrection;
 	correctedPosition += selfCollCorrection;
 	
 	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
-	correctedVelocity = (length(correctedVelocity) >= 50000) ? correctedVelocity * 0.0001 : correctedVelocity;
+	float maxVelocity = 1000;
+	correctedVelocity = (length(correctedVelocity) >= maxVelocity) ? correctedVelocity * 0.0001 : correctedVelocity;
 
+	float repulsionDistance = restLenHV * 0.33;
+	float sphereDamping = 0.95;
 	//COLLISION DETECTION
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{
@@ -264,13 +267,13 @@ void main()
 
 			vec3 sphereDist = correctedPosition - spheres[i].sphereCenter.xyz;
 
-			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * 0.33) 
+			if (length(sphereDist) < spheres[i].sphereRadius + repulsionDistance) 
 			{
 				// If the particle is inside the sphere, push it to the outer radius
 				correctedPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
-									* (spheres[i].sphereRadius + restLenHV * 0.33);
+									* (spheres[i].sphereRadius + repulsionDistance);
 				// Cancel out velocity
-				correctedVelocity *= 0.95f;
+				correctedVelocity *= sphereDamping;
 			}
 		}
 	}

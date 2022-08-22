@@ -52,6 +52,7 @@ void run()
 	int size = 50;
 	float linkLenght = 10;
 	Cloth cloth("Cloth", size, size, linkLenght);
+	// cloth.PinTopPoints();
 	cloth.PinCenter();
 	Scene::GetInstance()->AddGameObject(&cloth);
 	cloth.GetTransform().AddPosition({-(size * linkLenght / 2), 0, -(size * linkLenght / 2)});
