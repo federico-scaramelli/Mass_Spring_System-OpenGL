@@ -1,5 +1,4 @@
 #pragma once
-#include "MassSpringUI.h"
 #include "../engine/GameObject.h"
 
 struct MassSpringParameters

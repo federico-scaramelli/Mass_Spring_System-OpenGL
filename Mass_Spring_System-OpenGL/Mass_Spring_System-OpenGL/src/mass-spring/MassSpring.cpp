@@ -1,5 +1,7 @@
 #include "MassSpring.h"
 
+#include "MassSpringUI.h"
+
 MassSpring::MassSpring(const char* name, MassSpringParameters parameters) :
 	  GameObject (name),
 	  m_Parameters (std::move (parameters))

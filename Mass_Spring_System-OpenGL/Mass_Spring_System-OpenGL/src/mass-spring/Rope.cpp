@@ -1,5 +1,12 @@
 #include "Rope.h"
 
+struct Node {
+	glm::vec4 position;
+	glm::vec4 velocity;
+	glm::vec4 oldPosition;
+	glm::vec4 pinned;
+};
+
 Rope::Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius) :
 	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, 
 													{ 0.f, -200, 0.f, 0.f }, 
@@ -57,7 +64,7 @@ void Rope::InitializeVertices()
 			glm::vec3 positionFront = nextNodeUpDir * weigth.y * m_Radius;
 
 			glm::vec3 position = positionSide + positionFront;
-			position += m_Nodes[i];
+			position += glm::vec3(m_Nodes[i].position);
 
 			Vertex vertex{{position.x, position.y, position.z, 0}};
 

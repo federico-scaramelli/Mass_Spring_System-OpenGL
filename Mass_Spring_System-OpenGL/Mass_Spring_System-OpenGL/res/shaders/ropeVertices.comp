@@ -73,5 +73,5 @@ void main()
 		return;
 
 
-	CopyData();
+	//CopyData();
 }

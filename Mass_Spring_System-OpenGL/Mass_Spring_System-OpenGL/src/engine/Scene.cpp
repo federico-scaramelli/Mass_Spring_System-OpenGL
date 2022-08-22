@@ -11,6 +11,7 @@
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
 #include "../mass-spring/PhysicsSolver.h"
+#include "../mass-spring/MassSpringUI.h"
 
 Scene* Scene::GetInstance ()
 {

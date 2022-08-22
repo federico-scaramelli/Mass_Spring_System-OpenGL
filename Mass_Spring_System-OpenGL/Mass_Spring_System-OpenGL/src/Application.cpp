@@ -87,8 +87,8 @@ void run()
 	//scene.AddGameObject (&cube);
 
 	// ROPE
-	Rope rope(50, 5, 10);
-	Scene::GetInstance()->AddGameObject(&rope);
+	// Rope rope(50, 5, 10);
+	// Scene::GetInstance()->AddGameObject(&rope);
 
 #pragma endregion
 

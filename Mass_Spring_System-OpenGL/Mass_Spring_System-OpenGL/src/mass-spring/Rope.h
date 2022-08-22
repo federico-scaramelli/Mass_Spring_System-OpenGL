@@ -7,12 +7,7 @@
 #include <utility>
 #include "MassSpring.h"
 
-struct Node {
-	glm::vec4 position;
-	glm::vec4 velocity;
-	glm::vec4 oldPosition;
-	glm::vec4 pinned;
-};
+struct Node;
 
 class Rope : public MassSpring {
 private:
