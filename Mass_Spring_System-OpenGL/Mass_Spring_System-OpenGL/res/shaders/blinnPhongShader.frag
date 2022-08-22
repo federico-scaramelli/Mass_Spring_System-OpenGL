@@ -22,8 +22,8 @@ vec3 blinnPhong ( vec3 position, vec3 normal )
 	//Light vec
 	vec3 lightDir = normalize( lightPosition - position );
     
+	//Ambient component color
     vec3 ambientComponent = lightAmbient * matAmbient;
-	vec3 specularComponent = vec3(0.0);
 
     //Bi-side lighting
     float viewNormalDot = dot ( viewDir, normal);
@@ -34,7 +34,7 @@ vec3 blinnPhong ( vec3 position, vec3 normal )
     //lambertian coefficient
 	float lightNormalDot = max ( dot ( lightDir, normal ), 0.0 );
 	
-    
+    vec3 specularComponent = vec3(0.0);
     // if the lambert coefficient is positive, then I can calculate the specular component
     if ( lightNormalDot > 0.0 ) {
 		vec3 halfway = normalize( viewDir + lightDir );

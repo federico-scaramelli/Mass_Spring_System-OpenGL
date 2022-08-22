@@ -7,7 +7,9 @@
 
 Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
 	MassSpring (name, 
-				MassSpringParameters( 0.016f, 16, 0.98f, { 0.f, -200, 0.f, 0.f }, 1.0f, 10.0f, 1.0f )),
+				MassSpringParameters( 0.032f, 16, 0.95f, 
+									{ 0.f, -1500, 0.f, 0.f }, 
+									1.0f, 1000.0f, 1.2f )),
 	m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
 	m_RestLengthHV (restLenghtHV)
 {
@@ -34,10 +36,10 @@ void Cloth::InitializeVertices ()
 
 			};
 
-			Vertex vertex{ { initialPosition.x, initialPosition.y, initialPosition.z, 0 } };
+			Vertex vertex{ { initialPosition.x - m_RestLengthHV * m_PointsByWidth/2, initialPosition.y - m_RestLengthHV * m_PointsByHeight/2, initialPosition.z, 0 } };
 			vertex.oldPosition = vertex.position;
-
-
+			vertex.velocity = glm::vec4{0};
+			
 			vertices.push_back (vertex);
 		}
 	}
