@@ -34,6 +34,16 @@ struct Sphere {
 };
 uniform Sphere spheres[MAX_SPHERES];
 
+struct ConstraintParams {
+	float correctionDumping;
+	float constraintDistanceMult;
+	float selfCollisionDistanceMult;
+	float sphereRepulsionDistMult;
+	float sphereRepulsionDamping;
+};
+uniform ConstraintParams constraintParams;
+
+
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
 }
@@ -46,8 +56,8 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	vec3 vectorToOther = otherPosition - position;
 	float distanceToOther = length(vectorToOther);
 
-	float maxDistance = restLen * 1.1;
-	float minDistance = restLen * 0.9;
+	//float constraintDistanceMult = 1.1;
+	float maxDistance = restLen * constraintParams.constraintDistanceMult;
 
 	vec3 correction = vec3(0,0,0);
 	float diff = distanceToOther - maxDistance;
@@ -61,18 +71,6 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 			correction;		
 	}
 
-	/*
-	diff = distanceToOther - minDistance;
-
-	if (diff < 0) 
-	{
-		correction = normalize(vectorToOther) * diff * 0.5;
-
-		correction = (IsPinned(otherIndex)) ? 
-			correction * 2 :
-			correction;		
-	}
-	*/
 	return correction;
 }
 
@@ -158,9 +156,11 @@ vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float epsilon)
 		vec3 norm = -normalize(dir);
 		float correctionMult;
 		vec3 currentCorrection = vec3(0,0,0);
+
 		correctionMult = (IsPinned(i)) ? 
 							1 :
 							0.5;
+
 		currentCorrection = (dist < epsilon && i != linearIdx) ?
 								currentCorrection + norm * (epsilon - dist) * correctionMult :
 								currentCorrection; 
@@ -247,25 +247,25 @@ void main()
 	vec3 correctedVelocity = vec3(0,0,0);
 
 	// Distance constraints
-	float correctionDamp = .25f;
-
+	//float correctionDamp = .25f;
 	vec3 distCorrection = vec3(0,0,0);
-	distCorrection = ComputeDistanceCorrection(linearIdx, particleGridDims, globalIdx) * correctionDamp;
+	distCorrection = ComputeDistanceCorrection(linearIdx, particleGridDims, globalIdx) * constraintParams.correctionDumping;
 
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
-	float selfRepulsionDistance = restLenHV * 0.8;
-	selfCollCorrection = ComputeSelfCollision(linearIdx, particleGridDims, selfRepulsionDistance);
+	//float selfCollisionDistMult = 0.8;
+	float selfCollisionDistance = restLenHV * constraintParams.selfCollisionDistanceMult;
+	selfCollCorrection = ComputeSelfCollision(linearIdx, particleGridDims, selfCollisionDistance);
 
 	correctedPosition += distCorrection;
 	correctedPosition += selfCollCorrection;
 	
 	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
-	float maxVelocity = 1000;
+	float maxVelocity = 10000;
 	correctedVelocity = (length(correctedVelocity) >= maxVelocity) ? correctedVelocity * 0.0001 : correctedVelocity;
 
-	float repulsionDistance = restLenHV * 0.33;
-	float sphereDamping = 0.95;
+	//float sphereRepulsionDistMult = 1.05;
+	//float sphereRepulsionDamping = 0.95;
 	//COLLISION DETECTION
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{
@@ -277,13 +277,13 @@ void main()
 
 			vec3 sphereDist = correctedPosition - spheres[i].sphereCenter.xyz;
 
-			if (length(sphereDist) < spheres[i].sphereRadius + repulsionDistance) 
+			if (length(sphereDist) < spheres[i].sphereRadius * constraintParams.sphereRepulsionDistMult) 
 			{
 				// If the particle is inside the sphere, push it to the outer radius
 				correctedPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
-									* (spheres[i].sphereRadius + repulsionDistance);
+									* (spheres[i].sphereRadius * constraintParams.sphereRepulsionDistMult);
 				// Cancel out velocity
-				correctedVelocity *= sphereDamping;
+				correctedVelocity *= constraintParams.sphereRepulsionDamping;
 			}
 		}
 	}

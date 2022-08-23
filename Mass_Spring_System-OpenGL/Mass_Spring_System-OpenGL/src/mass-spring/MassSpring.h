@@ -13,16 +13,16 @@ struct MassSpringParameters
 		subStepDt = dT / static_cast<float> (subSteps);
 	}
 
-	const GLfloat deltaTime;
-	const uint16_t subSteps;
+	GLfloat deltaTime;
+	uint16_t subSteps;
 	GLfloat subStepDt;
 
-	const GLfloat damping;
-	const glm::vec4 gravityAccel;
-	const GLfloat particleMass;
+	GLfloat damping;
+	glm::vec4 gravityAccel;
+	GLfloat particleMass;
 
-	const GLfloat stiffness;
-	const GLfloat kSheering;
+	GLfloat stiffness;
+	GLfloat kSheering;
 	GLfloat kBending;
 };
 

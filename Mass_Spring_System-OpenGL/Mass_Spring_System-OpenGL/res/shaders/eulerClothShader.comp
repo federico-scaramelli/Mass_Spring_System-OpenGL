@@ -34,8 +34,8 @@ uniform float damping;
 uniform float particleMass;
 uniform float constShearMult;
 uniform float constBendMult;
-
 uniform vec4 gravityAcceleration;
+
 uniform float restLenHV;
 uniform float restLenDiagonal;
 uniform float deltaTime;
