@@ -44,39 +44,45 @@ void run()
 	// WIND
 	Wind wind{10, 50, 50};
 	Scene::GetInstance()->AddGameObject(&wind);
-	wind.GetTransform().AddPosition ( {-100, -100, 0} );
-	wind.GetTransform().AddRotation(  {0, -90, 0} );
+	wind.GetTransform().AddPosition({-100, -100, 0});
+	wind.GetTransform().AddRotation({0, -90, 0});
 
 	// CLOTH
 	int size = 50;
 	float linkLenght = 10;
 	Cloth cloth("Cloth", size, size, linkLenght);
+	// cloth.PinFourBorderPoints();
 	// cloth.PinTopPoints();
 	cloth.PinCenter();
 	Scene::GetInstance()->AddGameObject(&cloth);
+	
 	cloth.GetTransform().SetRotation({90, 0, 0});
 	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
+
 	// FLAG
-	Cloth flag("Flag", size, size * 0.7 , linkLenght);
+	Cloth flag("Flag", size, size * 0.7, linkLenght);
 	flag.PinLeftBorderVertices();
 	Scene::GetInstance()->AddGameObject(&flag);
 	flag.GetTransform().AddPosition({-(size * linkLenght / 2), 0, 0});
 	flag.GetUI().m_TransformUI->SetPositionRange({-700, 700});
-	flag.GetTransform().AddPosition ( {300, -100, 0} );
+	flag.GetTransform().AddPosition({300, -100, 0});
 
 	// SPHERE
 	CollidingSphere sphere("Sphere", 100);
+	sphere.m_IsActive = false;
 	Scene::GetInstance()->AddGameObject(&sphere);
 	sphere.GetTransform().AddPosition({0, -200, 0});
 
 	// SPHERE
 	CollidingSphere sphere2("Sphere2", 50);
+	sphere2.m_IsActive = false;
 	Scene::GetInstance()->AddGameObject(&sphere2);
 	sphere2.GetTransform().AddPosition({-150, -100, 0});
 
 	// SPHERE
 	CollidingSphere sphere3("Sphere3", 50);
+	sphere3.m_IsActive = false;
 	Scene::GetInstance()->AddGameObject(&sphere3);
 	sphere3.GetTransform().AddPosition({150, -100, 0});
 
@@ -85,7 +91,7 @@ void run()
 	//scene.AddGameObject (&cube);
 
 	// ROPE
-	Rope rope(10, 10, 2);
+	Rope rope(100, 10, 2);
 	Scene::GetInstance()->AddGameObject(&rope);
 
 #pragma endregion
@@ -95,7 +101,7 @@ void run()
 	{
 		Physics::nowTime = glfwGetTime();
 		Physics::deltaTime += (Physics::nowTime - Physics::lastTime)
-								/ Physics::fixedDeltaTime;
+			/ Physics::fixedDeltaTime;
 		Physics::lastTime = Physics::nowTime;
 
 		Renderer::GetInstance()->Clear();

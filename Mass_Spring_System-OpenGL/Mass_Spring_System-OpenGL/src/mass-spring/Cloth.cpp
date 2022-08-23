@@ -292,6 +292,22 @@ void Cloth::PinTopPoints ()
 	topCenter.pinned = { 1, 0, 0, 0 };
 }
 
+void Cloth::PinFourBorderPoints ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+
+	auto& topLeft = vertices[LinearIndex (m_PointsByHeight - 1, 0, m_PointsByWidth)];
+	auto& topRight = vertices[LinearIndex (m_PointsByHeight - 1, m_PointsByWidth - 1, m_PointsByWidth)];
+
+	auto& bottomLeft = vertices[LinearIndex (0, 0, m_PointsByWidth)];
+	auto& bottomRight = vertices[LinearIndex (0, m_PointsByWidth - 1, m_PointsByWidth)];
+
+	topLeft.pinned = { 1, 0, 0, 0 };
+	topRight.pinned = { 1, 0, 0, 0 };
+	bottomLeft.pinned = { 1, 0, 0, 0 };
+	bottomRight.pinned = { 1, 0, 0, 0 };
+}
+
 void Cloth::UpdateWithUI()
 {
 	MassSpring::UpdateWithUI();

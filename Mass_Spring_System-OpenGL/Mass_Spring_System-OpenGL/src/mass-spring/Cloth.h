@@ -48,7 +48,8 @@ public:
 	void PinCircleCenter();
 	void PinCenter ();
 	void PinTopPoints();
-	
+	void PinFourBorderPoints();
+
 	void UpdateWithUI () override;
 
 private:
