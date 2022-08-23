@@ -50,14 +50,14 @@ public:
 		ImGui::SliderFloat (m_LabelStiffness, &m_StiffnessData, 0.0f, 20000);
 		ImGui::SliderFloat (m_LabelDamping, &m_DampingData, 0, 1);
 		ImGui::SliderFloat (m_LabelParticleMass, &m_ParticleMassData, 0.1f, 1000);
-		ImGui::SliderFloat (m_LabelGravity, &m_GravityData, -5000.f, -9.81f);
+		ImGui::SliderFloat (m_LabelGravity, &m_GravityData, -10000.f, -9.81f);
 		ImGui::SliderFloat (m_LabelConstSheering, &m_ConstSheeringData, 0, 2);
 		ImGui::SliderFloat (m_LabelConstBending, &m_ConstBendingData, 0, 2);
 
 		ImGui::SliderFloat (m_LabelCorrectionDumping, &m_CorrectionDumpingData, 0, 1);
 		ImGui::SliderFloat (m_LabelConstraintDistanceMult, &m_ConstraintDistanceMultData, 1, 1.2f);
-		ImGui::SliderFloat (m_LabelSelfCollisionDistanceMult, &m_SelfCollisionDistanceMultData, 0.1f, 1.0f);
-		ImGui::SliderFloat (m_LabelSphereRepulsionDistMult, &m_SphereRepulsionDistMultData, 1.0f, 1.5f);
+		ImGui::SliderFloat (m_LabelSelfCollisionDistanceMult, &m_SelfCollisionDistanceMultData, 0.5f, 1.0f);
+		ImGui::SliderFloat (m_LabelSphereRepulsionDistMult, &m_SphereRepulsionDistMultData, 1.05f, 1.3f);
 		ImGui::SliderFloat (m_LabelSphereRepulsionDamping, &m_SphereRepulsionDampingData, 0, 1);
 	}
 
