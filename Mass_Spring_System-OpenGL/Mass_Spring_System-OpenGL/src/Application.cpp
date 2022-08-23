@@ -53,10 +53,8 @@ void run()
 	float linkLenght = 10;
 	Cloth cloth("Cloth", size, size, linkLenght);
 	// cloth.PinTopPoints();
-	// cloth.PinCenter();
-	cloth.PinTopPoints();
+	cloth.PinCenter();
 	Scene::GetInstance()->AddGameObject(&cloth);
-	// cloth.GetTransform().AddPosition({-(size * linkLenght / 2), 0, -(size * linkLenght / 2)});
 	cloth.GetTransform().SetRotation({90, 0, 0});
 	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
@@ -84,7 +82,7 @@ void run()
 	sphere3.GetTransform().AddPosition({150, -100, 0});
 
 	// CUBE
-	Primitive cube("Cube", CUBE, 300);
+	// Primitive cube("Cube", CUBE, 300);
 	//scene.AddGameObject (&cube);
 
 	// ROPE

@@ -20,12 +20,10 @@ Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight,
 
 	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
 
-
 	delete m_GameObjectUI;
 	m_GameObjectUI = new ClothUI (name);
 
 	clothUI = dynamic_cast<ClothUI*> (m_GameObjectUI);
-
 }
 
 void Cloth::InitializeVertices ()
@@ -60,26 +58,43 @@ void Cloth::InitializeIndices ()
 
 	indices.clear();
 
-	//Riga
-	for (auto x = 0; x < m_PointsByHeight - 1; x++)
-	{
-		//Colonna
-		for (auto y = 1; y < m_PointsByWidth; y++)
-		{
-			int v = LinearIndex (x, y, m_PointsByWidth);
-			int vLeft = v - 1;
-			int vUp = v + m_PointsByWidth;
-			int vUpLeft = vUp - 1;
+	// //Riga
+	// for (auto x = 0; x < m_PointsByHeight - 1; x++)
+	// {
+	// 	//Colonna
+	// 	for (auto y = 1; y < m_PointsByWidth; y++)
+	// 	{
+	// 		int v = LinearIndex (x, y, m_PointsByWidth);
+	// 		int vLeft = v - 1;
+	// 		int vUp = v + m_PointsByWidth;
+	// 		int vUpLeft = vUp - 1;
+	//
+	// 		indices.push_back (vLeft);
+	// 		indices.push_back (v);
+	// 		indices.push_back (vUp);
+	//
+	// 		indices.push_back (vUp);
+	// 		indices.push_back (vUpLeft);
+	// 		indices.push_back (vLeft);
+	// 	}
+	// }
 
-			indices.push_back (vLeft);
-			indices.push_back (v);
-			indices.push_back (vUp);
 
-			indices.push_back (vUp);
-			indices.push_back (vUpLeft);
-			indices.push_back (vLeft);
-		}
+	for(int h = 0; h < m_PointsByHeight - 1; ++h){
+	    for(int w = 0; w < m_PointsByWidth - 1; ++w) {
+			unsigned int top_left = w % m_PointsByWidth + h * m_PointsByWidth;
+			unsigned int top_right = top_left + 1;
+			unsigned int bot_left = top_left + m_PointsByWidth;
+			unsigned int bot_right = bot_left + 1;
+			indices.push_back(top_left);
+			indices.push_back(bot_right);
+			indices.push_back(top_right);
+			indices.push_back(top_left);
+			indices.push_back(bot_left);
+			indices.push_back(bot_right);
+	    }
 	}
+
 }
 
 void Cloth::Create ()
@@ -113,6 +128,16 @@ void Cloth::Create ()
 	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", m_RestLengthDiagonal);
 
 	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", correctionDumping);
+
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", constraintDistanceMult);
+
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", selfCollisionDistanceMult);
+
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", sphereRepulsionDistMult);
+
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", sphereRepulsionDamping);
 }
 
 void Cloth::Update ()
@@ -142,16 +167,18 @@ void Cloth::Update ()
 
 	simulationStageComputeShader.Use();
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
+	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
+	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
+	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
+	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
-	/*glMemoryBarrier (GL_BUFFER_UPDATE_BARRIER_BIT);
-	std::vector<Vertex> copy;
-	copy.resize (GetMesh().GetVertices().size());
-	glad_glGetNamedBufferSubData (GetMesh().m_vbo.GetID(), 0, GetMesh().m_vbo.GetSize(), copy.data());
-	std::cout << "( " << copy[0].position.x << " " << copy[0].position.y << " " << copy[0].position.z << " ) - " << copy
-		[0].pinned.x << "\n";*/
-	/*glad_glGetNamedBufferSubData(m_ComputeTempVertexBuffer,0, GetMesh().m_vbo.GetSize(), copy.data());
-	std::cout << "( " << copy[0].position.x << " " << copy[0].position.y << " " <<  copy[0].position.z << " ) - " << copy[0].pinned.x << "\n";
-	std::cout << " ----- \n";*/
+	constraintsStageComputeShader.Use();
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", correctionDumping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", constraintDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", selfCollisionDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", sphereRepulsionDistMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", sphereRepulsionDamping);
 }
 
 void Cloth::SetComputeBuffers ()
@@ -261,16 +288,20 @@ void Cloth::PinTopPoints ()
 	topCenter.pinned = { 1, 0, 0, 0 };
 }
 
-void Cloth::GenerateUI()
-{
-	MassSpring::GenerateUI();
-
-
-}
-
 void Cloth::UpdateWithUI()
 {
 	MassSpring::UpdateWithUI();
 
+	m_Parameters.stiffness = clothUI->m_StiffnessData;
+	m_Parameters.damping = clothUI->m_DampingData;
+	m_Parameters.particleMass = clothUI->m_ParticleMassData;
+	m_Parameters.kSheering = clothUI->m_ConstSheeringData;
+	m_Parameters.kBending = clothUI->m_ConstBendingData;
+	m_Parameters.gravityAccel.y = clothUI->m_GravityData;
 
+	correctionDumping = clothUI->m_CorrectionDumpingData;
+	constraintDistanceMult = clothUI->m_ConstraintDistanceMultData;
+	selfCollisionDistanceMult = clothUI->m_SelfCollisionDistanceMultData;
+	sphereRepulsionDistMult = clothUI->m_SphereRepulsionDistMultData;
+	sphereRepulsionDamping = clothUI->m_SphereRepulsionDampingData;
 }
