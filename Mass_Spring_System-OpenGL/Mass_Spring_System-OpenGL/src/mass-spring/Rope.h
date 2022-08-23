@@ -7,15 +7,23 @@
 #include <utility>
 #include "MassSpring.h"
 
-struct Node;
+struct Node {
+	glm::vec4 position;
+	glm::vec4 velocity;
+	glm::vec4 oldPosition;
+	glm::vec4 pinned;
+};
 
 class Rope : public MassSpring {
 private:
 	GLfloat m_RestLength;
-	GLint m_PointsByLength;
+	GLuint m_PointsByLength;
 	GLfloat m_Radius;
 
 	std::vector<Node> m_Nodes;
+
+	GLuint m_ComputeNodesInBuffer;
+	GLuint m_ComputeNodesOutBuffer;
 
 	std::array<glm::vec2, 8> vertexPositionsWeigths = {
 		{
@@ -31,7 +39,7 @@ private:
 	};
 
 public:
-	Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius);
+	Rope(GLuint pointsByLength, uint16_t restLenght, GLfloat radius);
 
 	void InitializeNodes();
 
@@ -45,7 +53,7 @@ public:
 
 	void CreateBackSurfaceIndices();
 
-	void SetComputeBuffers() override {}
+	void SetComputeBuffers() override;
 	void BindComputeBuffers(int vboBind, int tempBind) override {}
 	
 	void Create() override;

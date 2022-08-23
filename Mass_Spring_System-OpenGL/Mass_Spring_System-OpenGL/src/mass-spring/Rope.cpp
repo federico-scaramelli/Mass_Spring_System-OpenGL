@@ -1,22 +1,19 @@
 #include "Rope.h"
 
-struct Node {
-	glm::vec4 position;
-	glm::vec4 velocity;
-	glm::vec4 oldPosition;
-	glm::vec4 pinned;
-};
+#include "PhysicsParameters.h"
 
-Rope::Rope(GLint pointsByLength, uint16_t restLenght, GLfloat radius) :
+
+
+Rope::Rope(GLuint pointsByLength, uint16_t restLenght, GLfloat radius) :
 	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, 
-													{ 0.f, -200, 0.f, 0.f }, 
+													{ 0.f, -100, 0.f, 0.f }, 
 													1.0f, 10.0f, 1.0f, 1.0f)),
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {
 	InitializeNodes();
-	Rope::InitializeVertices();
-	Rope::InitializeIndices();
+	InitializeVertices();
+	InitializeIndices();
 }
 
 void Rope::InitializeNodes()
@@ -160,6 +157,38 @@ void Rope::CreateBackSurfaceIndices()
 	}
 }
 
+void Rope::SetComputeBuffers()
+{
+	// Compute stage 1: compute new positions without constraints
+	simulationStageComputeShader.CreateProgram ({ "eulerConstraintsRopeShader.comp", ShaderType::COMPUTE });
+	simulationStageComputeShader.SetWorkGroupSize ({ 16, 1, 1 });
+	simulationStageComputeShader.SetWorkGroupNum ({ m_Nodes.size(), 1, 1 });
+
+	// Compute stage 2: apply constraints
+	constraintsStageComputeShader.CreateProgram ({ "ropeVertices.comp", ShaderType::COMPUTE });
+	constraintsStageComputeShader.SetWorkGroupSize ({ 16, 1, 1 });
+	constraintsStageComputeShader.SetWorkGroupNum ({ GetMesh().GetVertices().size(), 1, 1 });
+
+	glGenBuffers (1, &m_ComputeNodesInBuffer);
+	glGenBuffers (1, &m_ComputeNodesOutBuffer);
+
+	auto size = sizeof(Node) * m_Nodes.size();
+
+	simulationStageComputeShader.Use();
+	//In
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesInBuffer);
+	glBufferData (GL_SHADER_STORAGE_BUFFER, size, m_Nodes.data(), GL_DYNAMIC_DRAW);
+
+	// Out
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesOutBuffer);
+	glBufferData (GL_SHADER_STORAGE_BUFFER, size, m_Nodes.data(), GL_DYNAMIC_DRAW);
+
+	constraintsStageComputeShader.Use();
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_Mesh.m_vbo.GetID());
+	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
+
+}
+
 void Rope::Create()
 {
 	MassSpring::Create();
@@ -170,7 +199,9 @@ void Rope::Create()
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
 	
-	simulationStageComputeShader.SetUniform<GLfloat> ("ropeDim", m_PointsByLength);
+	simulationStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 
@@ -182,17 +213,50 @@ void Rope::Create()
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
+	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", m_Parameters.gravityAccel);
+
 	constraintsStageComputeShader.Use();
 	
-	constraintsStageComputeShader.SetUniform<GLfloat> ("verticesDim", m_Mesh.GetVertices().size());
-	//
-	// constraintsStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
-	//
-	// constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+	constraintsStageComputeShader.SetUniform<GLuint> ("verticesDim", m_Mesh.GetVertices().size());
+
+	constraintsStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
 }
 
 void Rope::Update()
 {
 	MassSpring::Update();
 
+	if (Physics::deltaTime >= 1.0)
+	{
+		
+		for (int i = 0; i < m_Parameters.subSteps; i++)
+		{
+			simulationStageComputeShader.Use();
+			// BindComputeBuffers (0, 1);
+
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesInBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesOutBuffer);
+			
+			simulationStageComputeShader.Compute();
+			simulationStageComputeShader.Wait();
+
+			// SwapComputeBuffers();
+
+			constraintsStageComputeShader.Use();
+			// BindComputeBuffers (1, 0);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesInBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesOutBuffer);
+
+			constraintsStageComputeShader.Compute();
+			constraintsStageComputeShader.Wait();
+		}
+
+		Physics::deltaTime--;
+	}
+
+	
+	
+	
 }
