@@ -48,58 +48,6 @@ void BuildCubeMesh(Mesh& mesh, GLfloat size)
 	};
 }
 
-// void Primitive::BuildSphereMesh(Mesh& mesh, GLfloat radius)
-// {
-// 	auto& vertices = mesh.GetVertices();
-// 	vertices.clear();
-// 	auto& indices = mesh.GetIndices();
-// 	indices.clear();
-//
-// 	double latitudeBands = 30;
-//     double longitudeBands = 30;
-//
-// 	float M_PI = 3.14;
-//
-//     for (double latNumber = 0; latNumber <= latitudeBands; latNumber++)
-//     {
-// 	    double theta = latNumber * M_PI / latitudeBands;
-//     	double sinTheta = sin(theta);
-//     	double cosTheta = cos(theta);
-//         
-//     	for (double longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-//     		double phi = longNumber * 2 * M_PI / longitudeBands;
-//     		double sinPhi = sin(phi);
-//     		double cosPhi = cos(phi);
-//             
-//     		Vertex vs;
-//     		vs.normal.x = cosPhi * sinTheta;   // x
-//     		vs.normal.y = cosTheta;            // y
-//     		vs.normal.z = sinPhi * sinTheta;   // z
-//     		vs.position.x = radius * vs.normal.x;
-//     		vs.position.y = radius * vs.normal.y;
-//     		vs.position.z = radius * vs.normal.z;
-//             
-//     		vertices.push_back(vs);
-//     	}
-//         
-//     	for (int latNumber = 0; latNumber < latitudeBands; latNumber++) {
-//     		for (int longNumber = 0; longNumber < longitudeBands; longNumber++) {
-//     			int first = (latNumber * (longitudeBands + 1)) + longNumber;
-//     			int second = first + longitudeBands + 1;
-//                 
-//     			indices.push_back(first);
-//     			indices.push_back(second);
-//     			indices.push_back(first + 1);
-//                 
-//     			indices.push_back(second);
-//     			indices.push_back(second + 1);
-//     			indices.push_back(first + 1);
-//                 
-//     		}
-//     	}
-//     }
-// }
-
 void Primitive::BuildSphereMesh(Mesh& mesh, GLfloat radius)
 {
 	auto& vertices = mesh.GetVertices();
@@ -240,5 +188,9 @@ Primitive::Primitive (const char* name, PrimitiveType type,
 }
 
 
-void Primitive::Create() {}
+void Primitive::Create()
+{
+	SetupGraphicsShader (BlinnPhong);
+	GenerateUI();
+}
 void Primitive::Update() {}

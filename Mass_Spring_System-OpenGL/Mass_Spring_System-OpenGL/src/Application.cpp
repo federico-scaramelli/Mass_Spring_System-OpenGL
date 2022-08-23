@@ -15,13 +15,12 @@
 #include "engine/CollidingSphere.h"
 
 #include "glm/gtc/type_ptr.inl"
-#include "mass-spring/PhysicsSolver.h"
+#include "mass-spring/PhysicsParameters.h"
 
 #pragma endregion
 
 Window window{};
 GLFWwindow* glfwWindow = nullptr;
-PhysicsSolver physicsSolver;
 
 
 void init()
@@ -93,13 +92,13 @@ void run()
 
 #pragma endregion
 
-	physicsSolver.lastTime = glfwGetTime();
+	Physics::lastTime = glfwGetTime();
 	while (!glfwWindowShouldClose(glfwWindow))
 	{
-		physicsSolver.nowTime = glfwGetTime();
-		PhysicsSolver::deltaTime += (physicsSolver.nowTime - physicsSolver.lastTime)
-			/ physicsSolver.fixedDeltaTime;
-		physicsSolver.lastTime = physicsSolver.nowTime;
+		Physics::nowTime = glfwGetTime();
+		Physics::deltaTime += (Physics::nowTime - Physics::lastTime)
+								/ Physics::fixedDeltaTime;
+		Physics::lastTime = Physics::nowTime;
 
 		Renderer::GetInstance()->Clear();
 

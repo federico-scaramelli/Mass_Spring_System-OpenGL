@@ -22,7 +22,11 @@ public:
 		Primitive::GenerateUI();
 	}
 
-	void Create() override {}
+	void Create() override
+	{
+		SetupGraphicsShader (Solid);
+		GenerateUI();
+	}
 	void Update() override {}
 
 	void UpdateWithUI() override

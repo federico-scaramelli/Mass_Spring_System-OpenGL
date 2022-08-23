@@ -4,6 +4,7 @@
 #include "LightSource.h"
 #include "../mass-spring/Wind.h"
 #include "../mass-spring/MassSpring.h"
+#include "../mass-spring/MassSpringUI.h"
 #include "Scene.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -69,7 +70,7 @@ void RendererUI::DrawUI ()
 		{
 			ImGui::ListBox ("Select Mass Spring Object",
 						   &MassSpringUI::selectedMassSpring,
-						   MassSpringUI::sceneMassSprings,
+						   MassSpringUI::massSpringsList,
 						   Scene::GetInstance()->m_MassSprings.size());
 			Scene::GetInstance()->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
 		}

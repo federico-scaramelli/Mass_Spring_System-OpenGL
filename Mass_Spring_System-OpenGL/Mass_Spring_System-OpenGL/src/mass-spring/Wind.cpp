@@ -17,6 +17,11 @@ Wind::Wind (GLfloat fullForceRadius, GLfloat attenuationRadius, GLfloat forceMul
 }
 
 void Wind::GenerateUI () { Primitive::GenerateUI(); }
+void Wind::Create ()
+{ 
+    SetupGraphicsShader (Solid);
+	GenerateUI();
+}
 
 void Wind::Update()
 {

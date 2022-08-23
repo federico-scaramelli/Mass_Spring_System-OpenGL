@@ -3,9 +3,9 @@
 
 #include <iostream>
 #include <random>
-#include "PhysicsSolver.h"
 #include "../engine/Vertex.h"
 #include "ClothUI.h"
+#include "PhysicsParameters.h"
 
 Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
 	MassSpring (name, 
@@ -84,6 +84,8 @@ void Cloth::InitializeIndices ()
 
 void Cloth::Create ()
 {
+	MassSpring::Create();
+
 	simulationStageComputeShader.Use();
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
@@ -117,7 +119,9 @@ void Cloth::Create ()
 
 void Cloth::Update ()
 {
-	if (PhysicsSolver::deltaTime >= 1.0)
+	MassSpring::Update();
+
+	if (Physics::deltaTime >= 1.0)
 	{
 		
 		for (int i = 0; i < m_Parameters.subSteps; i++)
@@ -137,7 +141,7 @@ void Cloth::Update ()
 			constraintsStageComputeShader.Wait();
 		}
 
-		PhysicsSolver::deltaTime--;
+		Physics::deltaTime--;
 	}
 
 	simulationStageComputeShader.Use();

@@ -10,7 +10,6 @@
 #include "glm/gtc/matrix_inverse.hpp"
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
-#include "../mass-spring/PhysicsSolver.h"
 #include "../mass-spring/MassSpringUI.h"
 
 Scene* Scene::GetInstance ()
@@ -30,50 +29,31 @@ void Scene::AddCamera (Camera* camera)
 	camera->GetTransform().SetPosition ({ 0, -100, 700 });
 }
 
-void Scene::AddGameObject (Primitive* primitive)
+void Scene::AddGameObject (GameObject* gameObject)
 {
-	primitive->SetupGraphicsShader(BlinnPhong);
-	m_Primitives.push_back (primitive);
-	
-	primitive->Create();
-	primitive->GenerateUI();
-}
+	gameObject->Create();
 
-void Scene::AddGameObject (CollidingSphere* collidingSphere)
-{
-	collidingSphere->SetupGraphicsShader(BlinnPhong);
-	m_Primitives.push_back (collidingSphere);
-	m_PhysicsSolver.AddCollider (collidingSphere);
-	
-	collidingSphere->Create();
-	collidingSphere->GenerateUI();
-}
-
-void Scene::AddGameObject (MassSpring* massSpring)
-{
-	massSpring->SetupGraphicsShader(BlinnPhong);
-	MassSpringUI::sceneMassSprings[m_MassSprings.size()] = massSpring->name;
-	m_MassSprings.push_back (massSpring);
-
-	massSpring->SetComputeBuffers();
-	massSpring->Create();
-	massSpring->GenerateUI();
-}
-
-void Scene::AddGameObject (Wind* wind)
-{
-	wind->SetupGraphicsShader(Solid);
-	m_Wind = wind;
-	m_PhysicsSolver.SetActiveWind (wind);
-
-	wind->GenerateUI();
-}
-
-void Scene::AddGameObject (LightSource* light)
-{
-	light->SetupGraphicsShader(Solid);
-	m_LightSource = light;
-	light->GenerateUI();
+	if (dynamic_cast<CollidingSphere*>(gameObject) != nullptr)
+	{
+		m_Primitives.push_back (dynamic_cast<CollidingSphere*>(gameObject));
+		m_Colliders.push_back (dynamic_cast<CollidingSphere*>(gameObject));
+	}
+	else if (dynamic_cast<MassSpring*>(gameObject) != nullptr)
+	{
+		MassSpringUI::massSpringsList[m_MassSprings.size()] = gameObject->name;
+		m_MassSprings.push_back (dynamic_cast<MassSpring*>(gameObject));
+	}
+	else if (dynamic_cast<Wind*>(gameObject) != nullptr)
+	{
+		m_Wind = dynamic_cast<Wind*>(gameObject);
+	}
+	else if (dynamic_cast<LightSource*>(gameObject) != nullptr)
+	{
+		m_LightSource = dynamic_cast<LightSource*>(gameObject);
+	}else if (dynamic_cast<Primitive*>(gameObject) != nullptr)
+	{
+		m_Primitives.push_back (dynamic_cast<Primitive*>(gameObject));
+	}
 }
 
 void Scene::UpdateCamera () { m_Camera->UpdateWithUI(); }
@@ -84,8 +64,6 @@ void Scene::Update ()
 
 	UpdateCamera();
 	UpdateGameObjects();
-
-	m_PhysicsSolver.Update();
 }
 
 void Scene::UpdateGameObjects ()
@@ -106,7 +84,6 @@ void Scene::UpdateGameObjects ()
 	if (!m_MassSprings.empty())
 	{
 		auto massSpring = m_MassSprings[MassSpringUI::selectedMassSpring];
-		m_PhysicsSolver.SetActiveMassSpring (massSpring);
 		massSpring->Update();
 		UpdateTransform (massSpring);
 		DrawGameObject (massSpring);
@@ -115,7 +92,6 @@ void Scene::UpdateGameObjects ()
 	// Update Wind
 	if (m_Wind != nullptr)
 	{
-		m_Wind->GetMesh().GetMaterial().GetShader().Use();
 		UpdateTransform (m_Wind);
 		m_Wind->Update();
 		DrawGameObject (m_Wind);
@@ -124,7 +100,6 @@ void Scene::UpdateGameObjects ()
 	// Update Light
 	if (m_LightSource != nullptr)
 	{
-		m_LightSource->GetMesh().GetMaterial().GetShader().Use();
 		UpdateTransform (m_LightSource);
 		DrawGameObject (m_LightSource);
 	}

@@ -162,6 +162,8 @@ void Rope::CreateBackSurfaceIndices()
 
 void Rope::Create()
 {
+	MassSpring::Create();
+
 	simulationStageComputeShader.Use();
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
@@ -191,6 +193,6 @@ void Rope::Create()
 
 void Rope::Update()
 {
-
+	MassSpring::Update();
 
 }

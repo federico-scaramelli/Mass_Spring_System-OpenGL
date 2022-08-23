@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include "../mass-spring/PhysicsSolver.h"
 
 class Primitive;
 class Wind;
@@ -19,11 +18,7 @@ public:
 	static Scene* GetInstance ();
 
 	void AddCamera (Camera* camera);
-	void AddGameObject (MassSpring* massSpring);
-	void AddGameObject (Primitive* primitive);
-	void AddGameObject (CollidingSphere* collidingSphere);
-	void AddGameObject (Wind* wind);
-	void AddGameObject (LightSource* light);
+	void AddGameObject (GameObject* gameObject);
 
 	[[nodiscard]] size_t GetGameObjectCount () const { return m_Primitives.size(); }
 
@@ -32,16 +27,15 @@ public:
 	[[nodiscard]] Camera* GetCamera () const { return m_Camera; }
 	[[nodiscard]] LightSource* GetLightSource () const { return m_LightSource; }
 	[[nodiscard]] Wind* GetWind () const { return m_Wind; }
+	[[nodiscard]] std::vector<CollidingSphere*> GetColliders() const { return m_Colliders; }
 
 	void Update ();
 
 
 private:
-	Scene () : m_PhysicsSolver() {}
+	Scene () {}
 	~Scene () { delete instance; }
 	static Scene* instance;
-
-	PhysicsSolver m_PhysicsSolver;
 
 	Camera* m_Camera;
 	LightSource* m_LightSource;
@@ -49,6 +43,7 @@ private:
 
 	std::vector<GameObject*> m_Primitives;
 	std::vector<MassSpring*> m_MassSprings;
+	std::vector<CollidingSphere*> m_Colliders;
 	
 	void UpdateGameObjects ();
 

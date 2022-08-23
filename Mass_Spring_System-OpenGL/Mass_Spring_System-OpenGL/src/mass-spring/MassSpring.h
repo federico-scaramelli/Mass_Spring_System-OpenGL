@@ -42,7 +42,7 @@ public:
 	ShaderProgramCompute constraintsStageComputeShader {};
 
 	virtual void SetComputeBuffers () = 0;
-	void Create () override = 0;
+	void Create () override;
 	void Update () override = 0;
 
 	

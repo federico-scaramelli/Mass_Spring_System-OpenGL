@@ -13,7 +13,7 @@ public:
 
 	void GenerateUI() override;
 
-	void Create() override {}
+	void Create() override;
 	void Update() override;
 
 	void UpdateWithUI() override;

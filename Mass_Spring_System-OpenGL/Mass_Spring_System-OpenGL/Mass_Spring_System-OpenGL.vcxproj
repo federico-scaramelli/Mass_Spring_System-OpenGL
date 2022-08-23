@@ -174,7 +174,6 @@
     <ClCompile Include="src\engine\RendererUI.cpp" />
     <ClCompile Include="src\engine\Scene.cpp" />
     <ClCompile Include="src\mass-spring\MassSpring.cpp" />
-    <ClCompile Include="src\mass-spring\PhysicsSolver.cpp" />
     <ClCompile Include="src\mass-spring\Rope.cpp" />
     <ClCompile Include="src\mass-spring\Cloth.cpp" />
     <ClCompile Include="libraries\include\imgui\imgui.cpp" />
@@ -217,10 +216,10 @@
     <ClInclude Include="src\engine\SolidMaterialUI.h" />
     <ClInclude Include="src\engine\TransformUI.h" />
     <ClInclude Include="src\mass-spring\ClothUI.h" />
+    <ClInclude Include="src\mass-spring\PhysicsParameters.h" />
     <ClInclude Include="src\mass-spring\WindUI.h" />
     <ClInclude Include="src\mass-spring\MassSpring.h" />
     <ClInclude Include="src\mass-spring\MassSpringUI.h" />
-    <ClInclude Include="src\mass-spring\PhysicsSolver.h" />
     <ClInclude Include="src\mass-spring\Rope.h" />
     <ClInclude Include="src\mass-spring\Cloth.h" />
     <ClInclude Include="libraries\include\imgui\imconfig.h" />
