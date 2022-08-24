@@ -17,7 +17,6 @@ MassSpring::MassSpring (const char* name, MassSpringParameters parameters) :
 	m_GameObjectUI = new MassSpringUI (name);
 
 	m_MassSpringUI = dynamic_cast<MassSpringUI*> (m_GameObjectUI);
-
 }
 
 void MassSpring::Create ()
@@ -81,22 +80,52 @@ void MassSpring::Update ()
 	if (!colliders.empty())
 	{
 		constraintsStageComputeShader.Use();
-		for (int i = 0; i < colliders.size(); i++)
+
+		for (auto it = colliders.begin();
+		  //next_it = it;
+		     it != colliders.end();)
+		     //it = next_it)
 		{
-			auto spherePos = 
-			  inverseModel * glm::vec4 (colliders[i]->GetTransform().GetPosition(), 1);
-		
-			constraintsStageComputeShader.SetUniformArray<glm::vec4>
-						  (("spheres[" + std::to_string(i) + "].sphereCenter").c_str(), spherePos);
-			constraintsStageComputeShader.SetUniformArray<GLfloat>
-							(("spheres[" + std::to_string(i) + "].sphereRadius").c_str(), colliders[i]->radius);
-			constraintsStageComputeShader.SetUniformArray<GLuint>
-							(("spheres[" + std::to_string(i) + "].sphereActive").c_str(), colliders[i]->m_IsActive);
+			//++next_it;
+
+			constraintsStageComputeShader.SetUniformArray<GLuint>("sphereCount", colliders.size());
+
+			auto collider = it->second;
+			int i = std::distance (colliders.begin(), it);
+
+			if (Scene::GetInstance()->GetGameObjects().find (it->first)
+				!= Scene::GetInstance()->GetGameObjects().end())
+			{
+				auto spherePos =
+				inverseModel * glm::vec4 (collider->GetTransform().GetPosition(), 1);
+
+				constraintsStageComputeShader.SetUniformArray<glm::vec4>
+					(("spheres[" + std::to_string (i) + "].sphereCenter").c_str(), spherePos);
+				constraintsStageComputeShader.SetUniformArray<GLfloat>
+					(("spheres[" + std::to_string (i) + "].sphereRadius").c_str(), collider->radius);
+				constraintsStageComputeShader.SetUniformArray<GLuint>
+					(("spheres[" + std::to_string (i) + "].sphereActive").c_str(), collider->m_IsActive);
+
+				++it;
+			}
+			else
+			{
+				constraintsStageComputeShader.SetUniformArray<glm::vec4>
+				  (("spheres[" + std::to_string (i) + "].sphereCenter").c_str(), {0,0,0,0});
+				constraintsStageComputeShader.SetUniformArray<GLfloat>
+					(("spheres[" + std::to_string (i) + "].sphereRadius").c_str(), 0);
+				constraintsStageComputeShader.SetUniformArray<GLuint>
+					(("spheres[" + std::to_string (i) + "].sphereActive").c_str(), 0);
+				Scene::GetInstance()->EraseCollider(it->first);
+				return;
+				colliders.erase (it++);
+				Scene::GetInstance()->GetColliders() = colliders;
+			}
 		}
 	}
 }
 
-void MassSpring::UpdateWithUI()
+void MassSpring::UpdateWithUI ()
 {
 	GameObject::UpdateWithUI();
 

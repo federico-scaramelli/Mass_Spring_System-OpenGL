@@ -1,6 +1,7 @@
 #include "RendererUI.h"
 
 #include "Camera.h"
+#include "CollidingSphere.h"
 #include "LightSource.h"
 #include "../mass-spring/Wind.h"
 #include "../mass-spring/MassSpring.h"
@@ -47,27 +48,37 @@ void RendererUI::DrawUI ()
 
 	// Primitives UI
 	ImGui::Begin ("Objects");
-	if (ImGui::CollapsingHeader ("Primitives", ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader ("Colliding spheres", ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		if (newSphereRadius > 150) newSphereRadius = 150;
-		else if (newSphereRadius < 5) newSphereRadius = 5;
-		ImGui::InputFloat ("Radius: ", &newSphereRadius, 2.5, 5, "%.1f");
-		if (ImGui::Button ("Add Sphere", { 100, 25 }))
-		{
-			std::cout << newSphereRadius << std::endl;
-		}
+		AddSphereUI();
+
+		ImGui::Dummy ({ 0, 20 });
 
 		// GameObjects UI
-		for (int i = 0; i < Scene::GetInstance()->GetGameObjectCount(); i++)
+		auto m = Scene::GetInstance()->GetGameObjects();
+		for (auto it = m.cbegin(), next_it = it;
+		     it != m.cend();
+		     it = next_it)
 		{
-			GameObject* gameObject = Scene::GetInstance()->GetGameObjects()[i];
-
-			ImGui::Checkbox (gameObject->GetUI().m_Name, &gameObject->m_IsActive);
-
-			if (!gameObject->m_IsActive) continue;
-
-			if (ImGui::CollapsingHeader (gameObject->GetUI().m_Name)) { gameObject->GetUI().Draw(); }
-			ImGui::Dummy ({ 0, 15 });
+			++next_it;
+			GameObject* gameObject = it->second;
+			std::string label = "X##";
+			label.append (gameObject->name);
+			if (ImGui::Button (label.c_str(), { 20, 20 }))
+			{
+				Scene::GetInstance()->RemoveGameObject (it->first);
+			}
+			else
+			{
+				ImGui::SameLine();
+				ImGui::Checkbox (gameObject->name.c_str(), &gameObject->m_IsActive);
+				if (gameObject->m_IsActive)
+				{
+					ImGui::SameLine();
+					if (ImGui::CollapsingHeader (gameObject->name.c_str())) { gameObject->GetUI().Draw(); }
+					ImGui::Dummy ({ 0, 15 });
+				}
+			}
 		}
 	}
 
@@ -81,9 +92,9 @@ void RendererUI::DrawUI ()
 		if (!Scene::GetInstance()->m_MassSprings.empty())
 		{
 			ImGui::ListBox ("Select Mass Spring Object",
-						   &MassSpringUI::selectedMassSpring,
-						   MassSpringUI::massSpringsList,
-						   Scene::GetInstance()->m_MassSprings.size());
+			                &MassSpringUI::selectedMassSpring,
+			                MassSpringUI::massSpringsList,
+			                Scene::GetInstance()->m_MassSprings.size());
 			Scene::GetInstance()->m_MassSprings[MassSpringUI::selectedMassSpring]->GetUI().Draw();
 		}
 	}
@@ -93,4 +104,39 @@ void RendererUI::DrawUI ()
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData (ImGui::GetDrawData());
+}
+
+void RendererUI::AddSphereUI ()
+{
+	auto colliders = Scene::GetInstance()->GetColliders();
+	int i = 0;
+	for (auto it = colliders.begin(); it != colliders.end();)
+	{
+		i++;
+		++it;
+	}
+	if (i >= 10)
+	{
+		ImGui::Text ("Max number of sphere in scene reached.");
+		return;
+	}
+
+
+	if (newSphereRadius > 150) newSphereRadius = 150;
+	else if (newSphereRadius < 5) newSphereRadius = 5;
+	ImGui::Text ("Create a new sphere");
+	ImGui::PushItemWidth (200);
+	ImGui::InputFloat ("Radius", &newSphereRadius, 2.5, 10, "%.1f");
+	ImGui::SameLine();
+	if (ImGui::Button ("Add Sphere", { 80, 20 }))
+	{
+		newSphereCount++;
+
+		std::string name = "Sphere (";
+		if (newSphereCount < 10) name += "0";
+		name.append (std::to_string (newSphereCount));
+		name.append (")");
+		auto* newSphere = new CollidingSphere (name.c_str(), newSphereRadius);
+		Scene::GetInstance()->AddGameObject (newSphere);
+	}
 }

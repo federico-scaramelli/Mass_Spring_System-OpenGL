@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 #include <iostream>
 #include <random>
 
@@ -50,11 +51,21 @@ namespace Utils
 	}
 
 	template<typename T>
-	void destroy_vector(std::vector<T*> &v)
+	void destroyVector(std::vector<T*> &v)
 	{
 		while(!v.empty()) {
 			delete v.back();
 			v.pop_back();
+		}
+	}
+
+	template<typename A, typename T>
+	void destroyMap(std::map<A,T*> &v)
+	{
+		for (auto [a, b] : v)
+		{
+			delete b;
+			v.erase (a);
 		}
 	}
 }

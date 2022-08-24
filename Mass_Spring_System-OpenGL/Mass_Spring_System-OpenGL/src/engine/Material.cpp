@@ -73,20 +73,20 @@ void Material::CreateShaderProgram (std::vector<std::pair<std::string, ShaderTyp
 	m_Shader.Setup();
 }
 
-void Material::GenerateUI (GameObjectUI* gameObjectUI)
+void Material::GenerateUI (GameObject* gameObject)
 {
 	switch (fragShader)
 	{
 	case BlinnPhong:
-		m_MaterialUI = new BlinnPhongMaterialUI(gameObjectUI->m_Name);
+		m_MaterialUI = new BlinnPhongMaterialUI(gameObject->name.c_str());
 		break;
 	case Solid:
-		m_MaterialUI = new SolidMaterialUI(gameObjectUI->m_Name);
+		m_MaterialUI = new SolidMaterialUI(gameObject->name.c_str());
 		break;
 	default:
 	  return;
 	}
-	gameObjectUI->m_MaterialUI = m_MaterialUI;
+	gameObject->GetUI().m_MaterialUI = m_MaterialUI;
 }
 
 void Material::UpdateWithUI ()

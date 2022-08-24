@@ -17,7 +17,7 @@ protected:
 
 public:
 	virtual ~GameObject () { delete m_GameObjectUI; }
-	const char* name;
+	std::string name;
 	bool m_IsActive = true;
 
 	GameObject (const char* name) : m_Transform (name), name (name) {}

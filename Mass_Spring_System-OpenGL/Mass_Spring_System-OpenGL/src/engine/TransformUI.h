@@ -1,22 +1,23 @@
 #pragma once
 #include "glm/vec2.hpp"
 #include "imgui/imgui.h"
+#include <string>
 
 class TransformUI 
 {
 public:
 	TransformUI();
-	TransformUI (const char* name)
+	TransformUI (const std::string& name)
 	{
-		strcpy_s (m_LabelPosition, name);
+		strcpy_s (m_LabelPosition, name.c_str());
 		strcat_s (m_LabelPosition, " position");
 
-		strcpy_s (m_LabelRotation, name);
+		strcpy_s (m_LabelRotation, name.c_str());
 		strcat_s (m_LabelRotation, " rotation");
 	}
 
-	void SetPositionRange(glm::vec2 minMax) { m_PositionMinMax = minMax; }
-	void SetRotationRange(glm::vec2 minMax) { m_RotationMinMax = minMax; }
+	void SetPositionRange(const glm::vec2 minMax) { m_PositionMinMax = minMax; }
+	void SetRotationRange(const glm::vec2 minMax) { m_RotationMinMax = minMax; }
 
 	void Draw()
 	{

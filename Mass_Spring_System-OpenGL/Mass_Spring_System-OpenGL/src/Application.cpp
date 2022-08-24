@@ -47,46 +47,45 @@ void run()
 	wind->GetTransform().AddPosition ( {-100, -100, 0} );
 	wind->GetTransform().AddRotation(  {0, -90, 0} );
 
+	// ROPE
+	//auto* rope = new Rope(10, 10, 2);
+	//Scene::GetInstance()->AddGameObject(rope);
+
 	// CLOTH
 	int size = 50;
-	float linkLenght = 10;
-	auto* cloth = new Cloth("Cloth", size, size, linkLenght);
-	// cloth.PinTopPoints();
-	cloth->PinCenter();
+	auto* cloth = new Cloth("Cloth", size, size, 10);
+	cloth->PinAllEdges();
+	//cloth->PinCenter();
 	Scene::GetInstance()->AddGameObject(cloth);
 	cloth->GetTransform().SetRotation({90, 0, 0});
 	cloth->GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
 	// FLAG
-	Cloth flag("Flag", size, size * 0.7 , linkLenght);
-	flag.PinLeftBorderVertices();
-	Scene::GetInstance()->AddGameObject(&flag);
-	flag.GetTransform().AddPosition({-(size * linkLenght / 2), 0, 0});
-	flag.GetUI().m_TransformUI->SetPositionRange({-700, 700});
-	flag.GetTransform().AddPosition ( {300, -100, 0} );
+	auto* flag = new Cloth("Flag", size, size * 0.7 , 10);
+	flag->PinLeftBorderVertices();
+	Scene::GetInstance()->AddGameObject(flag);
+	flag->GetTransform().AddPosition({-(size * 10 / 2), 0, 0});
+	flag->GetUI().m_TransformUI->SetPositionRange({-700, 700});
+	flag->GetTransform().AddPosition ( {300, -100, 0} );
 
 	// SPHERE
-	CollidingSphere sphere("Sphere", 100);
-	Scene::GetInstance()->AddGameObject(&sphere);
-	sphere.GetTransform().AddPosition({0, -200, 0});
+	/*auto* sphere = new CollidingSphere("Sphere", 100);
+	Scene::GetInstance()->AddGameObject(sphere);
+	sphere->GetTransform().AddPosition({0, -200, 0});*/
 
-	// SPHERE
-	CollidingSphere sphere2("Sphere2", 50);
-	Scene::GetInstance()->AddGameObject(&sphere2);
-	sphere2.GetTransform().AddPosition({-150, -100, 0});
+	//// SPHERE
+	//CollidingSphere sphere2("Sphere2", 50);
+	//Scene::GetInstance()->AddGameObject(&sphere2);
+	//sphere2.GetTransform().AddPosition({-150, -100, 0});
 
-	// SPHERE
-	CollidingSphere sphere3("Sphere3", 50);
-	Scene::GetInstance()->AddGameObject(&sphere3);
-	sphere3.GetTransform().AddPosition({150, -100, 0});
+	//// SPHERE
+	//CollidingSphere sphere3("Sphere3", 50);
+	//Scene::GetInstance()->AddGameObject(&sphere3);
+	//sphere3.GetTransform().AddPosition({150, -100, 0});
 
 	// CUBE
 	// Primitive cube("Cube", CUBE, 300);
 	//scene.AddGameObject (&cube);
-
-	// ROPE
-	Rope rope(10, 10, 2);
-	Scene::GetInstance()->AddGameObject(&rope);
 
 #pragma endregion
 

@@ -1,9 +1,13 @@
 #pragma once
+#include "glad/glad.h"
 
 class RendererUI
 {
 private:
-	float newSphereRadius = 25;
+	GLfloat newSphereRadius = 25;
+	GLuint newSphereCount = 0;
+
+	void AddSphereUI();
 
 public:
 	RendererUI() = default;
