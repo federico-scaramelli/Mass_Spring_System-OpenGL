@@ -43,13 +43,19 @@ uniform float radius;
 
 uniform WindInfo wind;
 
+struct ConstraintParams {
+	float correctionDumping;
+	float constraintDistanceMult;
+	float selfCollisionDistanceMult;
+	float sphereRepulsionDistMult;
+	float sphereRepulsionDamping;
+};
+uniform ConstraintParams constraintParams;
+
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
 	vec3 vectorToOther = otherPosition - myPosition;
-	float maxDist = restLength * 1.1;
-	float minDist = restLength * 0.9;
 	float distance = length(vectorToOther);
-	
 	vec3 force=elasticStiffness * (distance - restLength) * normalize(vectorToOther);
 	
 	return force;
@@ -62,8 +68,6 @@ bool IsPinned () {
 vec3 ComputeElasticForce (vec3 position) 
 {
 	vec3 totalForce = vec3(0,0,0);
-
-	// NOTE: x = column; y = row;
 
 	// STRUCTURE - Horizonal / Vertical
 	
@@ -127,7 +131,7 @@ vec3 ApplyConstraints (uint otherIndex, float restLen)
 	vec3 vectorToOther = otherPosition - position;
 	float distanceToOther = length(vectorToOther);
 
-	float maxDistance = restLen * 1.1;
+	float maxDistance = restLen * constraintParams.constraintDistanceMult;
 
 	vec3 correction = vec3(0,0,0);
 	float diff = distanceToOther - maxDistance;
@@ -147,7 +151,6 @@ vec3 ApplyConstraints (uint otherIndex, float restLen)
 vec3 ComputeDistanceCorrection () 
 {
 	vec3 totalCorrection = vec3(0,0,0);
-
 
 	// Bend Spring - Left
 	totalCorrection = (gl_GlobalInvocationID.x > 1) ?
@@ -174,14 +177,16 @@ vec3 ComputeDistanceCorrection ()
 	return totalCorrection;
 }
 
-vec3 ComputeSelfCollision(float epsilon) {
+vec3 ComputeSelfCollision(float restLength) {
 	vec3 correction = vec3(0,0,0);
+
+	float epsilon = restLength * constraintParams.selfCollisionDistanceMult;
 
 	for (int i = 0; i < ropeDim; i++) 
 	{
-		//if (i == gl_GlobalInvocationID.x) {
-		//	continue;
-		//}
+		if (i == gl_GlobalInvocationID.x) {
+			continue;
+		}
 
 		vec3 dir = nodesIn[i].pos.xyz - nodesIn[gl_GlobalInvocationID.x].pos.xyz;
 		float dist = length(dir);
@@ -238,22 +243,19 @@ void main()
 
 	vec3 acceleration = totalForce / particleMass;
 
-	
 	vec3 newVelocity = velocity + acceleration * deltaTime;
 
 	vec3 newPosition = position + newVelocity * deltaTime;
 	
-	
 	// Distance constraints
-	float correctionDamp = 0.2;
 	vec3 distCorrection = vec3(0,0,0);
-	distCorrection = ComputeDistanceCorrection() * correctionDamp;
+	distCorrection = ComputeDistanceCorrection() * constraintParams.correctionDumping;
+	
 	/*
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
-	float selfCollDistanceMult = 0.8;
-	float selfRepulsionDistance = (restLenHV + radius) * selfCollDistanceMult;
-	selfCollCorrection = ComputeSelfCollision(selfRepulsionDistance);
+	float selfCollDistance = (restLenHV + radius);
+	selfCollCorrection = ComputeSelfCollision(selfCollDistance);
 	*/
 
 	newPosition += distCorrection;
@@ -264,15 +266,10 @@ void main()
 	float maxVelocity = 100;
 	newVelocity = (length(newVelocity) >= maxVelocity) ? newVelocity * 0.0001 : newVelocity;
 	
-	newVelocity *= damping;
+	//newVelocity *= damping;
 
 	nodesOut[gl_GlobalInvocationID.x].oldPos = vec4(position, 1.0);
 	nodesOut[gl_GlobalInvocationID.x].pos = vec4(newPosition, 1.0);
 	nodesOut[gl_GlobalInvocationID.x].vel = vec4(newVelocity, 0.0);
 	
-/*
-	nodesOut[gl_GlobalInvocationID.x].oldPos = vec4(oldPosition, 1.0);
-	nodesOut[gl_GlobalInvocationID.x].pos = vec4(position, 1.0);
-	nodesOut[gl_GlobalInvocationID.x].vel = vec4(velocity, 0.0);
-*/
 }

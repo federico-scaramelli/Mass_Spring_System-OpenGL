@@ -25,7 +25,7 @@ struct MassSpringParameters
 	GLfloat kSheering;
 	GLfloat kBending;
 
-	GLfloat correctionDumping = 0.25f;
+	GLfloat constraintDistanceDumping = 0.25f;
 	GLfloat constraintDistanceMult = 1.1f;
 	GLfloat selfCollisionDistanceMult = 0.8f;
 	GLfloat sphereRepulsionDistMult = 1.05f;

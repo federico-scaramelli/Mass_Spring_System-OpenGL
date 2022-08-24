@@ -107,7 +107,7 @@ void MassSpring::UpdateWithUI()
 	m_Parameters.kBending = m_MassSpringUI->m_ConstBendingData;
 	m_Parameters.gravityAccel.y = m_MassSpringUI->m_GravityData;
 
-	m_Parameters.correctionDumping = m_MassSpringUI->m_CorrectionDumpingData;
+	m_Parameters.constraintDistanceDumping = m_MassSpringUI->m_CorrectionDumpingData;
 	m_Parameters.constraintDistanceMult = m_MassSpringUI->m_ConstraintDistanceMultData;
 	m_Parameters.selfCollisionDistanceMult = m_MassSpringUI->m_SelfCollisionDistanceMultData;
 	m_Parameters.sphereRepulsionDistMult = m_MassSpringUI->m_SphereRepulsionDistMultData;

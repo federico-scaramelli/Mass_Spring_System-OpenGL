@@ -1,16 +1,21 @@
 #include "Rope.h"
 
+#include "MassSpringUI.h"
 #include "PhysicsParameters.h"
 
 
 
 Rope::Rope(GLuint pointsByLength, uint16_t restLenght, GLfloat radius) :
 	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, 
-													{ 0.f, -100, 0.f, 0.f }, 
-													1.0f, 10.0f, 1.0f, 1.0f)),
+													{ 0.f, -1000, 0.f, 0.f }, 
+													50.0f, 1000.0f, 1.0f, 1.0f)),
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {
+	m_MassSpringUI->m_StiffnessData = m_Parameters.stiffness;
+	m_MassSpringUI->m_GravityData = m_Parameters.gravityAccel.y;
+	m_MassSpringUI->m_ParticleMassData = m_Parameters.particleMass;
+
 	InitializeNodes();
 	InitializeVertices();
 	InitializeIndices();
@@ -195,17 +200,17 @@ void Rope::Create()
 
 	simulationStageComputeShader.Use();
 
-	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
-
-	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
-	
 	simulationStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
 
-	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	
+	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 
@@ -213,7 +218,17 @@ void Rope::Create()
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
-	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", m_Parameters.gravityAccel);
+	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
+
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.constraintDistanceDumping);
+
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
+
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
+
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);
+
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", m_Parameters.sphereRepulsionDamping);
 
 	constraintsStageComputeShader.Use();
 	
@@ -256,7 +271,19 @@ void Rope::Update()
 		Physics::deltaTime--;
 	}
 
-	
-	
+	simulationStageComputeShader.Use();
+
+	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
+
+	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
+	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
+	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
+	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.constraintDistanceDumping);
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);
+	simulationStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", m_Parameters.sphereRepulsionDamping);
 	
 }
