@@ -45,9 +45,18 @@ void RendererUI::DrawUI ()
 	if (ImGui::CollapsingHeader ("Wind")) { Scene::GetInstance()->GetWind()->GetUI().Draw(); }
 	ImGui::End();
 
+	// Primitives UI
 	ImGui::Begin ("Objects");
 	if (ImGui::CollapsingHeader ("Primitives", ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		if (newSphereRadius > 150) newSphereRadius = 150;
+		else if (newSphereRadius < 5) newSphereRadius = 5;
+		ImGui::InputFloat ("Radius: ", &newSphereRadius, 2.5, 5, "%.1f");
+		if (ImGui::Button ("Add Sphere", { 100, 25 }))
+		{
+			std::cout << newSphereRadius << std::endl;
+		}
+
 		// GameObjects UI
 		for (int i = 0; i < Scene::GetInstance()->GetGameObjectCount(); i++)
 		{
@@ -61,9 +70,12 @@ void RendererUI::DrawUI ()
 			ImGui::Dummy ({ 0, 15 });
 		}
 	}
+
 	ImGui::Dummy ({ 0, 20 });
 	ImGui::Separator();
 	ImGui::Dummy ({ 0, 20 });
+
+	// Mass Springs UI
 	if (ImGui::CollapsingHeader ("Mass Springs", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		if (!Scene::GetInstance()->m_MassSprings.empty())

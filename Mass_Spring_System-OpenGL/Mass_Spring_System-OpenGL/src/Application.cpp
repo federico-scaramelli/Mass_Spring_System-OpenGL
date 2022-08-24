@@ -33,29 +33,29 @@ void run()
 {
 #pragma region Scene Creation
 	//Camera
-	Camera camera(window.GetAspectRatio());
-	Scene::GetInstance()->AddCamera(&camera);
+	auto* camera = new Camera(window.GetAspectRatio());
+	Scene::GetInstance()->AddCamera(camera);
 
 	// LIGHT
-	LightSource lightSource{};
-	Scene::GetInstance()->AddGameObject(&lightSource);
-	lightSource.GetTransform().AddPosition({122.5, -80, 122.5});
+	auto* lightSource = new LightSource();
+	Scene::GetInstance()->AddGameObject(lightSource);
+	lightSource->GetTransform().AddPosition({122.5, -80, 122.5});
 
 	// WIND
-	Wind wind{10, 50, 50};
-	Scene::GetInstance()->AddGameObject(&wind);
-	wind.GetTransform().AddPosition ( {-100, -100, 0} );
-	wind.GetTransform().AddRotation(  {0, -90, 0} );
+	auto* wind = new Wind(10, 50, 50);
+	Scene::GetInstance()->AddGameObject(wind);
+	wind->GetTransform().AddPosition ( {-100, -100, 0} );
+	wind->GetTransform().AddRotation(  {0, -90, 0} );
 
 	// CLOTH
 	int size = 50;
 	float linkLenght = 10;
-	Cloth cloth("Cloth", size, size, linkLenght);
+	auto* cloth = new Cloth("Cloth", size, size, linkLenght);
 	// cloth.PinTopPoints();
-	cloth.PinCenter();
-	Scene::GetInstance()->AddGameObject(&cloth);
-	cloth.GetTransform().SetRotation({90, 0, 0});
-	cloth.GetUI().m_TransformUI->SetPositionRange({-700, 700});
+	cloth->PinCenter();
+	Scene::GetInstance()->AddGameObject(cloth);
+	cloth->GetTransform().SetRotation({90, 0, 0});
+	cloth->GetUI().m_TransformUI->SetPositionRange({-700, 700});
 
 	// FLAG
 	Cloth flag("Flag", size, size * 0.7 , linkLenght);

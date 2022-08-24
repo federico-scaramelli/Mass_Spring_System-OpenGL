@@ -2,6 +2,9 @@
 
 class RendererUI
 {
+private:
+	float newSphereRadius = 25;
+
 public:
 	RendererUI() = default;
 

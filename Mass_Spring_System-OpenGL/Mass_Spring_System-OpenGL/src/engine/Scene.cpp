@@ -11,6 +11,17 @@
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
 #include "../mass-spring/MassSpringUI.h"
+#include "Utils.h"
+
+Scene::~Scene ()
+{
+	delete instance;
+	delete m_Camera;
+	delete m_LightSource;
+	Utils::destroyVector (m_Colliders);
+	Utils::destroyVector (m_Primitives);
+	Utils::destroyVector (m_MassSprings);
+}
 
 Scene* Scene::GetInstance ()
 {
