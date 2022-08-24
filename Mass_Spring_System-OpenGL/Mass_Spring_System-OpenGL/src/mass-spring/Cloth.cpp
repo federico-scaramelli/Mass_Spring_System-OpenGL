@@ -128,7 +128,7 @@ void Cloth::Create ()
 
 	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceDumping", m_Parameters.constraintDistanceDumping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.constraintDistanceDumping);
 
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
 
@@ -175,7 +175,7 @@ void Cloth::Update ()
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
 	constraintsStageComputeShader.Use();
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceDumping", m_Parameters.constraintDistanceDumping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.constraintDistanceDumping);
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);

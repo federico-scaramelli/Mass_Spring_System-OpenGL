@@ -25,10 +25,6 @@ layout ( std430, binding = 0 ) buffer NodesBufferIn {
 	Node nodesIn[];
 };
 
-layout ( std430, binding = 1 ) buffer NodesBufferOut {
-	Node nodesOut[];
-};
-
 layout ( std430, binding = 2 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
@@ -53,8 +49,8 @@ void UpdateNormals() {
 	
 }
 
-vec3 CalculateVertexPosition(uint nodeIndex, uint nodeWheightsIndex, vec3 forward){
-	vec3 right = normalize(cross(forward, vec3(0,1,0)));
+vec3 CalculateVertexPosition(uint nodeIndex, uint nodeWheightsIndex, vec3 forward, vec3 worldUp){
+	vec3 right = normalize(cross(forward, worldUp));
 	vec3 up = normalize(cross(right, forward));
 
 	vec3 positionSide = right * vertexPositionsWeigths[nodeWheightsIndex].x * radius;
@@ -73,30 +69,36 @@ void main()
 		return;
 
 	uint nodeIndex = gl_GlobalInvocationID.x / 8;
-	uint nodeWheightsIndex = gl_GlobalInvocationID.x - nodeIndex * 8;
+	uint nodeWheightsIndex = gl_GlobalInvocationID.x - (nodeIndex * 8);
 
 	vec3 nodePosition = nodesIn[nodeIndex].pos.xyz;
 
-	vec3 forwardNext = (nodeIndex == ropeDim - 1) ?
-				nodesIn[nodeIndex].pos.xyz - nodesIn[nodeIndex - 1].pos.xyz :
-				nodesIn[nodeIndex + 1].pos.xyz - nodesIn[nodeIndex].pos.xyz; 
+	vec3 nextNodePosition = (nodeIndex == ropeDim - 1) ?
+		nodePosition + (nodePosition - nodesIn[nodeIndex - 1].pos.xyz) : 
+		nodesIn[nodeIndex + 1].pos.xyz;
 
-	vec3 forwardPrec = (nodeIndex == 0) ?
-				nodesIn[nodeIndex + 1].pos.xyz - nodesIn[nodeIndex].pos.xyz :
-				nodesIn[nodeIndex].pos.xyz - nodesIn[nodeIndex - 1].pos.xyz; 
+	vec3 precNodePosition = (nodeIndex == 0) ?
+		nodePosition + (nodePosition - nodesIn[nodeIndex + 1].pos.xyz) : 
+		nodesIn[nodeIndex - 1].pos.xyz;
 
-	vec3 vertexPositionNext = CalculateVertexPosition(nodeIndex, nodeWheightsIndex, normalize(forwardNext));
-	vec3 vertexPositionPrec = CalculateVertexPosition(nodeIndex, nodeWheightsIndex, normalize(forwardPrec));
+	vec3 worldUp = vec3(0,1,0);
 
-	vec3 vertexPosition = 0.5 * vertexPositionNext + 0.5 * vertexPositionPrec;
+	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
+	vec3 rightNext = normalize(cross(forwardNext, worldUp));
+	vec3 upNext = normalize(cross(rightNext, forwardNext));
+
+	vec3 forwardPrec = -normalize(precNodePosition - nodePosition);
+	vec3 rightPrec = normalize(cross(forwardPrec, worldUp));
+	vec3 upPrec = normalize(cross(rightPrec, forwardPrec));
+
+	vec3 rightFinal = normalize(rightNext + rightPrec);
+	vec3 upFinal = normalize(upNext + upPrec);
+
+	vec3 positionSide = rightFinal * vertexPositionsWeigths[nodeWheightsIndex].x * radius;
+	vec3 positionFront = upFinal * vertexPositionsWeigths[nodeWheightsIndex].y * radius;
+	
+	vec3 vertexPosition = positionSide + positionFront;
+	vertexPosition += nodesIn[nodeIndex].pos.xyz;
 
 	verticesOut[gl_GlobalInvocationID.x].pos = vec4(vertexPosition ,1.0);
-
-	if(nodeWheightsIndex == 0){
-		nodesOut[nodeIndex].pos = nodesIn[nodeIndex].pos ;
-		nodesOut[nodeIndex].oldPos = nodesIn[nodeIndex].oldPos ;
-		nodesOut[nodeIndex].vel = nodesIn[nodeIndex].vel ;
-	}
-
-	//CopyData();
 }

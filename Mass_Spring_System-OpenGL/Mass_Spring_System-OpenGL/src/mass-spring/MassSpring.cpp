@@ -18,6 +18,11 @@ MassSpring::MassSpring (const char* name, MassSpringParameters parameters) :
 
 	m_MassSpringUI = dynamic_cast<MassSpringUI*> (m_GameObjectUI);
 
+	m_MassSpringUI->m_StiffnessData = m_Parameters.stiffness;
+	m_MassSpringUI->m_GravityData = m_Parameters.gravityAccel.y;
+	m_MassSpringUI->m_ParticleMassData = m_Parameters.particleMass;
+	m_MassSpringUI->m_SelfCollisionDistanceMultData = m_Parameters.selfCollisionDistanceMult;
+	m_MassSpringUI->m_DampingData = m_Parameters.damping;
 }
 
 void MassSpring::Create ()

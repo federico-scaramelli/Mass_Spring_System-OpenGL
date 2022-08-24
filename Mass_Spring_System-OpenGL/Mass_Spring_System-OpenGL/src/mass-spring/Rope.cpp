@@ -6,15 +6,12 @@
 
 
 Rope::Rope(GLuint pointsByLength, uint16_t restLenght, GLfloat radius) :
-	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.98f, 
+	MassSpring ("Rope", MassSpringParameters (0.016f, 16, 0.99f, 
 													{ 0.f, -1000, 0.f, 0.f }, 
-													50.0f, 1000.0f, 1.0f, 1.0f)),
+													1.0f, 1000.0f, 1.0f, 1.0f)),
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {
-	m_MassSpringUI->m_StiffnessData = m_Parameters.stiffness;
-	m_MassSpringUI->m_GravityData = m_Parameters.gravityAccel.y;
-	m_MassSpringUI->m_ParticleMassData = m_Parameters.particleMass;
 
 	InitializeNodes();
 	InitializeVertices();
@@ -189,6 +186,7 @@ void Rope::SetComputeBuffers()
 	glBufferData (GL_SHADER_STORAGE_BUFFER, size, m_Nodes.data(), GL_DYNAMIC_DRAW);
 
 	constraintsStageComputeShader.Use();
+	
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_Mesh.m_vbo.GetID());
 	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
 
@@ -243,29 +241,28 @@ void Rope::Update()
 {
 	MassSpring::Update();
 
+	static int readBuf = 0;
+
 	if (Physics::deltaTime >= 1.0)
 	{
 		
 		for (int i = 0; i < m_Parameters.subSteps; i++)
 		{
 			simulationStageComputeShader.Use();
-			// BindComputeBuffers (0, 1);
-
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesInBuffer);
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesOutBuffer);
 			
 			simulationStageComputeShader.Compute();
 			simulationStageComputeShader.Wait();
-
-			// SwapComputeBuffers();
-
+			
 			constraintsStageComputeShader.Use();
-			// BindComputeBuffers (1, 0);
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesInBuffer);
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesOutBuffer);
 
 			constraintsStageComputeShader.Compute();
 			constraintsStageComputeShader.Wait();
+
+			readBuf = 1 - readBuf;
+
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, readBuf, m_ComputeNodesInBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1-readBuf, m_ComputeNodesOutBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_Mesh.m_vbo.GetID());
 		}
 
 		Physics::deltaTime--;

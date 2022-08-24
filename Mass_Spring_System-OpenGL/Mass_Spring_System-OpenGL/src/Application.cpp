@@ -48,8 +48,10 @@ void run()
 	wind.GetTransform().AddRotation({0, -90, 0});
 
 	// ROPE
-	Rope rope(50, 10, 4);
+	Rope rope(16, 2.56f, 2.56f);
 	Scene::GetInstance()->AddGameObject(&rope);
+	rope.GetTransform().AddRotation({0, 0, 1});
+	rope.GetTransform().AddPosition({0, -75, 600});
 
 	// CLOTH
 	int size = 50;
