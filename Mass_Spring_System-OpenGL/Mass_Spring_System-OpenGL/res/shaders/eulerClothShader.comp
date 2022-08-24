@@ -74,6 +74,21 @@ void EulerIntegrator (uint idx, vec3 acceleration, vec3 velocity, vec3 position)
 	verticesOut[idx].vel = vec4(newVelocity, 0.0);
 }
 
+void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosition) 
+{
+	vec3 deltaAcceleration = acceleration * deltaTime * deltaTime;
+
+	vec3 deltaPosition = (position - oldPosition) * damping;
+	
+	if(length (deltaPosition) > 100) deltaPosition *= 0.0001;
+
+	vec3 nextPosition =	position + deltaPosition + deltaAcceleration;
+
+	verticesOut[idx].oldPos = vec4(position, 1.0);
+	verticesOut[idx].pos = vec4(nextPosition, 1.0);
+	verticesOut[idx].vel = vec4(((nextPosition - position) * deltaTime), 0.0);
+}
+
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
 }
@@ -212,4 +227,6 @@ void main()
 	vec3 acceleration = totalForce / particleMass;
 
 	EulerIntegrator(linearIdx, acceleration, velocity, position);
+
+	//VerletIntegrator (linearIdx, acceleration, position, oldPosition); 
 }

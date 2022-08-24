@@ -19,11 +19,6 @@ Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight,
 	InitializeIndices();
 
 	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
-
-	delete m_GameObjectUI;
-	m_GameObjectUI = new ClothUI (name);
-
-	clothUI = dynamic_cast<ClothUI*> (m_GameObjectUI);
 }
 
 void Cloth::InitializeVertices ()
@@ -131,15 +126,15 @@ void Cloth::Create ()
 
 	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", correctionDumping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.correctionDumping);
 
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", constraintDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
 
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", selfCollisionDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
 
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", sphereRepulsionDistMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);
 
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", sphereRepulsionDamping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", m_Parameters.sphereRepulsionDamping);
 }
 
 void Cloth::Update ()
@@ -178,11 +173,11 @@ void Cloth::Update ()
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
 
 	constraintsStageComputeShader.Use();
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", correctionDumping);
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", constraintDistanceMult);
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", selfCollisionDistanceMult);
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", sphereRepulsionDistMult);
-	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", sphereRepulsionDamping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.correctionDumping);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);
+	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", m_Parameters.sphereRepulsionDamping);
 }
 
 void Cloth::SetComputeBuffers ()
@@ -292,20 +287,19 @@ void Cloth::PinTopPoints ()
 	topCenter.pinned = { 1, 0, 0, 0 };
 }
 
-void Cloth::UpdateWithUI()
+void Cloth::PinFourBorderPoints ()
 {
-	MassSpring::UpdateWithUI();
+	auto& vertices = m_Mesh.GetVertices();
 
-	m_Parameters.stiffness = clothUI->m_StiffnessData;
-	m_Parameters.damping = clothUI->m_DampingData;
-	m_Parameters.particleMass = clothUI->m_ParticleMassData;
-	m_Parameters.kSheering = clothUI->m_ConstSheeringData;
-	m_Parameters.kBending = clothUI->m_ConstBendingData;
-	m_Parameters.gravityAccel.y = clothUI->m_GravityData;
+	auto& topLeft = vertices[LinearIndex (m_PointsByHeight - 1, 0, m_PointsByWidth)];
+	auto& topRight = vertices[LinearIndex (m_PointsByHeight - 1, m_PointsByWidth - 1, m_PointsByWidth)];
 
-	correctionDumping = clothUI->m_CorrectionDumpingData;
-	constraintDistanceMult = clothUI->m_ConstraintDistanceMultData;
-	selfCollisionDistanceMult = clothUI->m_SelfCollisionDistanceMultData;
-	sphereRepulsionDistMult = clothUI->m_SphereRepulsionDistMultData;
-	sphereRepulsionDamping = clothUI->m_SphereRepulsionDampingData;
+	auto& bottomLeft = vertices[LinearIndex (0, 0, m_PointsByWidth)];
+	auto& bottomRight = vertices[LinearIndex (0, m_PointsByWidth - 1, m_PointsByWidth)];
+
+	topLeft.pinned = { 1, 0, 0, 0 };
+	topRight.pinned = { 1, 0, 0, 0 };
+	bottomLeft.pinned = { 1, 0, 0, 0 };
+	bottomRight.pinned = { 1, 0, 0, 0 };
 }
+

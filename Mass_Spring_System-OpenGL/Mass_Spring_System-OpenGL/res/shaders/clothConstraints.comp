@@ -141,7 +141,7 @@ vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 gl
 	return totalCorrection;
 }
 
-vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float epsilon) {
+vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float radius) {
 	vec3 correction = vec3(0,0,0);
 	uint size = particleGridDims.x * particleGridDims.y;
 
@@ -151,9 +151,10 @@ vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float epsilon)
 			continue;
 		}
 
-		vec3 dir = verticesIn[i].pos.xyz - verticesIn[linearIdx].pos.xyz;
-		float dist = length(dir);
-		vec3 norm = -normalize(dir);
+		vec3 vectorToOther = verticesIn[i].pos.xyz - verticesIn[linearIdx].pos.xyz;
+		float dist = length(vectorToOther);
+		vec3 dirToOther = normalize(vectorToOther);
+
 		float correctionMult;
 		vec3 currentCorrection = vec3(0,0,0);
 
@@ -161,8 +162,9 @@ vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float epsilon)
 							1 :
 							0.5;
 
-		currentCorrection = (dist < epsilon && i != linearIdx) ?
-								currentCorrection + norm * (epsilon - dist) * correctionMult :
+		float diff = dist - radius;
+		currentCorrection = (diff < 0 && i != linearIdx) ?
+								currentCorrection + dirToOther * diff * correctionMult:
 								currentCorrection; 
 
 		correction += currentCorrection;
@@ -264,8 +266,6 @@ void main()
 	float maxVelocity = 10000;
 	correctedVelocity = (length(correctedVelocity) >= maxVelocity) ? correctedVelocity * 0.0001 : correctedVelocity;
 
-	//float sphereRepulsionDistMult = 1.05;
-	//float sphereRepulsionDamping = 0.95;
 	//COLLISION DETECTION
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{

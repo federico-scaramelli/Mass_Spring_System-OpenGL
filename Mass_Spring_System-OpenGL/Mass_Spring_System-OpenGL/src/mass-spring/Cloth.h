@@ -8,7 +8,7 @@
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 
 struct Vertex;
-class ClothUI;
+// class ClothUI;
 
 class Cloth : public MassSpring {
 public:
@@ -19,11 +19,7 @@ public:
 	
 	GLuint m_ComputeTempVertexBuffer;
 
-	GLfloat correctionDumping=0.25f;
-	GLfloat constraintDistanceMult = 1.1f;
-	GLfloat selfCollisionDistanceMult = 0.8f;
-	GLfloat sphereRepulsionDistMult = 1.05f;
-	GLfloat sphereRepulsionDamping = 0.95f;
+	
 	
 	Cloth(const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV);
 
@@ -48,9 +44,7 @@ public:
 	void PinCircleCenter();
 	void PinCenter ();
 	void PinTopPoints();
-	
-	void UpdateWithUI () override;
+	void PinFourBorderPoints();
 
-private:
-	ClothUI* clothUI;
+	
 };
