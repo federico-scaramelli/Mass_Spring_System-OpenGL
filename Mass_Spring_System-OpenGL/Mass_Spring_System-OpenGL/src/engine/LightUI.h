@@ -4,12 +4,12 @@
 class LightUI : public GameObjectUI
 {
 public:
-	LightUI(const char* name) : GameObjectUI (name)
+	LightUI(const std::string& name) : GameObjectUI (name)
 	{
-		strcpy_s(m_LabelDiffuse, name);
+		strcpy_s(m_LabelDiffuse, name.c_str());
 		strcat_s (m_LabelDiffuse, " diffuse");
 
-		strcpy_s (m_LabelAmbient, name);
+		strcpy_s (m_LabelAmbient, name.c_str());
 		strcat_s (m_LabelAmbient, " ambient");
 	}
 

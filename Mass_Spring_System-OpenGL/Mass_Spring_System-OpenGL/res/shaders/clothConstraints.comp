@@ -1,6 +1,7 @@
 #version 460
 
-#define MAX_SPHERES 5
+#include "../src/engine/Utils.h"
+#define MAX_SPHERES 10
 
 //Worksize
 layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
@@ -32,6 +33,7 @@ struct Sphere {
 	float sphereRadius;
 	bool sphereActive;
 };
+uniform uint sphereCount;
 uniform Sphere spheres[MAX_SPHERES];
 
 struct ConstraintParams {
@@ -269,7 +271,7 @@ void main()
 	//METTERE QUA IL DUMPING DELLA VELOCITA'
 
 	//COLLISION DETECTION
-	for (int i = 0; i < MAX_SPHERES; i++)
+	for (int i = 0; i < sphereCount; i++)
 	{
 		//bool currSphereActive = sphereActive[i];
 		if (spheres[i].sphereActive)
@@ -279,11 +281,11 @@ void main()
 
 			vec3 sphereDist = correctedPosition - spheres[i].sphereCenter.xyz;
 
-			if (length(sphereDist) < spheres[i].sphereRadius * constraintParams.sphereRepulsionDistMult) 
+			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * constraintParams.sphereRepulsionDistMult) 
 			{
 				// If the particle is inside the sphere, push it to the outer radius
 				correctedPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
-									* (spheres[i].sphereRadius * constraintParams.sphereRepulsionDistMult);
+									* (spheres[i].sphereRadius + restLenHV  * constraintParams.sphereRepulsionDistMult);
 				// Cancel out velocity
 				correctedVelocity *= constraintParams.sphereRepulsionDamping;
 			}

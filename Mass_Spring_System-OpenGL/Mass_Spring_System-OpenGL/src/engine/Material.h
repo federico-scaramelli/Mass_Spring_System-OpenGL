@@ -10,6 +10,7 @@
 #include "SolidMaterialUI.h"
 #include "glm/vec3.hpp"
 
+class GameObject;
 class SolidMaterialUI;
 class BlinnPhongMaterialUI;
 class MaterialUI;
@@ -73,7 +74,7 @@ public:
 	void Update();
 	void CreateShaderProgram (std::vector<std::pair<std::string, ShaderType>> pairList);
 
-	void GenerateUI (GameObjectUI* gameObjectUI);
+	void GenerateUI (GameObject* gameObject);
 	void UpdateWithUI ();
 
 	ShaderProgram& GetShader () { return m_Shader; }

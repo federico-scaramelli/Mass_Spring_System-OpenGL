@@ -3,7 +3,7 @@
 void GameObject::GenerateUI()
 {
 	m_Transform.SetUIObject(m_GameObjectUI->m_TransformUI);
-	GetMaterial().GenerateUI (m_GameObjectUI);
+	GetMaterial().GenerateUI (this);
 }
 
 void GameObject::UpdateWithUI()

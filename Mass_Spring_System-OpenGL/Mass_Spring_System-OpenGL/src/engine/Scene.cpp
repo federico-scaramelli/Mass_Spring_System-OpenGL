@@ -11,6 +11,18 @@
 #include "glm/glm.hpp"
 #include "../mass-spring/Cloth.h"
 #include "../mass-spring/MassSpringUI.h"
+#include "Utils.h"
+
+Scene::~Scene ()
+{
+	delete instance;
+	delete m_Camera;
+	delete m_LightSource;
+	delete m_Wind;
+	//Utils::destroyVector (m_Primitives);
+	Utils::destroyMap (m_Primitives);
+	Utils::destroyVector (m_MassSprings);
+}
 
 Scene* Scene::GetInstance ()
 {
@@ -35,12 +47,12 @@ void Scene::AddGameObject (GameObject* gameObject)
 
 	if (dynamic_cast<CollidingSphere*>(gameObject) != nullptr)
 	{
-		m_Primitives.push_back (dynamic_cast<CollidingSphere*>(gameObject));
-		m_Colliders.push_back (dynamic_cast<CollidingSphere*>(gameObject));
+		m_Primitives.insert ({gameObject->name, dynamic_cast<CollidingSphere*>(gameObject)});
+		m_Colliders.insert ({gameObject->name, dynamic_cast<CollidingSphere*>(gameObject)});
 	}
 	else if (dynamic_cast<MassSpring*>(gameObject) != nullptr)
 	{
-		MassSpringUI::massSpringsList[m_MassSprings.size()] = gameObject->name;
+		MassSpringUI::massSpringsList[m_MassSprings.size()] = gameObject->name.c_str();
 		m_MassSprings.push_back (dynamic_cast<MassSpring*>(gameObject));
 	}
 	else if (dynamic_cast<Wind*>(gameObject) != nullptr)
@@ -52,8 +64,20 @@ void Scene::AddGameObject (GameObject* gameObject)
 		m_LightSource = dynamic_cast<LightSource*>(gameObject);
 	}else if (dynamic_cast<Primitive*>(gameObject) != nullptr)
 	{
-		m_Primitives.push_back (dynamic_cast<Primitive*>(gameObject));
+		m_Primitives.insert ({gameObject->name, dynamic_cast<Primitive*>(gameObject)});
 	}
+}
+
+void Scene::RemoveGameObject (const std::string& name)
+{
+	auto gameObject = m_Primitives.find (name)->second;
+	m_Primitives.erase (name);
+	delete gameObject;
+}
+
+void Scene::EraseCollider (const std::string& name)
+{
+	m_Colliders.erase (name);
 }
 
 void Scene::UpdateCamera () { m_Camera->UpdateWithUI(); }
@@ -69,7 +93,7 @@ void Scene::Update ()
 void Scene::UpdateGameObjects ()
 {
 	// Update primitives
-	for (auto primitive : m_Primitives)
+	for (auto [name, primitive] : m_Primitives)
 	{
 		if (!primitive->m_IsActive) continue;
 

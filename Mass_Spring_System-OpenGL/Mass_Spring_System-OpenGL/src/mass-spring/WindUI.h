@@ -4,15 +4,15 @@
 class WindUI : public GameObjectUI
 {
 public:
-	WindUI(const char* name) : GameObjectUI (name)
+	WindUI(const std::string& name) : GameObjectUI (name)
 	{
-		strcpy_s(m_LabelFullForceRadius, name);
+		strcpy_s(m_LabelFullForceRadius, name.c_str());
 		strcat_s (m_LabelFullForceRadius, " full force radius");
-		strcpy_s(m_LabelAttenuationRadius, name);
+		strcpy_s(m_LabelAttenuationRadius, name.c_str());
 		strcat_s (m_LabelAttenuationRadius, " attenuation radius");
-		strcpy_s(m_LabelForce, name);
+		strcpy_s(m_LabelForce, name.c_str());
 		strcat_s (m_LabelForce, " force multiplier");
-		strcpy_s(m_LabelOffsetMaxValue, name);
+		strcpy_s(m_LabelOffsetMaxValue, name.c_str());
 		strcat_s (m_LabelOffsetMaxValue, " tilt factor");
 	}
 

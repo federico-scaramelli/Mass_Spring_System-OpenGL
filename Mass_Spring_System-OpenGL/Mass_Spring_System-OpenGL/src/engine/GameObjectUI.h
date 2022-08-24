@@ -11,9 +11,9 @@ public:
 		delete m_MaterialUI;
 	}
 
-	GameObjectUI (const char* name)
+	GameObjectUI (const std::string& name)
 	{
-		m_Name = name;
+		m_Name = name.c_str();
 		m_TransformUI = new TransformUI(name);
 	}
 
