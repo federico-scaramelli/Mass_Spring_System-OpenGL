@@ -1,4 +1,6 @@
 #include "MassSpring.h"
+
+#include "ClothUI.h"
 #include "MassSpringUI.h"
 #include "Wind.h"
 #include "../engine/Scene.h"
@@ -7,7 +9,16 @@
 
 MassSpring::MassSpring (const char* name, MassSpringParameters parameters) :
 	GameObject (name),
-	m_Parameters (std::move (parameters)) { m_GameObjectUI = new MassSpringUI (name); }
+	m_Parameters (std::move (parameters))
+{
+	// m_GameObjectUI = new MassSpringUI (name);
+
+	delete m_GameObjectUI;
+	m_GameObjectUI = new MassSpringUI (name);
+
+	m_MassSpringUI = dynamic_cast<MassSpringUI*> (m_GameObjectUI);
+
+}
 
 void MassSpring::Create ()
 {
@@ -83,4 +94,22 @@ void MassSpring::Update ()
 							(("spheres[" + std::to_string(i) + "].sphereActive").c_str(), colliders[i]->m_IsActive);
 		}
 	}
+}
+
+void MassSpring::UpdateWithUI()
+{
+	GameObject::UpdateWithUI();
+
+	m_Parameters.stiffness = m_MassSpringUI->m_StiffnessData;
+	m_Parameters.damping = m_MassSpringUI->m_DampingData;
+	m_Parameters.particleMass = m_MassSpringUI->m_ParticleMassData;
+	m_Parameters.kSheering = m_MassSpringUI->m_ConstSheeringData;
+	m_Parameters.kBending = m_MassSpringUI->m_ConstBendingData;
+	m_Parameters.gravityAccel.y = m_MassSpringUI->m_GravityData;
+
+	m_Parameters.correctionDumping = m_MassSpringUI->m_CorrectionDumpingData;
+	m_Parameters.constraintDistanceMult = m_MassSpringUI->m_ConstraintDistanceMultData;
+	m_Parameters.selfCollisionDistanceMult = m_MassSpringUI->m_SelfCollisionDistanceMultData;
+	m_Parameters.sphereRepulsionDistMult = m_MassSpringUI->m_SphereRepulsionDistMultData;
+	m_Parameters.sphereRepulsionDamping = m_MassSpringUI->m_SphereRepulsionDampingData;
 }

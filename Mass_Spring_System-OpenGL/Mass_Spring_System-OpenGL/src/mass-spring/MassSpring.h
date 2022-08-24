@@ -24,13 +24,23 @@ struct MassSpringParameters
 	GLfloat stiffness;
 	GLfloat kSheering;
 	GLfloat kBending;
+
+	GLfloat correctionDumping = 0.25f;
+	GLfloat constraintDistanceMult = 1.1f;
+	GLfloat selfCollisionDistanceMult = 0.8f;
+	GLfloat sphereRepulsionDistMult = 1.05f;
+	GLfloat sphereRepulsionDamping = 0.95f;
 };
+
+class MassSpringUI;
 
 class MassSpring : public GameObject
 {
 protected:
 	MassSpring (const char* name, MassSpringParameters parameters);
 	MassSpringParameters m_Parameters;
+
+	MassSpringUI* m_MassSpringUI;
 
 	virtual void InitializeVertices () = 0;
 	virtual void InitializeIndices () = 0;
@@ -45,5 +55,5 @@ public:
 	void Create () override;
 	void Update () override = 0;
 
-	
+	void UpdateWithUI () override;
 };

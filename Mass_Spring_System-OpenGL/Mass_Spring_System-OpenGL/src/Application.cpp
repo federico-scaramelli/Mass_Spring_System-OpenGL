@@ -47,6 +47,10 @@ void run()
 	wind.GetTransform().AddPosition({-100, -100, 0});
 	wind.GetTransform().AddRotation({0, -90, 0});
 
+	// ROPE
+	Rope rope(50, 10, 4);
+	Scene::GetInstance()->AddGameObject(&rope);
+
 	// CLOTH
 	int size = 50;
 	float linkLenght = 10;
@@ -90,9 +94,7 @@ void run()
 	// Primitive cube("Cube", CUBE, 300);
 	//scene.AddGameObject (&cube);
 
-	// ROPE
-	Rope rope(100, 10, 2);
-	Scene::GetInstance()->AddGameObject(&rope);
+	
 
 #pragma endregion
 
