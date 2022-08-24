@@ -34,71 +34,101 @@ void MassSpring::Create ()
 
 void MassSpring::Update ()
 {
-	// WIND
-	auto wind = Scene::GetInstance()->GetWind();
-	auto colliders = Scene::GetInstance()->GetColliders();
-	auto inverseModel = glm::inverse (GetTransform().GetModelMatrix());
-	if (wind != nullptr)
-	{
-		simulationStageComputeShader.Use();
+  // WIND
+  auto wind = Scene::GetInstance()->GetWind();
+  auto colliders = Scene::GetInstance()->GetColliders();
+  auto inverseModel = glm::inverse (GetTransform().GetModelMatrix());
+  if (wind != nullptr)
+  {
+    simulationStageComputeShader.Use();
 
-		glm::vec4 forwardWind = glm::vec4 (0.0, 0.0, -1.0, 0.0);
+    glm::vec4 forwardWind = glm::vec4 (0.0, 0.0, -1.0, 0.0);
 
 
-		glm::mat4 rotationMatrix = glm::mat4 (1.0f);
-		rotationMatrix = glm::rotate (rotationMatrix,
-		                              glm::radians (wind->alternativeRotation.x),
-		                              wind->GetTransform().GetRightDirection());
-		rotationMatrix = glm::rotate (rotationMatrix,
-		                              glm::radians (wind->alternativeRotation.y),
-		                              wind->GetTransform().GetUpDirection());
-		rotationMatrix = glm::rotate (rotationMatrix,
-		                              glm::radians (wind->alternativeRotation.z),
-		                              wind->GetTransform().GetForwardDirection());
+    glm::mat4 rotationMatrix = glm::mat4 (1.0f);
+    rotationMatrix = glm::rotate (rotationMatrix,
+                                  glm::radians (wind->alternativeRotation.x),
+                                  wind->GetTransform().GetRightDirection());
+    rotationMatrix = glm::rotate (rotationMatrix,
+                                  glm::radians (wind->alternativeRotation.y),
+                                  wind->GetTransform().GetUpDirection());
+    rotationMatrix = glm::rotate (rotationMatrix,
+                                  glm::radians (wind->alternativeRotation.z),
+                                  wind->GetTransform().GetForwardDirection());
 
-		//World forward of wind
-		forwardWind = rotationMatrix * forwardWind;
+    //World forward of wind
+    forwardWind = rotationMatrix * forwardWind;
 
-		//Zw
-		glm::vec3 localForwardWind = (glm::normalize (inverseModel * forwardWind));
+    //Zw
+    glm::vec3 localForwardWind = (glm::normalize (inverseModel * forwardWind));
 
-		//Origin and axis in local space as vec4
-		glm::vec4 localPositionWind4f = inverseModel * glm::vec4 (wind->GetTransform().GetPosition(), 1.0);
-		glm::vec4 localForwardWind4f = glm::vec4 (localForwardWind, 0.0f);
+    //Origin and axis in local space as vec4
+    glm::vec4 localPositionWind4f = inverseModel * glm::vec4 (wind->GetTransform().GetPosition(), 1.0);
+    glm::vec4 localForwardWind4f = glm::vec4 (localForwardWind, 0.0f);
 
-		simulationStageComputeShader.SetUniform<glm::vec4>
-			("wind.position", localPositionWind4f);
+    simulationStageComputeShader.SetUniform<glm::vec4>
+      ("wind.position", localPositionWind4f);
 
-		simulationStageComputeShader.SetUniform<glm::vec4>
-			("wind.forward", localForwardWind4f);
+    simulationStageComputeShader.SetUniform<glm::vec4>
+      ("wind.forward", localForwardWind4f);
 
-		simulationStageComputeShader.SetUniform<GLfloat>
-			("wind.forceMult", wind->GetForceMultiplier());
+    simulationStageComputeShader.SetUniform<GLfloat>
+      ("wind.forceMult", wind->GetForceMultiplier());
 
-		simulationStageComputeShader.SetUniform<GLfloat>
-			("wind.fullForceRadius", wind->GetFullRadius());
+    simulationStageComputeShader.SetUniform<GLfloat>
+      ("wind.fullForceRadius", wind->GetFullRadius());
 
-		simulationStageComputeShader.SetUniform<GLfloat>
-			("wind.attenuationRadius", wind->GetAttenuatedRadius());
-	}
+    simulationStageComputeShader.SetUniform<GLfloat>
+      ("wind.attenuationRadius", wind->GetAttenuatedRadius());
+  }
 
-	// COLLIDING SPHERE
-	if (!colliders.empty())
-	{
-		constraintsStageComputeShader.Use();
-		for (int i = 0; i < colliders.size(); i++)
-		{
-			auto spherePos = 
-			  inverseModel * glm::vec4 (colliders[i]->GetTransform().GetPosition(), 1);
-		
-			constraintsStageComputeShader.SetUniformArray<glm::vec4>
-						  (("spheres[" + std::to_string(i) + "].sphereCenter").c_str(), spherePos);
-			constraintsStageComputeShader.SetUniformArray<GLfloat>
-							(("spheres[" + std::to_string(i) + "].sphereRadius").c_str(), colliders[i]->radius);
-			constraintsStageComputeShader.SetUniformArray<GLuint>
-							(("spheres[" + std::to_string(i) + "].sphereActive").c_str(), colliders[i]->m_IsActive);
-		}
-	}
+  // COLLIDING SPHERE
+  if (!colliders.empty())
+  {
+    constraintsStageComputeShader.Use();
+
+    for (auto it = colliders.begin();
+      //next_it = it;
+         it != colliders.end();)
+         //it = next_it)
+    {
+      //++next_it;
+
+      constraintsStageComputeShader.SetUniformArray<GLuint>("sphereCount", colliders.size());
+
+      auto collider = it->second;
+      int i = std::distance (colliders.begin(), it);
+
+      if (Scene::GetInstance()->GetGameObjects().find (it->first)
+        != Scene::GetInstance()->GetGameObjects().end())
+      {
+        auto spherePos =
+        inverseModel * glm::vec4 (collider->GetTransform().GetPosition(), 1);
+
+        constraintsStageComputeShader.SetUniformArray<glm::vec4>
+          (("spheres[" + std::to_string (i) + "].sphereCenter").c_str(), spherePos);
+        constraintsStageComputeShader.SetUniformArray<GLfloat>
+          (("spheres[" + std::to_string (i) + "].sphereRadius").c_str(), collider->radius);
+        constraintsStageComputeShader.SetUniformArray<GLuint>
+          (("spheres[" + std::to_string (i) + "].sphereActive").c_str(), collider->m_IsActive);
+
+        ++it;
+      }
+      else
+      {
+        constraintsStageComputeShader.SetUniformArray<glm::vec4>
+          (("spheres[" + std::to_string (i) + "].sphereCenter").c_str(), {0,0,0,0});
+        constraintsStageComputeShader.SetUniformArray<GLfloat>
+          (("spheres[" + std::to_string (i) + "].sphereRadius").c_str(), 0);
+        constraintsStageComputeShader.SetUniformArray<GLuint>
+          (("spheres[" + std::to_string (i) + "].sphereActive").c_str(), 0);
+        Scene::GetInstance()->EraseCollider(it->first);
+        return;
+        colliders.erase (it++);
+        Scene::GetInstance()->GetColliders() = colliders;
+      }
+    }
+  }
 }
 
 void MassSpring::UpdateWithUI()

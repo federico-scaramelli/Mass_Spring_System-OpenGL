@@ -1,6 +1,5 @@
 #version 460
 
-#include "../src/engine/Utils.h"
 #define MAX_SPHERES 10
 
 //Worksize
