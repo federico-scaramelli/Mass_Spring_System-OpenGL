@@ -1,5 +1,6 @@
 #include "MassSpring.h"
 
+#include "ClothPresets.h"
 #include "ClothUI.h"
 #include "MassSpringUI.h"
 #include "Wind.h"
@@ -12,6 +13,21 @@ MassSpring::MassSpring (const char* name, MassSpringParameters parameters) :
 	m_Parameters (std::move (parameters))
 {
 
+	delete m_GameObjectUI;
+	m_GameObjectUI = new MassSpringUI (name);
+
+	m_MassSpringUI = dynamic_cast<MassSpringUI*> (m_GameObjectUI);
+
+	m_MassSpringUI->m_StiffnessData = m_Parameters.stiffness;
+	m_MassSpringUI->m_GravityData = m_Parameters.gravityAccel.y;
+	m_MassSpringUI->m_ParticleMassData = m_Parameters.particleMass;
+	m_MassSpringUI->m_SelfCollisionDistanceMultData = m_Parameters.selfCollisionDistanceMult;
+	m_MassSpringUI->m_DampingData = m_Parameters.damping;
+}
+
+MassSpring::MassSpring (const char* name, ClothPreset* preset) : GameObject (name),
+  m_Parameters (preset->parameters), preset (preset)
+{
 	delete m_GameObjectUI;
 	m_GameObjectUI = new MassSpringUI (name);
 
@@ -142,8 +158,8 @@ void MassSpring::Reset ()
 		}	
 	}
 
-	GetTransform().SetPosition ({0,0,0});
-	GetTransform().SetRotation({0,0,0});
+	GetTransform().SetPosition (preset->startingPos);
+	GetTransform().SetRotation(preset->startingRot);
 	InitializeVertices();
 	for (int i : pinnedIdx)
 	{

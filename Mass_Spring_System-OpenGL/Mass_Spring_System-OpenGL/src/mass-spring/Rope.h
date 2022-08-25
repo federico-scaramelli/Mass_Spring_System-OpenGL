@@ -39,7 +39,7 @@ private:
 	};
 
 public:
-	Rope(GLuint pointsByLength, uint16_t restLenght, GLfloat radius);
+	Rope(GLuint pointsByLength, uint16_t restLenght, GLfloat radius, MassSpringParameters parameters);
 
 	void InitializeNodes();
 

@@ -8,18 +8,26 @@
 #include "MassSpringUI.h"
 #include "PhysicsParameters.h"
 #include "../engine/Scene.h"
+#include "ClothPresets.h"
 
-Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
-	MassSpring (name, 
-				MassSpringParameters( 0.016f, 16, 0.95f, 
-									{ 0.f, -1500, 0.f, 0.f }, 
-									1.0f, 10.0f, 1.0f, 1.0f)),
+Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV, MassSpringParameters parameters) :
+	MassSpring (name, parameters),
 	m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
 	m_RestLengthHV (restLenghtHV)
 {
 	InitializeVertices();
 	InitializeIndices();
 
+	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
+}
+
+Cloth::Cloth (const char* name, ClothPreset* preset): MassSpring (name, preset)
+{
+	m_PointsByWidth = preset->pointsByWidth;
+	m_PointsByHeight = preset->pointsByHeight;
+	m_RestLengthHV = preset->restLenghtHV;
+	InitializeVertices();
+	InitializeIndices();
 	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
 }
 
@@ -99,46 +107,30 @@ void Cloth::Create ()
 	MassSpring::Create();
 
 	simulationStageComputeShader.Use();
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
-	
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", m_RestLengthDiagonal);
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
-
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
-	
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
-
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
 
 	constraintsStageComputeShader.Use();
-
 	constraintsStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
-
 	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
-
 	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenDiagonal", m_RestLengthDiagonal);
-
 	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
-
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.correctionDumping", m_Parameters.constraintDistanceDumping);
-
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.constraintDistanceMult", m_Parameters.constraintDistanceMult);
-
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
-
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);
-
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", m_Parameters.sphereRepulsionDamping);
+
+	m_Transform.SetPosition (preset->startingPos);
+	m_Transform.SetRotation (preset->startingRot);
 }
 
 void Cloth::Update ()

@@ -164,6 +164,7 @@ vec3 ComputeWindForce(vec3 position)
 	float dotWindZ = dot (windDir, normalize(vectorToVertex));
 	float windMult = wind.forceMult;
 
+	// Wind max range
 	float referenceDistance = 1000;
 
 	vec3 forwardMaxRadiusPoint = vec3(0, wind.fullForceRadius, 0) + windDir * referenceDistance;

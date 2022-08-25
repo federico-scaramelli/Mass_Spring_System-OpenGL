@@ -8,7 +8,6 @@
 #define LinearIndex(i, j, rowSize) ((i) * (rowSize) + (j))
 
 struct Vertex;
-// class ClothUI;
 
 class Cloth : public MassSpring {
 public:
@@ -19,9 +18,8 @@ public:
 	
 	GLuint m_ComputeTempVertexBuffer;
 
-	
-	
-	Cloth(const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV);
+	Cloth(const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV, MassSpringParameters parameters);
+	Cloth(const char* name, ClothPreset* preset);
 
 	void InitializeVertices() override;
 	void InitializeIndices() override;

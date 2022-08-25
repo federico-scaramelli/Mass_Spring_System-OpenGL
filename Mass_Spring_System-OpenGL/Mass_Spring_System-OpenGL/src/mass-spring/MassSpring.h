@@ -1,14 +1,23 @@
 #pragma once
 #include "../engine/GameObject.h"
 
+class ClothPreset;
+
 struct MassSpringParameters
 {
 	MassSpringParameters(const GLfloat dT, const uint16_t subSteps, 
 						const GLfloat damping, const glm::vec4 gravityAcc, GLfloat particleMass, 
-						GLfloat stiffness, GLfloat kSheering, GLfloat kBending) :
+						GLfloat stiffness, GLfloat kSheering, GLfloat kBending,
+						GLfloat constraintDistanceDumping, GLfloat constraintDistanceMult,
+						GLfloat selfCollisionDistanceMult, GLfloat sphereRepulsionDistMult,
+						GLfloat sphereRepulsionDamping) :
+
 						deltaTime (dT), subSteps (subSteps),
 						damping (damping), gravityAccel (gravityAcc), particleMass (particleMass),
-						stiffness (stiffness), kSheering (kSheering), kBending(kBending)
+						stiffness (stiffness), kSheering (kSheering), kBending(kBending),
+						constraintDistanceDumping (constraintDistanceDumping), constraintDistanceMult (constraintDistanceMult),
+						selfCollisionDistanceMult (selfCollisionDistanceMult), sphereRepulsionDistMult (sphereRepulsionDistMult),
+						sphereRepulsionDamping (sphereRepulsionDamping)
 	{
 		subStepDt = dT / static_cast<float> (subSteps);
 	}
@@ -25,11 +34,11 @@ struct MassSpringParameters
 	GLfloat kSheering;
 	GLfloat kBending;
 
-	GLfloat constraintDistanceDumping = 0.25f;
-	GLfloat constraintDistanceMult = 1.1f;
-	GLfloat selfCollisionDistanceMult = 0.8f;
-	GLfloat sphereRepulsionDistMult = 1.05f;
-	GLfloat sphereRepulsionDamping = 0.95f;
+	GLfloat constraintDistanceDumping;
+	GLfloat constraintDistanceMult;
+	GLfloat selfCollisionDistanceMult;
+	GLfloat sphereRepulsionDistMult;
+	GLfloat sphereRepulsionDamping;
 };
 
 class MassSpringUI;
@@ -38,6 +47,7 @@ class MassSpring : public GameObject
 {
 protected:
 	MassSpring (const char* name, MassSpringParameters parameters);
+	MassSpring (const char* name, ClothPreset* preset);
 	MassSpringParameters m_Parameters;
 
 	MassSpringUI* m_MassSpringUI;
@@ -55,6 +65,7 @@ public:
 	void Create () override;
 	void Update () override = 0;
 
+	ClothPreset* preset;
 
 	virtual void Reset ();
 

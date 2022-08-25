@@ -1,6 +1,13 @@
 #pragma once
 #include "../engine/GameObjectUI.h"
 
+
+// NOTE: NOT USED
+// NOTE: NOT USED
+// NOTE: NOT USED
+// NOTE: NOT USED
+
+
 class ClothUI : public GameObjectUI
 {
 public:
@@ -57,7 +64,7 @@ public:
 		ImGui::SliderFloat (m_LabelCorrectionDumping, &m_CorrectionDumpingData, 0, 1);
 		ImGui::SliderFloat (m_LabelConstraintDistanceMult, &m_ConstraintDistanceMultData, 1, 1.2f);
 		ImGui::SliderFloat (m_LabelSelfCollisionDistanceMult, &m_SelfCollisionDistanceMultData, 0.5f, 1.0f);
-		ImGui::SliderFloat (m_LabelSphereRepulsionDistMult, &m_SphereRepulsionDistMultData, 1.05f, 1.3f);
+		ImGui::SliderFloat (m_LabelSphereRepulsionDistMult, &m_SphereRepulsionDistMultData, 0.2f, 1.5f);
 		ImGui::SliderFloat (m_LabelSphereRepulsionDamping, &m_SphereRepulsionDampingData, 0, 1);
 	}
 
@@ -71,7 +78,7 @@ public:
 	float m_CorrectionDumpingData = 0.25f;
 	float m_ConstraintDistanceMultData = 1.1f;
 	float m_SelfCollisionDistanceMultData = 0.8f;
-	float m_SphereRepulsionDistMultData = 1.05f;
+	float m_SphereRepulsionDistMultData = 0.33f;
 	float m_SphereRepulsionDampingData = 0.95f;
 
 private:
