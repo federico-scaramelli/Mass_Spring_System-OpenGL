@@ -39,6 +39,6 @@ private:
 	char m_LabelPosition[40];
 	char m_LabelRotation[40];
 
-	glm::vec2 m_PositionMinMax {-250, 250};
-	glm::vec2 m_RotationMinMax {-250, 250};
+	glm::vec2 m_PositionMinMax {-500, 500};
+	glm::vec2 m_RotationMinMax {-180, 180};
 };

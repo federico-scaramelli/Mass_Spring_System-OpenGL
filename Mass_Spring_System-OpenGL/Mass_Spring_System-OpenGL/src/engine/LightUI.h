@@ -15,9 +15,9 @@ public:
 
 	void Draw() override
 	{
-		m_TransformUI->Draw();
-		m_MaterialUI->Draw();
+		GameObjectUI::Draw();
 
+		ImGui::Dummy ({ 0, 10 });
 		ImGui::Text ("Light");
 		ImGui::ColorEdit3 (m_LabelDiffuse, m_LightDiffuseData);
 		ImGui::ColorEdit3 (m_LabelAmbient, m_LightAmbientData);

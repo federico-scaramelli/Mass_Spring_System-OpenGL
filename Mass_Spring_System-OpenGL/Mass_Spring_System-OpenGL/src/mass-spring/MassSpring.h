@@ -55,5 +55,8 @@ public:
 	void Create () override;
 	void Update () override = 0;
 
+
+	virtual void Reset ();
+
 	void UpdateWithUI () override;
 };

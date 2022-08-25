@@ -28,6 +28,7 @@ public:
 
 	void Create() override;
 	void Update() override;
+	void Reset () override;
 
 	void SetComputeBuffers() override;
 	void BindComputeBuffers(int vboBind, int tempBind) override;

@@ -23,6 +23,7 @@ public:
 	void AddGameObject (GameObject* gameObject);
 	void RemoveGameObject (const std::string& name);
 	void EraseCollider (const std::string& name);
+	void ResetMassSpring ();
 	
 	[[nodiscard]] size_t GetGameObjectCount () const { return m_Primitives.size(); }
 	
@@ -32,6 +33,7 @@ public:
 	[[nodiscard]] LightSource* GetLightSource () const { return m_LightSource; }
 	[[nodiscard]] Wind* GetWind () const { return m_Wind; }
 	[[nodiscard]] std::map<std::string, CollidingSphere*> GetColliders() const { return m_Colliders; }
+	[[nodiscard]] std::map<std::string, MassSpring*> GetMassSprings() const { return m_MassSprings; }
 
 	void Update ();
 
@@ -46,7 +48,7 @@ private:
 	Wind* m_Wind;
 
 	std::map<std::string, GameObject*> m_Primitives;
-	std::vector<MassSpring*> m_MassSprings;
+	std::map<std::string, MassSpring*> m_MassSprings;
 	std::map<std::string, CollidingSphere*> m_Colliders;
 	
 	void UpdateGameObjects ();

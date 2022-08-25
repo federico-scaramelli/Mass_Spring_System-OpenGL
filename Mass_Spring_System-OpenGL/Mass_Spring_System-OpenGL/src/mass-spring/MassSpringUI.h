@@ -46,9 +46,9 @@ public:
 
 	void Draw() override
 	{
-		m_TransformUI->Draw();
-		m_MaterialUI->Draw();
+		GameObjectUI::Draw();
 
+		ImGui::Dummy ({ 0, 10 });
 		ImGui::Text ("Spring parameters");
 		ImGui::SliderFloat (m_LabelStiffness, &m_StiffnessData, 0.0f, 20000);
 		ImGui::SliderFloat (m_LabelDamping, &m_DampingData, 0, 1);

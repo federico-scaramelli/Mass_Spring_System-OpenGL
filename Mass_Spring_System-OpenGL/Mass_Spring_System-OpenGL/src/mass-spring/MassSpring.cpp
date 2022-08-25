@@ -11,7 +11,6 @@ MassSpring::MassSpring (const char* name, MassSpringParameters parameters) :
 	GameObject (name),
 	m_Parameters (std::move (parameters))
 {
-	// m_GameObjectUI = new MassSpringUI (name);
 
 	delete m_GameObjectUI;
 	m_GameObjectUI = new MassSpringUI (name);
@@ -129,6 +128,30 @@ void MassSpring::Update ()
       }
     }
   }
+}
+
+void MassSpring::Reset ()
+{
+	auto& vertices = m_Mesh.GetVertices();
+	std::vector<int> pinnedIdx;
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		if (vertices[i].pinned.x > 0.5f)
+		{
+			pinnedIdx.push_back (i);
+		}	
+	}
+
+	GetTransform().SetPosition ({0,0,0});
+	GetTransform().SetRotation({0,0,0});
+	InitializeVertices();
+	for (int i : pinnedIdx)
+	{
+		vertices[i].pinned.x = 1.0;
+	}
+	GetMesh().UpdateBuffers();
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_Mesh.m_vbo.GetID());
+	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
 }
 
 void MassSpring::UpdateWithUI()

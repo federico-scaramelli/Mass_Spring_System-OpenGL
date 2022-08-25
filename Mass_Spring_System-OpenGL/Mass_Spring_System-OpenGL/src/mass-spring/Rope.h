@@ -58,4 +58,5 @@ public:
 	
 	void Create() override;
 	void Update() override;
+	void Reset () override;
 };

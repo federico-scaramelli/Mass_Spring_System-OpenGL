@@ -19,9 +19,14 @@ public:
 
 	virtual void Draw()
 	{
+		ImGui::Dummy ({ 0, 10 });
 		m_TransformUI->Draw();
+
 		if (m_MaterialUI != nullptr)
-		  m_MaterialUI->Draw();
+		{
+			ImGui::Dummy ({ 0, 10 });
+			m_MaterialUI->Draw();
+		}
 	}
 
 	const char* m_Name;

@@ -5,7 +5,9 @@
 #include <random>
 #include "../engine/Vertex.h"
 #include "ClothUI.h"
+#include "MassSpringUI.h"
 #include "PhysicsParameters.h"
+#include "../engine/Scene.h"
 
 Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV) :
 	MassSpring (name, 
@@ -180,6 +182,13 @@ void Cloth::Update ()
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.selfCollisionDistanceMult", m_Parameters.selfCollisionDistanceMult);
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDistMult", m_Parameters.sphereRepulsionDistMult);
 	constraintsStageComputeShader.SetUniform<GLfloat>("constraintParams.sphereRepulsionDamping", m_Parameters.sphereRepulsionDamping);
+}
+
+void Cloth::Reset ()
+{
+	MassSpring::Reset();
+	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeTempVertexBuffer);
+	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
 }
 
 void Cloth::SetComputeBuffers ()

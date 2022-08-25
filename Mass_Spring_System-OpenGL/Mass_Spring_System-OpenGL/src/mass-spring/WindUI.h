@@ -18,9 +18,9 @@ public:
 
 	void Draw() override
 	{
-		m_TransformUI->Draw();
-		m_MaterialUI->Draw();
+		GameObjectUI::Draw();
 
+		ImGui::Dummy ({ 0, 10 });
 		ImGui::Text ("Wind parameters");
 		ImGui::SliderFloat (m_LabelFullForceRadius, &m_FullForceRadiusData, 0.0f, 250);
 		ImGui::SliderFloat (m_LabelAttenuationRadius, &m_AttenuationRadiusData, 0, 500);

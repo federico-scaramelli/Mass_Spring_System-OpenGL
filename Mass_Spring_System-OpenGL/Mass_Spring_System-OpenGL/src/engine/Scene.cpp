@@ -19,9 +19,8 @@ Scene::~Scene ()
 	delete m_Camera;
 	delete m_LightSource;
 	delete m_Wind;
-	//Utils::destroyVector (m_Primitives);
 	Utils::destroyMap (m_Primitives);
-	Utils::destroyVector (m_MassSprings);
+	Utils::destroyMap (m_MassSprings);
 }
 
 Scene* Scene::GetInstance ()
@@ -53,7 +52,7 @@ void Scene::AddGameObject (GameObject* gameObject)
 	else if (dynamic_cast<MassSpring*>(gameObject) != nullptr)
 	{
 		MassSpringUI::massSpringsList[m_MassSprings.size()] = gameObject->name.c_str();
-		m_MassSprings.push_back (dynamic_cast<MassSpring*>(gameObject));
+		m_MassSprings.insert ({gameObject->name, dynamic_cast<MassSpring*>(gameObject)});
 	}
 	else if (dynamic_cast<Wind*>(gameObject) != nullptr)
 	{
@@ -73,6 +72,13 @@ void Scene::RemoveGameObject (const std::string& name)
 	auto gameObject = m_Primitives.find (name)->second;
 	m_Primitives.erase (name);
 	delete gameObject;
+}
+
+void Scene::ResetMassSpring ()
+{
+	std::string selectedName = MassSpringUI::massSpringsList[MassSpringUI::selectedMassSpring];
+	auto oldObj = m_MassSprings.at (selectedName);
+	oldObj->Reset();
 }
 
 void Scene::EraseCollider (const std::string& name)
@@ -107,7 +113,11 @@ void Scene::UpdateGameObjects ()
 	// Update mass springs
 	if (!m_MassSprings.empty())
 	{
-		auto massSpring = m_MassSprings[MassSpringUI::selectedMassSpring];
+		std::string selectedName = MassSpringUI::massSpringsList[MassSpringUI::selectedMassSpring];
+		/*auto it = m_MassSprings.begin();
+		std::advance (it, MassSpringUI::selectedMassSpring);
+		auto massSpring = it->second;*/
+		auto massSpring = m_MassSprings.at (selectedName);
 		massSpring->Update();
 		UpdateTransform (massSpring);
 		DrawGameObject (massSpring);
