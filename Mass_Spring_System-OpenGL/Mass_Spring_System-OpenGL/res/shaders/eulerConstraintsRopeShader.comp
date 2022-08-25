@@ -8,6 +8,7 @@ struct Node {
 	vec4 vel;
 	vec4 oldPos;
 	vec4 pinned;
+	vec4 currentUp;
 };
 
 struct WindInfo {
@@ -51,6 +52,15 @@ struct ConstraintParams {
 	float sphereRepulsionDamping;
 };
 uniform ConstraintParams constraintParams;
+
+#define MAX_SPHERES 10
+struct Sphere {
+	vec4 sphereCenter;
+	float sphereRadius;
+	bool sphereActive;
+};
+uniform uint sphereCount;
+uniform Sphere spheres[MAX_SPHERES];
 
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
@@ -267,18 +277,45 @@ void main()
 	
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
-	selfCollCorrection = ComputeSelfCollision(restLenHV);
+	selfCollCorrection = ComputeSelfCollision(restLenHV + radius*0.01);
 	
 	newPosition += distCorrection;
 	newPosition += selfCollCorrection;
 
 	newVelocity = (newPosition - position) / deltaTime;
+	float maxVelocity = 100;
+
+	newVelocity = min(newVelocity, maxVelocity);
+	/*
 	
-	float maxVelocity = 1000;
 	newVelocity = (length(newVelocity) >= maxVelocity) ? newVelocity * 0.0001 : newVelocity;
-	
+	*/
 	//TODO: mettere questa friction nel cloth dopo i constraints
 	//newVelocity *= 0.999;
+
+	//COLLISION DETECTION
+	for (int i = 0; i < sphereCount; i++)
+	{
+		//bool currSphereActive = sphereActive[i];
+		if (spheres[i].sphereActive)
+		{
+			//vec3 currSpherePos = sphereCenter[i].xyz;
+			//float currSphereRadius = sphereRadius[i];
+
+			vec3 sphereDist = newPosition - spheres[i].sphereCenter.xyz;
+
+			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * constraintParams.sphereRepulsionDistMult) 
+			{
+				// If the particle is inside the sphere, push it to the outer radius
+				newPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
+									* (spheres[i].sphereRadius + restLenHV  * constraintParams.sphereRepulsionDistMult);
+				// Cancel out velocity
+				newVelocity *= constraintParams.sphereRepulsionDamping;
+			}
+		}
+	}
+
+
 
 	nodesOut[gl_GlobalInvocationID.x].oldPos = vec4(position, 1.0);
 	nodesOut[gl_GlobalInvocationID.x].pos = vec4(newPosition, 1.0);
