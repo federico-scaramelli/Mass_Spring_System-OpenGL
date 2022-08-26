@@ -1,7 +1,6 @@
 #include "MassSpring.h"
 
 #include "ClothPresets.h"
-#include "ClothUI.h"
 #include "MassSpringUI.h"
 #include "Wind.h"
 #include "../engine/Scene.h"
@@ -45,6 +44,14 @@ void MassSpring::Create ()
 	SetupGraphicsShader (BlinnPhong);
 	SetComputeBuffers();
 	GenerateUI();
+    if (preset != nullptr)
+    {
+	    dynamic_cast<BlinnPhongMaterialUI*>(GetUI().m_MaterialUI)->SetValues(
+          preset->diffuseMat,
+          preset->specularMat,
+          preset->ambientMat,
+          preset->shininessMat);
+    }
 }
 
 void MassSpring::Update ()

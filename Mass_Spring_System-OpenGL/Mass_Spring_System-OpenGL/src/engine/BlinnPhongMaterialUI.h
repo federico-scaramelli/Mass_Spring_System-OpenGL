@@ -1,5 +1,6 @@
 #pragma once
 #include "MaterialUI.h"
+#include "glm/vec3.hpp"
 
 class BlinnPhongMaterialUI : public MaterialUI
 {
@@ -28,6 +29,20 @@ public:
 		ImGui::ColorEdit3 (m_LabelSpecular, m_SpecularData);
 		ImGui::ColorEdit3 (m_LabelAmbient, m_AmbientData);
 		ImGui::SliderFloat (m_LabelShininess, &m_ShininessData, m_ShininessMinMax.x, m_ShininessMinMax.y);
+	}
+
+	void SetValues(glm::vec3 diffuseData, glm::vec3 specularData, glm::vec3 ambientData, float shininessData)
+	{
+		m_DiffuseData[0] = diffuseData[0];
+		m_DiffuseData[1] = diffuseData[1];
+		m_DiffuseData[2] = diffuseData[2];
+		m_SpecularData[0] = specularData[0];
+		m_SpecularData[1] = specularData[1];
+		m_SpecularData[2] = specularData[2];
+		m_AmbientData[0] = ambientData[0];
+		m_AmbientData[1] = ambientData[1];
+		m_AmbientData[2] = ambientData[2];
+		m_ShininessData = shininessData;
 	}
 
 	float m_DiffuseData[3] = {0.5f, 0.5f, 0.5f};

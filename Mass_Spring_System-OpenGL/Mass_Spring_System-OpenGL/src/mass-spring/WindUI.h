@@ -24,13 +24,13 @@ public:
 		ImGui::Text ("Wind parameters");
 		ImGui::SliderFloat (m_LabelFullForceRadius, &m_FullForceRadiusData, 0.0f, 250);
 		ImGui::SliderFloat (m_LabelAttenuationRadius, &m_AttenuationRadiusData, 0, 500);
-		ImGui::SliderFloat (m_LabelForce, &m_ForceData, 0, 10000);
+		ImGui::SliderFloat (m_LabelForce, &m_ForceData, 10, 10000);
 		ImGui::SliderFloat (m_LabelOffsetMaxValue, &m_OffsetMaxValueData, 0, 30);
 	}
 
 	float m_FullForceRadiusData = 5;
 	float m_AttenuationRadiusData = 20;
-	float m_ForceData = 20;
+	float m_ForceData = 200;
 	float m_OffsetMaxValueData = 5;
 
 private:

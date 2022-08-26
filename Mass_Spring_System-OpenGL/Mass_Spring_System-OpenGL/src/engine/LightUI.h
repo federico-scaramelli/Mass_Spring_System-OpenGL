@@ -23,7 +23,7 @@ public:
 		ImGui::ColorEdit3 (m_LabelAmbient, m_LightAmbientData);
 	}
 
-	float m_LightDiffuseData[3] = {1, 1, .5f};
+	float m_LightDiffuseData[3] = {1, 1, 1};
 	float m_LightAmbientData[3] = {0, 0, 0};
 
 private:

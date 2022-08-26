@@ -4,7 +4,6 @@
 #include <iostream>
 #include <random>
 #include "../engine/Vertex.h"
-#include "ClothUI.h"
 #include "MassSpringUI.h"
 #include "PhysicsParameters.h"
 #include "../engine/Scene.h"

@@ -216,7 +216,6 @@
     <ClInclude Include="src\engine\SolidMaterialUI.h" />
     <ClInclude Include="src\engine\TransformUI.h" />
     <ClInclude Include="src\mass-spring\ClothPresets.h" />
-    <ClInclude Include="src\mass-spring\ClothUI.h" />
     <ClInclude Include="src\mass-spring\PhysicsParameters.h" />
     <ClInclude Include="src\mass-spring\WindUI.h" />
     <ClInclude Include="src\mass-spring\MassSpring.h" />

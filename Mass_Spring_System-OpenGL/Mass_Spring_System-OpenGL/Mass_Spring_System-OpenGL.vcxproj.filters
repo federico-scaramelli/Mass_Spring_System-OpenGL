@@ -1100,9 +1100,6 @@
     <ClInclude Include="src\engine\SolidMaterialUI.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="src\mass-spring\ClothUI.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="src\mass-spring\PhysicsParameters.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>

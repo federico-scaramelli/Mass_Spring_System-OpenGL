@@ -41,12 +41,14 @@ void run ()
 	auto* lightSource = new LightSource();
 	Scene::GetInstance()->AddGameObject (lightSource);
 	lightSource->GetTransform().AddPosition ({ 122.5, -80, 122.5 });
+	dynamic_cast<SolidMaterialUI*>(lightSource->GetUI().m_MaterialUI)->SetValues({1, 1, 0.6f});
 
 	// WIND
-	auto* wind = new Wind (10, 50, 0);
+	auto* wind = new Wind (10, 50, 200);
 	Scene::GetInstance()->AddGameObject (wind);
-	//wind->GetTransform().AddPosition ({ -100, -100, 0 });
-	//wind->GetTransform().AddRotation ({ 0, -90, 0 });
+	wind->GetTransform().AddPosition ({ -100, -100, 0 });
+	wind->GetTransform().AddRotation ({ 0, -90, 0 });
+	dynamic_cast<SolidMaterialUI*>(wind->GetUI().m_MaterialUI)->SetValues({0, 0.32, 1});
 
 	// CLOTH
 	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);

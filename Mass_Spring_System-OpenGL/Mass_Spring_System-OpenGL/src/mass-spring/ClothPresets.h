@@ -12,20 +12,37 @@ public:
 	             uint16_t pointsByHeight,
 	             float restLenghtHV,
 				glm::vec3 startingPos,
-				glm::vec3 startingRot) :
+				glm::vec3 startingRot,
+				glm::vec3 diffuseData, 
+				glm::vec3 specularData, 
+				glm::vec3 ambientData, 
+				float shininessData) :
+
 		parameters (parameters),
 		pointsByWidth (pointsByWidth),
 		pointsByHeight (pointsByHeight),
 		restLenghtHV (restLenghtHV),
 		startingPos (startingPos),
-		startingRot (startingRot){}
+		startingRot (startingRot),
+		diffuseMat (diffuseData),
+		specularMat (specularData),
+		ambientMat (ambientData),
+		shininessMat (shininessData)
+		
+	{}
 
 	MassSpringParameters parameters;
 	uint16_t pointsByWidth;
 	uint16_t pointsByHeight;
 	float restLenghtHV;
+
 	glm::vec3 startingPos;
 	glm::vec3 startingRot;
+
+	glm::vec3 diffuseMat;
+	glm::vec3 specularMat; 
+	glm::vec3 ambientMat;
+	float shininessMat;
 };
 
 class ClothPresets
@@ -37,11 +54,15 @@ public:
 		{0.016f, 16, 0.95f,
 		{ 0.f, -1500, 0.f, 0.f },
 		1.0f, 10.0f, 1.0f, 1.0f,
-		0.25f, 1.1f, 0.8f, 0.33f, 0.95f},
+		0.25f, 1.1f, 1.0f, 0.33f, 0.95f},
 		50, 50,
 		5,
 		{0, 0, 0},
-		{0, 0, 0}
+		{0, 0, 0},
+		{0.15, 0.51, 0.74},
+		{0.15, 0.25, 0.59},
+		{0, 0, 0},
+		50
 	};
 
 	inline static ClothPreset flag
@@ -49,11 +70,15 @@ public:
 	  {0.016f, 16, 0.95f,
 		{ 0.f, -1500, 0.f, 0.f },
 		1.0f, 10.0f, 1.0f, 1.0f,
-		0.25f, 1.1f, 0.8f, 0.33f, 0.95f},
+		0.25f, 1.1f, 1.0f, 0.33f, 0.95f},
 		50, 37,
 		6.0f,
 		{50, 0, 0},
-		{0, 0, 0}
+		{0, 0, 0},
+		{0.68f, 0.23f, 0.23f},
+		{0.08, 0.07, 0.07},
+		{0, 0, 0},
+		50
 	};
 
 	inline static ClothPreset trampoline
@@ -61,11 +86,15 @@ public:
 	  {0.016f, 16, 0.95f,
 		{ 0.f, -1500, 0.f, 0.f },
 		1.0f, 10.0f, 1.0f, 1.0f,
-		0.25f, 1.1f, 0.8f, 0.33f, 0.95f},
+		0.25f, 1.1f, 1.0f, 0.33f, 0.95f},
 		50, 50,
 		5.0f,
 		{0, -200, 0},
-		{90, 0, 0}
+		{90, 0, 0},
+		{0.15, 0.47, 1.0},
+		{0, 0, 0},
+		{0, 0, 0},
+		50
 	};
 
 	inline static ClothPreset towel
@@ -73,10 +102,14 @@ public:
 	  {0.016f, 16, 0.95f,
 		{ 0.f, -1500, 0.f, 0.f },
 		1.0f, 10.0f, 1.0f, 1.0f,
-		0.25f, 1.1f, 0.8f, 0.33f, 0.95f},
+		0.25f, 1.1f, 1.0f, 0.33f, 0.95f},
 		50, 50,
 		5.0f,
 		{0, 0, 0},
-		{0, 0, 0}
+		{0, 0, 0},
+		{0.49, 0.36, 0.66},
+		{0, 0, 0},
+		{0, 0, 0},
+		50
 	};
 };
