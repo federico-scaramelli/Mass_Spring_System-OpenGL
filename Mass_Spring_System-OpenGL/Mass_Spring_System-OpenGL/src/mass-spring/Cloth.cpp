@@ -107,7 +107,7 @@ void Cloth::Create ()
 
 	simulationStageComputeShader.Use();
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
-	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gridDims", glm::vec4 (m_PointsByWidth, m_PointsByHeight, 0, 0));
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLengthHV);
@@ -161,7 +161,7 @@ void Cloth::Update ()
 
 	simulationStageComputeShader.Use();
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
-	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);

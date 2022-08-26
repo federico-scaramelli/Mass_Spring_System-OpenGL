@@ -13,7 +13,7 @@ struct MassSpringParameters
 						GLfloat sphereRepulsionDamping) :
 
 						deltaTime (dT), subSteps (subSteps),
-						damping (damping), gravityAccel (gravityAcc), particleMass (particleMass),
+						drag (damping), gravityAccel (gravityAcc), particleMass (particleMass),
 						stiffness (stiffness), kSheering (kSheering), kBending(kBending),
 						constraintDistanceDumping (constraintDistanceDumping), constraintDistanceMult (constraintDistanceMult),
 						selfCollisionDistanceMult (selfCollisionDistanceMult), sphereRepulsionDistMult (sphereRepulsionDistMult),
@@ -26,7 +26,7 @@ struct MassSpringParameters
 	uint16_t subSteps;
 	GLfloat subStepDt;
 
-	GLfloat damping;
+	GLfloat drag;
 	glm::vec4 gravityAccel;
 	GLfloat particleMass;
 

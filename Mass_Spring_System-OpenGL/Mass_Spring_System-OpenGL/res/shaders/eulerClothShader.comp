@@ -31,7 +31,7 @@ layout ( std430, binding = 1 ) buffer VertexBufferOut {
 };
 
 uniform float elasticStiffness;
-uniform float damping;
+uniform float drag;
 uniform float particleMass;
 uniform float constShearMult;
 uniform float constBendMult;
@@ -79,7 +79,7 @@ void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosit
 {
 	vec3 deltaAcceleration = acceleration * deltaTime * deltaTime;
 
-	vec3 deltaPosition = (position - oldPosition) * damping;
+	vec3 deltaPosition = (position - oldPosition) * drag;
 	
 	if(length (deltaPosition) > 100) deltaPosition *= 0.0001;
 
@@ -221,7 +221,7 @@ void main()
 	totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
 
 	// Air friction
-	totalForce -= velocity * damping;
+	totalForce -= velocity * drag;
 
 	vec3 acceleration = totalForce / particleMass;
 

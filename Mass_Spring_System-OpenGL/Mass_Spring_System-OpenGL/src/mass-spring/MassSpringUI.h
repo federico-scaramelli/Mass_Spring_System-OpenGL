@@ -12,8 +12,8 @@ public:
 		strcpy_s(m_LabelStiffness, name);
 		strcat_s (m_LabelStiffness, " elastic stiffness");
 
-		strcpy_s(m_LabelDamping, name);
-		strcat_s (m_LabelDamping, " euler damping");
+		strcpy_s(m_LabelDrag, name);
+		strcat_s (m_LabelDrag, " drag");
 
 		strcpy_s(m_LabelParticleMass, name);
 		strcat_s (m_LabelParticleMass, " particle mass");
@@ -51,7 +51,7 @@ public:
 		ImGui::Dummy ({ 0, 10 });
 		ImGui::Text ("Spring parameters");
 		ImGui::SliderFloat (m_LabelStiffness, &m_StiffnessData, 0.0f, 100000);
-		ImGui::SliderFloat (m_LabelDamping, &m_DampingData, 0, 6);
+		ImGui::SliderFloat (m_LabelDrag, &m_DragData, 0, 6);
 		ImGui::SliderFloat (m_LabelParticleMass, &m_ParticleMassData, 1.0f, 1000);
 		ImGui::SliderFloat (m_LabelGravity, &m_GravityData, -10000.f, -9.81f);
 		ImGui::SliderFloat (m_LabelConstSheering, &m_ConstSheeringData, 0.2f, 2);
@@ -65,7 +65,7 @@ public:
 	}
 
 	float m_StiffnessData = 10;
-	float m_DampingData = 0.98f;
+	float m_DragData = 0.98f;
 	float m_ParticleMassData = 1;
 	float m_GravityData = -1500;
 	float m_ConstSheeringData = 1;
@@ -79,7 +79,7 @@ public:
 
 private:
 	char m_LabelStiffness[50];
-	char m_LabelDamping[50];
+	char m_LabelDrag[50];
 	char m_LabelParticleMass[50];
 	char m_LabelGravity[50];
 	char m_LabelConstSheering[50];

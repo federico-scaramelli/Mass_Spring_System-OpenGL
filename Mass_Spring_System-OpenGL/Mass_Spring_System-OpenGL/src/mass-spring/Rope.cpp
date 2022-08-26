@@ -229,7 +229,7 @@ void Rope::Create()
 
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 
-	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
 	
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 
@@ -298,7 +298,7 @@ void Rope::Update()
 
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
 
-	simulationStageComputeShader.SetUniform<GLfloat> ("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
@@ -315,7 +315,7 @@ void Rope::Update()
 	                                                   glm::inverse(GetTransform().GetUpdatedModelMatrix()) *
 	                                                   m_Parameters.gravityAccel);
 
-	simulationStageComputeShader.SetUniform<GLfloat>("damping", m_Parameters.damping);
+	simulationStageComputeShader.SetUniform<GLfloat>("drag", m_Parameters.drag);
 	simulationStageComputeShader.SetUniform<GLfloat>("elasticStiffness", m_Parameters.stiffness);
 	simulationStageComputeShader.SetUniform<GLfloat>("particleMass", m_Parameters.particleMass);
 	simulationStageComputeShader.SetUniform<GLfloat>("constShearMult", m_Parameters.kSheering);
