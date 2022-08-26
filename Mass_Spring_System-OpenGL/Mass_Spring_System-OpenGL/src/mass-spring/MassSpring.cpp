@@ -165,8 +165,15 @@ void MassSpring::Reset ()
 		}	
 	}
 
-	GetTransform().SetPosition (preset->startingPos);
-	GetTransform().SetRotation(preset->startingRot);
+    if (preset != nullptr)
+    {
+	    GetTransform().SetPosition (preset->startingPos);
+    	GetTransform().SetRotation(preset->startingRot);
+    } else {
+    	GetTransform().SetPosition ({0, 0, 0});
+    	GetTransform().SetRotation({0, 0, 0});
+    }
+
 	InitializeVertices();
 	for (int i : pinnedIdx)
 	{
