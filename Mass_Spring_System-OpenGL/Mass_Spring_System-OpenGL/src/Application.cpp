@@ -15,7 +15,6 @@
 #include "engine/CollidingSphere.h"
 
 #include "glm/gtc/type_ptr.inl"
-#include "mass-spring/ClothPresets.h"
 #include "mass-spring/PhysicsParameters.h"
 
 #pragma endregion
@@ -24,57 +23,67 @@ Window window{};
 GLFWwindow* glfwWindow = nullptr;
 
 
-void init ()
+void init()
 {
 	glfwWindow = window.GetGLFWWindow();
 	EnableDebug();
 }
 
-void run ()
+void run()
 {
 #pragma region Scene Creation
 	//Camera
-	auto* camera = new Camera (window.GetAspectRatio());
-	Scene::GetInstance()->AddCamera (camera);
+	auto* camera = new Camera(window.GetAspectRatio());
+	Scene::GetInstance()->AddCamera(camera);
 
 	// LIGHT
 	auto* lightSource = new LightSource();
-	Scene::GetInstance()->AddGameObject (lightSource);
-	lightSource->GetTransform().AddPosition ({ 122.5, -80, 122.5 });
+	Scene::GetInstance()->AddGameObject(lightSource);
+	lightSource->GetTransform().AddPosition({122.5, -80, 122.5});
 
 	// WIND
-	auto* wind = new Wind (10, 50, 0);
-	Scene::GetInstance()->AddGameObject (wind);
-	//wind->GetTransform().AddPosition ({ -100, -100, 0 });
-	//wind->GetTransform().AddRotation ({ 0, -90, 0 });
-
-	// CLOTH
-	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);
-	cloth->PinTopEdge();
-	Scene::GetInstance()->AddGameObject (cloth);
-	cloth->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
-
-	// FLAG
-	auto* flag = new Cloth ("Flag", &ClothPresets::flag);
-	flag->PinLeftBorderVertices();
-	Scene::GetInstance()->AddGameObject (flag);
-	flag->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
-
-	// TRAMPOLINE
-	auto* trampoline = new Cloth ("Trampoline", &ClothPresets::trampoline);
-	trampoline->PinAllEdges();
-	Scene::GetInstance()->AddGameObject (trampoline);
-	trampoline->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
-
-	// FLAG
-	auto* towel = new Cloth ("Towel", &ClothPresets::towel);
-	towel->PinCenter();
-	Scene::GetInstance()->AddGameObject (towel);
-	towel->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+	auto* wind = new Wind(10, 50, 50);
+	Scene::GetInstance()->AddGameObject(wind);
+	wind->GetTransform().AddPosition ( {-100, -100, 0} );
+	wind->GetTransform().AddRotation(  {0, -90, 0} );
 
 	// ROPE
-	/*auto* rope = new Rope(10, 10, 2);
-	Scene::GetInstance()->AddGameObject(rope);*/
+	auto* rope = new Rope(256, 1, 1);
+	Scene::GetInstance()->AddGameObject(rope);
+	rope->GetTransform().AddPosition({0,-20,450});
+	// rope->GetTransform().AddRotation(  {0, 0, 45} );
+
+	// CLOTH
+	int size = 50;
+	auto* cloth = new Cloth("Cloth", size, size, 10);
+	cloth->PinAllEdges();
+	//cloth->PinCenter();
+	Scene::GetInstance()->AddGameObject(cloth);
+	cloth->GetTransform().SetRotation({90, 0, 0});
+	cloth->GetUI().m_TransformUI->SetPositionRange({-700, 700});
+
+	// FLAG
+	auto* flag = new Cloth("Flag", size, size * 0.7 , 10);
+	flag->PinLeftBorderVertices();
+	Scene::GetInstance()->AddGameObject(flag);
+	flag->GetTransform().AddPosition({-(size * 10 / 2), 0, 0});
+	flag->GetUI().m_TransformUI->SetPositionRange({-700, 700});
+	flag->GetTransform().AddPosition ( {300, -100, 0} );
+
+	// SPHERE
+	/*auto* sphere = new CollidingSphere("Sphere", 100);
+	Scene::GetInstance()->AddGameObject(sphere);
+	sphere->GetTransform().AddPosition({0, -200, 0});*/
+
+	//// SPHERE
+	//CollidingSphere sphere2("Sphere2", 50);
+	//Scene::GetInstance()->AddGameObject(&sphere2);
+	//sphere2.GetTransform().AddPosition({-150, -100, 0});
+
+	//// SPHERE
+	//CollidingSphere sphere3("Sphere3", 50);
+	//Scene::GetInstance()->AddGameObject(&sphere3);
+	//sphere3.GetTransform().AddPosition({150, -100, 0});
 
 	// CUBE
 	// Primitive cube("Cube", CUBE, 300);
@@ -83,11 +92,11 @@ void run ()
 #pragma endregion
 
 	Physics::lastTime = glfwGetTime();
-	while (!glfwWindowShouldClose (glfwWindow))
+	while (!glfwWindowShouldClose(glfwWindow))
 	{
 		Physics::nowTime = glfwGetTime();
 		Physics::deltaTime += (Physics::nowTime - Physics::lastTime)
-			/ Physics::fixedDeltaTime;
+								/ Physics::fixedDeltaTime;
 		Physics::lastTime = Physics::nowTime;
 
 		Renderer::GetInstance()->Clear();
@@ -96,19 +105,22 @@ void run ()
 
 		Renderer::GetInstance()->DrawUI();
 
-		glfwSwapBuffers (glfwWindow);
+		glfwSwapBuffers(glfwWindow);
 		glfwPollEvents();
 	}
 }
 
-int main ()
+int main()
 {
 	try
 	{
 		init();
 		run();
 	}
-	catch (std::runtime_error& e) { std::cout << e.what() << std::endl; }
+	catch (std::runtime_error& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 
 	return 0;
 }
