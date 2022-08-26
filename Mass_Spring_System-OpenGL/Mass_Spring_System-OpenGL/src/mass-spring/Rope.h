@@ -12,6 +12,7 @@ struct Node {
 	glm::vec4 velocity;
 	glm::vec4 oldPosition;
 	glm::vec4 pinned;
+	glm::vec4 currentUp = {0, 1, 0, 0};
 };
 
 class Rope : public MassSpring {
