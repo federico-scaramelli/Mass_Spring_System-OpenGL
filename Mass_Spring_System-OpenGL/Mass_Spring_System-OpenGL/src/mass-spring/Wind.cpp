@@ -50,6 +50,7 @@ void Wind::UpdateWithUI ()
 	m_ForceMultiplier = windUI->m_ForceData;
 
 	m_OffsetMaxValue = windUI->m_OffsetMaxValueData;
+	m_ReferenceDistance = windUI->m_refDistanceData;
 }
 
 void Wind::SetFullForceRadius (GLfloat fullForceRadius)

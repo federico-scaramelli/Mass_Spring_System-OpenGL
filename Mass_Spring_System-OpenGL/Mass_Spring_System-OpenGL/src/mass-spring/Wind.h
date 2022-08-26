@@ -25,6 +25,7 @@ public:
 	GLfloat GetForceMultiplier() { return m_ForceMultiplier; }
 	GLfloat GetFullRadius() { return m_FullForceRadius; }
 	GLfloat GetAttenuatedRadius() { return m_AttenuationRadius; }
+	GLfloat GetReferenceDistance() { return m_ReferenceDistance; }
 
 private:
 	GLfloat m_OffsetMaxValue = 5;
@@ -32,6 +33,7 @@ private:
 	GLfloat m_FullForceRadius;
 	GLfloat m_AttenuationRadius;
 	GLfloat m_ForceMultiplier;
+	GLfloat m_ReferenceDistance;
 
 	WindUI* windUI;
 };

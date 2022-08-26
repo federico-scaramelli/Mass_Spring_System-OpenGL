@@ -108,6 +108,9 @@ void MassSpring::Update ()
 
     simulationStageComputeShader.SetUniform<GLfloat>
       ("wind.attenuationRadius", wind->GetAttenuatedRadius());
+
+    simulationStageComputeShader.SetUniform<GLfloat>
+      ("wind.referenceDistance", wind->GetReferenceDistance());
   }
 
   // COLLIDING SPHERE

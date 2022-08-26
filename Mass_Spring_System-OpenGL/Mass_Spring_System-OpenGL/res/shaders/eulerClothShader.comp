@@ -20,6 +20,7 @@ struct WindInfo {
 	float forceMult;
 	float fullForceRadius;
 	float attenuationRadius;
+	float referenceDistance;
 };
 
 layout ( std430, binding = 0 ) buffer VertexBufferIn {
@@ -164,13 +165,10 @@ vec3 ComputeWindForce(vec3 position)
 	float dotWindZ = dot (windDir, normalize(vectorToVertex));
 	float windMult = wind.forceMult;
 
-	// Wind max range
-	float referenceDistance = 1000;
-
-	vec3 forwardMaxRadiusPoint = vec3(0, wind.fullForceRadius, 0) + windDir * referenceDistance;
+	vec3 forwardMaxRadiusPoint = vec3(0, wind.fullForceRadius, 0) + windDir * wind.referenceDistance;
 	float maxDot = dot(windDir, normalize(forwardMaxRadiusPoint));
 
-	vec3 forwardAttRadiusPoint = vec3(0, wind.fullForceRadius + wind.attenuationRadius, 0) + windDir * referenceDistance;
+	vec3 forwardAttRadiusPoint = vec3(0, wind.fullForceRadius + wind.attenuationRadius, 0) + windDir * wind.referenceDistance;
 	float attDot = dot(windDir, normalize(forwardAttRadiusPoint));
 
 	if ( dotWindZ < attDot ) {

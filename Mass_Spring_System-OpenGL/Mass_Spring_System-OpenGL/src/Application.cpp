@@ -50,6 +50,18 @@ void run ()
 	wind->GetTransform().AddRotation ({ 0, -90, 0 });
 	dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
 
+	// ROPE
+	auto* rope = new Rope (256, 2, 2.56f,
+	                       {
+		                       0.016f, 16, 0.99f,
+		                       { 0.f, -1000, 0.f, 0.f },
+		                       1.0f, 1000.0f, 1.0f, 1.0f,
+		                       0.25f, 1.1f,
+		                       0.8f, 1.05f, 0.95f
+	                       }
+	);
+	Scene::GetInstance()->AddGameObject (rope);
+
 	// CLOTH
 	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);
 	cloth->PinTopEdge();
@@ -73,19 +85,8 @@ void run ()
 	towel->PinCenter();
 	Scene::GetInstance()->AddGameObject (towel);
 	towel->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
-
-	// ROPE
-	// ROPE
-	auto* rope = new Rope (256, 2, 2.56f,
-	                       {
-		                       0.016f, 16, 0.99f,
-		                       { 0.f, -1000, 0.f, 0.f },
-		                       1.0f, 1000.0f, 1.0f, 1.0f,
-		                       0.25f, 1.1f,
-		                       0.8f, 1.05f, 0.95f
-	                       }
-	);
-	Scene::GetInstance()->AddGameObject (rope);
+	
+	
 
 	// CUBE
 	// Primitive cube("Cube", CUBE, 300);

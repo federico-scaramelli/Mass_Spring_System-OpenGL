@@ -64,13 +64,31 @@ void Rope::InitializeVertices()
 
 		for (auto weigth : vertexPositionsWeigths)
 		{
+			glm::vec3 nodePos = glm::vec3(m_Nodes[i].position);
+
 			glm::vec3 positionSide = nextNodeRightDir * weigth.x * m_Radius;
 			glm::vec3 positionFront = nextNodeUpDir * weigth.y * m_Radius;
 
 			glm::vec3 position = positionSide + positionFront;
+			
 			position += glm::vec3(m_Nodes[i].position);
 
-			Vertex vertex{{position.x, position.y, position.z, 0}};
+			glm::vec3 normal = glm::normalize(position - nodePos);
+
+			Vertex vertex{{position.x, position.y, position.z, 0.0f}};
+			
+			if(i == 0)
+			{
+				auto dirToNext = glm::normalize(glm::vec3(m_Nodes[i+1].position) - nodePos);
+				normal += dirToNext;	
+			}
+			if(i == m_Nodes.size() - 1)
+			{
+				auto dirFromPrec = glm::normalize(nodePos - glm::vec3(m_Nodes[i-1].position));
+				normal += dirFromPrec;	
+			}
+
+			vertex.normal = {normal, 0.0f};
 
 			vertices.push_back(vertex);
 		}
@@ -357,6 +375,9 @@ void Rope::Update()
 
     simulationStageComputeShader.SetUniform<GLfloat>
       ("wind.attenuationRadius", wind->GetAttenuatedRadius());
+
+	simulationStageComputeShader.SetUniform<GLfloat>
+      ("wind.referenceDistance", wind->GetReferenceDistance());
   }
 
 	// COLLIDING SPHERE
