@@ -89,7 +89,7 @@ void main()
 	vec3 worldUp = vec3(0,1,0);
 	vec3 currentUp = nodesIn[nodeIndex].currentUp.xyz;
 
-	//Nodi
+	//Rope but tangles
 /*
 	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
 	vec3 rightNext = normalize(cross(forwardNext, currentUp));
@@ -126,29 +126,31 @@ void main()
 	vec3 upFinal = currentUp;
 */
 
+	//Rope do not tangles
 	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
 	vec3 forwardPrec = -normalize(precNodePosition - nodePosition);	
 	
-	vec3 normal = normalize(forwardNext + forwardPrec);
+	vec3 forwardFinal = normalize(forwardNext + forwardPrec);
 	vec3 origin = nodesIn[nodeIndex].pos.xyz;;
 	
 	float offsetX = vertexPositionsWeigths[nodeWheightsIndex].x * radius;
 	float offsetY = vertexPositionsWeigths[nodeWheightsIndex].y * radius;
 	float offsetZ = 0;
 	
-	vec3 xaxis = vec3(normal.y, -normal.x, normal.z); //(y, -x, z)
-    vec3 yaxis = normalize(cross(normal, xaxis));  
+	vec3 rightFinal = vec3(forwardFinal.y, -forwardFinal.x, forwardFinal.z); //(y, -x, z)
+    vec3 upFinal = normalize(cross(forwardFinal, rightFinal));  
 
-	vec3 positionSide = xaxis * offsetX;
-	vec3 positionFront = yaxis * offsetY;
+	vec3 positionRight = rightFinal * offsetX;
+	vec3 positionUp = upFinal * offsetY;
 	
-	vec3 vertexPosition = positionSide + positionFront;
+	vec3 vertexPosition = positionRight + positionUp;
 	vertexPosition += origin;
 	
-	vec3 upFinal = currentUp;
+	
 /*
 */
 
+	//If first vertex of node, copy node info
 	if(nodeWheightsIndex == 0) {
 		nodesOut[nodeIndex].pos = nodesIn[nodeIndex].pos;
 		nodesOut[nodeIndex].oldPos = nodesIn[nodeIndex].oldPos;
@@ -157,5 +159,22 @@ void main()
 		nodesOut[nodeIndex].currentUp = vec4(upFinal, 0.0);
 	}
 
+	//Update vertex position
 	verticesOut[gl_GlobalInvocationID.x].pos = vec4(vertexPosition ,1.0);
+
+
+	//Update vertex normal
+	vec3 normal;
+
+	normal = normalize(vertexPosition - origin);
+
+	normal = (nodeIndex == 0) ?
+		normalize(normal - forwardNext) : 
+		normal;
+
+	normal = (nodeIndex == ropeDim - 1) ?
+		normalize(normal - forwardPrec) : 
+		normal;
+
+	verticesOut[gl_GlobalInvocationID.x].normal = vec4(normal, 0.0);
 }
