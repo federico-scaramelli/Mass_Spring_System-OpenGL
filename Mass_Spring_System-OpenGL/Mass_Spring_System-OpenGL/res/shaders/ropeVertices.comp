@@ -67,6 +67,10 @@ vec3 CalculateVertexPosition(uint nodeIndex, uint nodeWheightsIndex, vec3 forwar
 	return vertexPosition;
 }
 
+vec3 RotateClockwhise(vec3 vector){
+	return vec3(vector.y, -vector.x, vector.z); //(y, -x, z)
+}
+
 void main() 
 {
 	// Safety check
@@ -137,7 +141,7 @@ void main()
 	float offsetY = vertexPositionsWeigths[nodeWheightsIndex].y * radius;
 	float offsetZ = 0;
 	
-	vec3 rightFinal = vec3(forwardFinal.y, -forwardFinal.x, forwardFinal.z); //(y, -x, z)
+	vec3 rightFinal = normalize(RotateClockwhise(forwardFinal));
     vec3 upFinal = normalize(cross(forwardFinal, rightFinal));  
 
 	vec3 positionRight = rightFinal * offsetX;
