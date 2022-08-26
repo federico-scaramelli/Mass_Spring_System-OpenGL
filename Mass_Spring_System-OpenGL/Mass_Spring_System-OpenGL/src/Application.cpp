@@ -68,7 +68,7 @@ void run ()
 	Scene::GetInstance()->AddGameObject (trampoline);
 	trampoline->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
 
-	// FLAG
+	// TOWEL
 	auto* towel = new Cloth ("Towel", &ClothPresets::towel);
 	towel->PinCenter();
 	Scene::GetInstance()->AddGameObject (towel);

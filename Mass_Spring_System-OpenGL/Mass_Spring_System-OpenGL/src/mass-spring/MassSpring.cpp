@@ -33,10 +33,16 @@ MassSpring::MassSpring (const char* name, ClothPreset* preset) : GameObject (nam
 	m_MassSpringUI = dynamic_cast<MassSpringUI*> (m_GameObjectUI);
 
 	m_MassSpringUI->m_StiffnessData = m_Parameters.stiffness;
+	m_MassSpringUI->m_DampingData = m_Parameters.damping;
 	m_MassSpringUI->m_GravityData = m_Parameters.gravityAccel.y;
 	m_MassSpringUI->m_ParticleMassData = m_Parameters.particleMass;
+	m_MassSpringUI->m_ConstSheeringData = m_Parameters.kSheering;
+	m_MassSpringUI->m_ConstBendingData = m_Parameters.kBending;
+	m_MassSpringUI->m_CorrectionDumpingData = m_Parameters.constraintDistanceDumping;
+	m_MassSpringUI->m_ConstraintDistanceMultData = m_Parameters.constraintDistanceMult;
 	m_MassSpringUI->m_SelfCollisionDistanceMultData = m_Parameters.selfCollisionDistanceMult;
-	m_MassSpringUI->m_DampingData = m_Parameters.damping;
+	m_MassSpringUI->m_SphereRepulsionDistMultData = m_Parameters.sphereRepulsionDistMult;
+	m_MassSpringUI->m_SphereRepulsionDampingData = m_Parameters.sphereRepulsionDamping;
 }
 
 void MassSpring::Create ()
