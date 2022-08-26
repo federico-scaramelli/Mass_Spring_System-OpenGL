@@ -86,12 +86,13 @@ void main()
 		nodePosition + (nodePosition - nodesIn[nodeIndex + 1].pos.xyz) : 
 		nodesIn[nodeIndex - 1].pos.xyz;
 
-	
 	vec3 worldUp = vec3(0,1,0);
 	vec3 currentUp = nodesIn[nodeIndex].currentUp.xyz;
 
 	//Nodi
 /*
+	
+
 	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
 	vec3 rightNext = normalize(cross(forwardNext, currentUp));
 	vec3 upNext = normalize(cross(rightNext, forwardNext));
@@ -113,6 +114,7 @@ void main()
 
 	//NASTRO
 /*
+
 	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
 	vec3 forwardPrec = -normalize(precNodePosition - nodePosition);	
 	vec3 forwardFinal = normalize(forwardNext + forwardPrec);
@@ -128,7 +130,6 @@ void main()
 
 */
 
-
 	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
 	vec3 forwardPrec = -normalize(precNodePosition - nodePosition);	
 	
@@ -138,8 +139,6 @@ void main()
 	float offsetX = vertexPositionsWeigths[nodeWheightsIndex].x * radius;
 	float offsetY = vertexPositionsWeigths[nodeWheightsIndex].y * radius;
 	float offsetZ = 0;
-	
-	//vec3 vertexPosition = vec3(0,0,0);
 	
 	vec3 xaxis = vec3(normal.y, -normal.x, normal.z); //(y, -x, z)
     vec3 yaxis = normalize(cross(normal, xaxis));  
@@ -153,13 +152,7 @@ void main()
 /*
 */
 
-
-
-
-	
 	vec3 upFinal = currentUp;
-
-	
 
 	if(nodeWheightsIndex == 0) {
 		nodesOut[nodeIndex].pos = nodesIn[nodeIndex].pos;

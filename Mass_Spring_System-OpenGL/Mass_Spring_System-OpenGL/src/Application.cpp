@@ -15,6 +15,7 @@
 #include "engine/CollidingSphere.h"
 
 #include "glm/gtc/type_ptr.inl"
+#include "mass-spring/ClothPresets.h"
 #include "mass-spring/PhysicsParameters.h"
 
 #pragma endregion
@@ -33,61 +34,58 @@ void run()
 {
 #pragma region Scene Creation
 	//Camera
-	auto* camera = new Camera(window.GetAspectRatio());
-	Scene::GetInstance()->AddCamera(camera);
+  auto* camera = new Camera (window.GetAspectRatio());
+  Scene::GetInstance()->AddCamera (camera);
 
-	// LIGHT
-	auto* lightSource = new LightSource();
-	Scene::GetInstance()->AddGameObject(lightSource);
-	lightSource->GetTransform().AddPosition({122.5, -80, 122.5});
+  // LIGHT
+  auto* lightSource = new LightSource();
+  Scene::GetInstance()->AddGameObject (lightSource);
+  lightSource->GetTransform().AddPosition ({ 122.5, -80, 122.5 });
 
-	// WIND
-	auto* wind = new Wind(10, 50, 50);
-	Scene::GetInstance()->AddGameObject(wind);
-	wind->GetTransform().AddPosition ( {-100, -100, 0} );
-	wind->GetTransform().AddRotation(  {0, -90, 0} );
+  // WIND
+  auto* wind = new Wind (10, 50, 0);
+  Scene::GetInstance()->AddGameObject (wind);
+  //wind->GetTransform().AddPosition ({ -100, -100, 0 });
+  //wind->GetTransform().AddRotation ({ 0, -90, 0 });
 
-	// ROPE
-	auto* rope = new Rope(256, 1, 1);
+  // CLOTH
+  auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);
+  cloth->PinTopEdge();
+  Scene::GetInstance()->AddGameObject (cloth);
+  cloth->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+
+  // FLAG
+  auto* flag = new Cloth ("Flag", &ClothPresets::flag);
+  flag->PinLeftBorderVertices();
+  Scene::GetInstance()->AddGameObject (flag);
+  flag->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+
+  // TRAMPOLINE
+  auto* trampoline = new Cloth ("Trampoline", &ClothPresets::trampoline);
+  trampoline->PinAllEdges();
+  Scene::GetInstance()->AddGameObject (trampoline);
+  trampoline->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+
+  // FLAG
+  auto* towel = new Cloth ("Towel", &ClothPresets::towel);
+  towel->PinCenter();
+  Scene::GetInstance()->AddGameObject (towel);
+  towel->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+
+  // ROPE
+  auto* rope = new Rope(256, 2, 2.56f, 
+		{0.016f, 16, 0.99f, 
+					{ 0.f, -1000, 0.f, 0.f }, 
+					1.0f, 1000.0f, 1.0f, 1.0f,
+					0.25f, 1.1f,
+			0.8f, 1.05f, 0.95f }
+	);
+
 	Scene::GetInstance()->AddGameObject(rope);
-	rope->GetTransform().AddPosition({0,-20,450});
-	// rope->GetTransform().AddRotation(  {0, 0, 45} );
 
-	// CLOTH
-	int size = 50;
-	auto* cloth = new Cloth("Cloth", size, size, 10);
-	cloth->PinAllEdges();
-	//cloth->PinCenter();
-	Scene::GetInstance()->AddGameObject(cloth);
-	cloth->GetTransform().SetRotation({90, 0, 0});
-	cloth->GetUI().m_TransformUI->SetPositionRange({-700, 700});
-
-	// FLAG
-	auto* flag = new Cloth("Flag", size, size * 0.7 , 10);
-	flag->PinLeftBorderVertices();
-	Scene::GetInstance()->AddGameObject(flag);
-	flag->GetTransform().AddPosition({-(size * 10 / 2), 0, 0});
-	flag->GetUI().m_TransformUI->SetPositionRange({-700, 700});
-	flag->GetTransform().AddPosition ( {300, -100, 0} );
-
-	// SPHERE
-	/*auto* sphere = new CollidingSphere("Sphere", 100);
-	Scene::GetInstance()->AddGameObject(sphere);
-	sphere->GetTransform().AddPosition({0, -200, 0});*/
-
-	//// SPHERE
-	//CollidingSphere sphere2("Sphere2", 50);
-	//Scene::GetInstance()->AddGameObject(&sphere2);
-	//sphere2.GetTransform().AddPosition({-150, -100, 0});
-
-	//// SPHERE
-	//CollidingSphere sphere3("Sphere3", 50);
-	//Scene::GetInstance()->AddGameObject(&sphere3);
-	//sphere3.GetTransform().AddPosition({150, -100, 0});
-
-	// CUBE
-	// Primitive cube("Cube", CUBE, 300);
-	//scene.AddGameObject (&cube);
+  // CUBE
+  // Primitive cube("Cube", CUBE, 300);
+  //scene.AddGameObject (&cube);
 
 #pragma endregion
 
