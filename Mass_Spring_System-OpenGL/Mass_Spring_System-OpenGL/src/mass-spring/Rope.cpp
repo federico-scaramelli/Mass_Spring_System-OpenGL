@@ -39,7 +39,7 @@ void Rope::InitializeNodes()
 		m_Nodes.push_back(node);
 	}
 
-	m_Nodes[0].pinned = {1,0,0,0};
+	
 }
 
 void Rope::InitializeVertices()
@@ -441,4 +441,45 @@ void Rope::Reset ()
 	// Out
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesOutBuffer);
 	glBufferData (GL_SHADER_STORAGE_BUFFER, size, m_Nodes.data(), GL_DYNAMIC_DRAW);
+}
+
+void Rope::PinFirstNode()
+{
+	m_Nodes[0].pinned = {1,0,0,0};
+}
+
+void Rope::PinLastNode()
+{
+	m_Nodes[m_PointsByLength - 1].pinned = {1,0,0,0};
+}
+
+void Rope::PinEdgesNode()
+{
+	PinFirstNode();
+	PinLastNode();
+}
+
+void Rope::PinMiddleNode()
+{
+	m_Nodes[m_PointsByLength / 2].pinned = {1,0,0,0};
+}
+
+void Rope::PinMiddleAndEdgesNode()
+{
+	PinEdgesNode();
+	PinMiddleNode();
+}
+
+void Rope::PinQuarters()
+{
+	m_Nodes[m_PointsByLength * (1.0f / 4.0f)].pinned = {1,0,0,0};
+	m_Nodes[m_PointsByLength * (2.0f / 4.0f)].pinned = {1,0,0,0};
+	m_Nodes[m_PointsByLength * (3.0f / 4.0f)].pinned = {1,0,0,0};
+}
+
+void Rope::PinTenths()
+{
+	m_Nodes[m_PointsByLength * (4.0f / 10.0f)].pinned = {1,0,0,0};
+	m_Nodes[m_PointsByLength * (5.0f / 10.0f)].pinned = {1,0,0,0};
+	m_Nodes[m_PointsByLength * (6.0f / 10.0f)].pinned = {1,0,0,0};
 }

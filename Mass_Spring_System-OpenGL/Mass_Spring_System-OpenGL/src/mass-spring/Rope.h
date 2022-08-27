@@ -60,4 +60,12 @@ public:
 	void Create() override;
 	void Update() override;
 	void Reset () override;
+
+	void PinFirstNode();
+	void PinLastNode();
+	void PinEdgesNode();
+	void PinMiddleNode();
+	void PinMiddleAndEdgesNode();
+	void PinQuarters();
+	void PinTenths();
 };
