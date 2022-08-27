@@ -51,7 +51,7 @@ void run ()
 	dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
 
 	// ROPE
-	auto* rope = new Rope (512, 2, 1.0f,
+	auto* rope = new Rope (128, 2, 1.0f,
 	                       {
 								 0.032f, 16, 1.0f,
 								 { 0.f, -500, 0.f, 0.f },
@@ -60,6 +60,13 @@ void run ()
 								 0.85f, 1.05f, 0.98f
 	                         }
 	);
+	rope->PinFirstNode();
+	// rope->PinLastNode();
+	// rope->PinEdgesNode();
+	// rope->PinMiddleNode();
+	// rope->PinMiddleAndEdgesNode();
+	// rope->PinQuarters();
+	// rope->PinTenths();
 	Scene::GetInstance()->AddGameObject (rope);
 
 	// CLOTH
