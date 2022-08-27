@@ -40,18 +40,20 @@ void run ()
 	// LIGHT
 	auto* lightSource = new LightSource();
 	Scene::GetInstance()->AddGameObject (lightSource);
-	lightSource->GetTransform().AddPosition ({ 122.5, -80, 122.5 });
-	dynamic_cast<SolidMaterialUI*> (lightSource->GetUI().m_MaterialUI)->SetValues ({ 1, 1, 0.6f });
+	lightSource->GetTransform().AddPosition ({ 0, 100, -50 });
+	if (lightSource->GetMaterial().fragShader == Solid)
+	  dynamic_cast<SolidMaterialUI*> (lightSource->GetUI().m_MaterialUI)->SetValues ({ 1, 1, 0.6f });
 
 	// WIND
 	auto* wind = new Wind (10, 50, 200);
 	Scene::GetInstance()->AddGameObject (wind);
 	wind->GetTransform().AddPosition ({ -100, -100, 0 });
 	wind->GetTransform().AddRotation ({ 0, -90, 0 });
-	dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
+	if (wind->GetMaterial().fragShader == Solid)
+	  dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
 
 	// ROPE
-	auto* rope = new Rope (512, 2, 1.0f,
+	auto* rope = new Rope (256, 1, 1.0f,
 	                       {
 								 0.032f, 16, 1.0f,
 								 { 0.f, -500, 0.f, 0.f },
@@ -63,10 +65,10 @@ void run ()
 	Scene::GetInstance()->AddGameObject (rope);
 
 	// CLOTH
-	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);
-	cloth->PinTopEdge();
-	Scene::GetInstance()->AddGameObject (cloth);
-	cloth->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+	auto* curtain = new Cloth ("Curtain", &ClothPresets::curtain);
+	curtain->PinTopEdge();
+	Scene::GetInstance()->AddGameObject (curtain);
+	curtain->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
 
 	// FLAG
 	auto* flag = new Cloth ("Flag", &ClothPresets::flag);

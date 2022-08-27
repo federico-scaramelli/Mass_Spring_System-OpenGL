@@ -234,7 +234,7 @@ void Cloth::PinTopEdge ()
 {
 	auto& vertices = m_Mesh.GetVertices();
 
-	for (int i = 0; i < m_PointsByWidth; i += 2)
+	for (int i = 0; i < m_PointsByWidth; i += 8)
 	{
 		int base = LinearIndex (m_PointsByHeight - 1, 0, m_PointsByWidth);
 		vertices[i + base].pinned = { 1, 0, 0, 0 };
