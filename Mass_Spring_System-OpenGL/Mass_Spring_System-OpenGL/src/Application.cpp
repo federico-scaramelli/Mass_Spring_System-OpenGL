@@ -51,23 +51,33 @@ void run ()
 	dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
 
 	// ROPE
-	auto* rope = new Rope (128, 2, 1.0f,
-	                       {
-								 0.032f, 16, 1.0f,
-								 { 0.f, -500, 0.f, 0.f },
-								 1.0f, 1000.0f, 1.0f, 1.0f,
-								 0.25f, 1.1f,
-								 0.85f, 1.05f, 0.98f
-	                         }
-	);
-	rope->PinFirstNode();
+	MassSpringParameters ropeParam = {
+										   0.032f, 16, 1.0f,
+										   { 0.f, -500, 0.f, 0.f },
+										   1.0f, 1000.0f, 1.0f, 1.0f,
+										   0.25f, 1.1f,
+										   0.85f, 1.05f, 0.98f
+										};
+	auto* ropeFirst = new Rope ("RopeFirst", 256, 2, 1.0f, ropeParam);
+	ropeFirst->PinFirstNode();
+	auto* ropeEdges = new Rope ("RopeEdges", 256, 2, 1.0f, ropeParam);
+	ropeEdges->PinEdgesNode();
+	auto* ropeMiddle = new Rope ("RopeMiddle", 256, 2, 1.0f, ropeParam);
+	ropeMiddle->PinMiddleNode();
+	auto* ropeMiddleAndEdges = new Rope ("RopeMiddleAndEdges", 256, 1, 1.0f, ropeParam);
+	ropeMiddleAndEdges->PinMiddleAndEdgesNode();
+	auto* ropeQuarters = new Rope ("RopeQuarters", 256, 2, 1.0f, ropeParam);
+	ropeQuarters->PinQuarters();
+	auto* ropeTenths = new Rope ("RopeTenths", 256, 2, 1.0f, ropeParam);
+	ropeTenths->PinTenths();
+
 	// rope->PinLastNode();
-	// rope->PinEdgesNode();
-	// rope->PinMiddleNode();
-	// rope->PinMiddleAndEdgesNode();
-	// rope->PinQuarters();
-	// rope->PinTenths();
-	Scene::GetInstance()->AddGameObject (rope);
+	Scene::GetInstance()->AddGameObject (ropeFirst);
+	Scene::GetInstance()->AddGameObject (ropeEdges);
+	Scene::GetInstance()->AddGameObject (ropeMiddle);
+	Scene::GetInstance()->AddGameObject (ropeMiddleAndEdges);
+	Scene::GetInstance()->AddGameObject (ropeQuarters);
+	Scene::GetInstance()->AddGameObject (ropeTenths);
 
 	// CLOTH
 	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);

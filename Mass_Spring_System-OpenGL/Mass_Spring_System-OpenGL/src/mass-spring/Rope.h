@@ -40,7 +40,7 @@ private:
 	};
 
 public:
-	Rope(GLuint pointsByLength, GLfloat restLenght, GLfloat radius, MassSpringParameters parameters);
+	Rope(std::string name, GLuint pointsByLength, GLfloat restLenght, GLfloat radius, MassSpringParameters parameters);
 
 	void InitializeNodes();
 

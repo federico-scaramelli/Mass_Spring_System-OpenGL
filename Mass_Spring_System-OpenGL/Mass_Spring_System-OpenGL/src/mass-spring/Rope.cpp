@@ -10,8 +10,8 @@
 #include "Wind.h"
 
 
-Rope::Rope(GLuint pointsByLength, GLfloat restLenght, GLfloat radius, MassSpringParameters parameters) :
-	MassSpring ("Rope", parameters),
+Rope::Rope(std::string name, GLuint pointsByLength, GLfloat restLenght, GLfloat radius, MassSpringParameters parameters) :
+	MassSpring (name.c_str(), parameters),
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {
