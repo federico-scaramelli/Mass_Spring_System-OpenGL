@@ -279,12 +279,11 @@ void main()
 	selfCollCorrection = ComputeSelfCollision(restLenHV + radius*0.01);
 	
 	newPosition += distCorrection;
-	newPosition += selfCollCorrection;
+	//newPosition += selfCollCorrection;
 
 	newVelocity = (newPosition - position) / deltaTime;
-	float maxVelocity = 100;
-
-	newVelocity = min(newVelocity, maxVelocity);
+	float maxVelocity = 1500;
+    newVelocity = (length(newVelocity) >= maxVelocity) ? newVelocity * 0.0001 : newVelocity;
 	
 	/*
 	

@@ -50,7 +50,7 @@ void MassSpring::Create ()
 	SetupGraphicsShader (BlinnPhong);
 	SetComputeBuffers();
 	GenerateUI();
-    if (preset != nullptr)
+    if (preset != nullptr && GetMaterial().fragShader == BlinnPhong)
     {
 	    dynamic_cast<BlinnPhongMaterialUI*>(GetUI().m_MaterialUI)->SetValues(
           preset->diffuseMat,
