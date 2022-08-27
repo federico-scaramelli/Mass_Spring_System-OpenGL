@@ -51,14 +51,14 @@ void run ()
 	dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
 
 	// ROPE
-	auto* rope = new Rope (128, 2, 1.0f,
+	auto* rope = new Rope (512, 2, 1.0f,
 	                       {
-		                       0.032f, 16, 1.0f,
-		                       { 0.f, -500, 0.f, 0.f },
-		                       1.0f, 1000.0f, 1.0f, 1.0f,
-		                       0.25f, 1.1f,
-		                       0.65f, 1.05f, 0.95f
-	                       }
+								 0.032f, 16, 1.0f,
+								 { 0.f, -500, 0.f, 0.f },
+								 1.0f, 1000.0f, 1.0f, 1.0f,
+								 0.25f, 1.1f,
+								 0.85f, 1.05f, 0.98f
+	                         }
 	);
 	Scene::GetInstance()->AddGameObject (rope);
 

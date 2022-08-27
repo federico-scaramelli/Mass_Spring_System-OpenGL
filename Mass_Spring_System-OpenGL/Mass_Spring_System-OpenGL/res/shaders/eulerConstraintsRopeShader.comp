@@ -276,10 +276,10 @@ void main()
 	
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
-	selfCollCorrection = ComputeSelfCollision(restLenHV + radius*0.01);
+	selfCollCorrection = ComputeSelfCollision(restLenHV + radius*0.01) * constraintParams.correctionDumping;
 	
 	newPosition += distCorrection;
-	//newPosition += selfCollCorrection;
+	newPosition += selfCollCorrection;
 
 	newVelocity = (newPosition - position) / deltaTime;
 	float maxVelocity = 1500;
