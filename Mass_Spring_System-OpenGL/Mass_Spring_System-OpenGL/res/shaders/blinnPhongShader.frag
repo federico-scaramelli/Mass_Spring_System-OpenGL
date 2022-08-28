@@ -3,8 +3,8 @@
 //posizione vertice in camera coords
 in vec3 position;
 in vec3 normal;
+in vec3 lightDir;
 
-uniform vec3 lightPosition;			// Light position in camera coordinates
 uniform vec3 lightAmbient;			// Ambient light intensity
 uniform vec3 lightDiffuse;			// Diffuse and specular light intensity
 
@@ -20,7 +20,7 @@ vec3 blinnPhong ( vec3 position, vec3 normal )
 	//View vec
 	vec3 viewDir = normalize(-position.xyz);
 	//Light vec
-	vec3 lightDir = normalize( lightPosition - position );
+	//vec3 lightDir = normalize( lightPosition - position );
     
 	//Ambient component color
     vec3 ambientComponent = lightAmbient * matAmbient;

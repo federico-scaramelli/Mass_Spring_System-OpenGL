@@ -180,6 +180,7 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 	//Calculate normal
 	vec3 normal = vec3(0.0);
 	vec3 a, b, c;
+	float sum=0;
 
 	if (globalIdx.y > 0) {
 		if (globalIdx.x > 0) {
@@ -187,12 +188,16 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 			b = verticesIn[linearIdx - particleGridDims.x - 1].pos.xyz - position;  //Lower left
 			c = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;		//Bottom
 			normal += cross(a, b) + cross(b, c);
+
+			sum+=2;
 		}
 		if (globalIdx.x < particleGridDims.x - 1) {
 			a = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;		//Bottom
 			b = verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz - position;  //Bottom right
 			c = verticesIn[linearIdx + 1].pos.xyz - position;						//Right
 			normal += cross(a, b) + cross(b, c);
+
+			sum+=2;
 		}
 	}
 
@@ -202,14 +207,20 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 			b = verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz - position;  //Top left
 			c = verticesIn[linearIdx - 1].pos.xyz - position;						//Left
 			normal += cross(a, b) + cross(b, c);
+
+			sum+=2;
 		}
 		if (globalIdx.x < particleGridDims.x - 1) {
 			a = verticesIn[linearIdx + 1].pos.xyz - position;						//Right
 			b = verticesIn[linearIdx + particleGridDims.x + 1].pos.xyz - position;	//Top right
 			c = verticesIn[linearIdx + particleGridDims.x].pos.xyz - position;		//Top
 			normal += cross(a, b) + cross(b, c);
+
+			sum+=2;
 		}
 	}
+
+	normal = (sum != 0) ? normal / sum : normal;
 
 	verticesOut[linearIdx].normal = vec4(normalize(normal), 0.0f);
 }

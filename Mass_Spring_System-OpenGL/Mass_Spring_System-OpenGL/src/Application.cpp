@@ -50,6 +50,12 @@ void run ()
 	wind->GetTransform().AddRotation ({ 0, -90, 0 });
 	dynamic_cast<SolidMaterialUI*> (wind->GetUI().m_MaterialUI)->SetValues ({ 0, 0.32, 1 });
 
+	// CLOTH
+	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);
+	cloth->PinTopEdge();
+	Scene::GetInstance()->AddGameObject (cloth);
+	cloth->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+
 	// ROPE
 	MassSpringParameters ropeParam = {
 										   0.032f, 16, 1.0f,
@@ -79,11 +85,7 @@ void run ()
 	Scene::GetInstance()->AddGameObject (ropeQuarters);
 	Scene::GetInstance()->AddGameObject (ropeTenths);
 
-	// CLOTH
-	auto* cloth = new Cloth ("Curtain", &ClothPresets::curtain);
-	cloth->PinTopEdge();
-	Scene::GetInstance()->AddGameObject (cloth);
-	cloth->GetUI().m_TransformUI->SetPositionRange ({ -700, 700 });
+	
 
 	// FLAG
 	auto* flag = new Cloth ("Flag", &ClothPresets::flag);
