@@ -1,8 +1,12 @@
 #version 460
 
-//Worksize
+//Size of the comppute workgroups
 layout ( local_size_x = 16, local_size_y = 1, local_size_z = 1 ) in;
 
+// Max number of spheres in the scene at the same time
+#define MAX_SPHERES 10
+
+// Node params
 struct Node {
 	vec4 pos;
 	vec4 vel;
@@ -11,6 +15,7 @@ struct Node {
 	vec4 currentUp;
 };
 
+// Wind params
 struct WindInfo {
 	vec4 position;
 	vec4 forward;
@@ -21,30 +26,35 @@ struct WindInfo {
 	float attenuationRadius;
 	float referenceDistance;
 };
+uniform WindInfo wind;
 
+// Input buffer of the shader
 layout ( std430, binding = 0 ) buffer NodesBufferIn {
 	Node nodesIn[];
 };
+
+// Output buffer of the shader
 layout ( std430, binding = 1 ) buffer NodesBufferOut {
 	Node nodesOut[];
 };
 
+// Spring params
 uniform float restLenHV;
-
 uniform float constShearMult;
 uniform float constBendMult;
-
 uniform float elasticStiffness;
 uniform float drag;
+
+// Simulation params
 uniform float particleMass;
 uniform vec4 gravityAcceleration;
 uniform float deltaTime;
 
+// Rope dimensions
 uniform uint ropeDim;
 uniform float radius;
 
-uniform WindInfo wind;
-
+// Spring constraints params
 struct ConstraintParams {
 	float correctionDumping;
 	float constraintDistanceMult;
@@ -54,14 +64,16 @@ struct ConstraintParams {
 };
 uniform ConstraintParams constraintParams;
 
-#define MAX_SPHERES 10
+// Sphere params
 struct Sphere {
 	vec4 sphereCenter;
 	float sphereRadius;
 	bool sphereActive;
 };
-uniform uint sphereCount;
 uniform Sphere spheres[MAX_SPHERES];
+
+// Number of spheres in the scene
+uniform uint sphereCount;
 
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
@@ -72,16 +84,16 @@ vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength)
 	return force;
 }
 
+// Tells if the particle is pinned
 bool IsPinned () {
 	return nodesIn[gl_GlobalInvocationID.x].pinned.x >= 0.5;
 }
 
+// Calculate elastic force between the particles at the given positions
 vec3 ComputeElasticForce (vec3 position) 
 {
 	vec3 totalForce = vec3(0,0,0);
 
-	// STRUCTURE - Horizonal / Vertical
-	
 	// Structure Spring - Left
 	totalForce = (gl_GlobalInvocationID.x > 0) ?
 		totalForce + constShearMult * ElasticForce(position, nodesIn[gl_GlobalInvocationID.x - 1].pos.xyz, restLenHV) :
@@ -91,8 +103,6 @@ vec3 ComputeElasticForce (vec3 position)
 		totalForce + constShearMult * ElasticForce(position, nodesIn[gl_GlobalInvocationID.x + 1].pos.xyz, restLenHV) :
 		totalForce;
 
-	// BEND - Distance 2  Horizonal / Vertical 
-	
 	// Bend Spring - Left
 	totalForce = (gl_GlobalInvocationID.x > 1) ?
 		totalForce + constBendMult * ElasticForce(position, nodesIn[gl_GlobalInvocationID.x - 2].pos.xyz, restLenHV * 2) :
@@ -106,6 +116,7 @@ vec3 ComputeElasticForce (vec3 position)
 	return totalForce;
 }
 
+// Calculate the wind force applied to the particle, if any
 vec3 ComputeWindForce(vec3 position) 
 {
 	vec3 vectorToVertex = position - wind.position.xyz;	
@@ -132,6 +143,7 @@ vec3 ComputeWindForce(vec3 position)
 	return windDir * windMult;
 }
 
+// Apply positional constraint of the spring to the particle
 vec3 ApplyConstraints (uint otherIndex, float restLen) 
 {
 	vec3 position = nodesIn[gl_GlobalInvocationID.x].pos.xyz;
@@ -157,6 +169,7 @@ vec3 ApplyConstraints (uint otherIndex, float restLen)
 	return correction;
 }
 
+// Calculate the total correction to respect the positional constraint with all the neighbour particles
 vec3 ComputeDistanceCorrection () 
 {
 	vec3 totalCorrection = vec3(0,0,0);
@@ -171,12 +184,10 @@ vec3 ComputeDistanceCorrection ()
 		totalCorrection + ApplyConstraints(gl_GlobalInvocationID.x + 2, restLenHV * 2) :
 		totalCorrection;
 
-	
 	// Structure Spring - Left
 	totalCorrection = (gl_GlobalInvocationID.x > 0) ?
 		totalCorrection + ApplyConstraints(gl_GlobalInvocationID.x - 1, restLenHV) :
 		totalCorrection;
-
 
 	// Structure Spring - Right
 	totalCorrection = (gl_GlobalInvocationID.x < ropeDim - 1) ?
@@ -186,6 +197,7 @@ vec3 ComputeDistanceCorrection ()
 	return totalCorrection;
 }
 
+// Calculate the total correction to avoid collisions with other particles
 vec3 ComputeSelfCollision(float restLength) {
 	vec3 correction = vec3(0,0,0);
 
@@ -229,6 +241,7 @@ void main()
 		return;
 	}
 	
+	// Total force applied to the particle
 	vec3 totalForce = vec3(0,0,0);
 
 	vec3 position = nodesIn[gl_GlobalInvocationID.x].pos.xyz;
@@ -247,29 +260,16 @@ void main()
 	// Springs
 	totalForce += ComputeElasticForce(position);
 
-	// Air friction
+	// Stokes's law
 	totalForce -= velocity * drag;
 
+	// Compute acceleration due to total force to the particle
 	vec3 acceleration = totalForce / particleMass;
-
-	//Euler
-	
+ 
+	// Calculate the next position and velocity using the euler symplectic integrator
 	vec3 newVelocity = velocity + acceleration * deltaTime;
 	vec3 newPosition = position + newVelocity * deltaTime;	
-	/*
-	*/
-	//
-
-	//verlet
-	/*
-	vec3 deltaAcceleration = acceleration * deltaTime * deltaTime;
-	vec3 deltaPosition = (position - oldPosition) * damping;
-	if(length (deltaPosition) > 10) deltaPosition *= 0.001;
-	vec3 newPosition =	position + deltaPosition + deltaAcceleration;
-	vec3 newVelocity = (newPosition - position) / deltaTime;
-	*/
-	//
-
+	
 	// Distance constraints
 	vec3 distCorrection = vec3(0,0,0);
 	distCorrection = ComputeDistanceCorrection() * constraintParams.correctionDumping;
@@ -278,29 +278,23 @@ void main()
 	vec3 selfCollCorrection = vec3(0,0,0);
 	selfCollCorrection = ComputeSelfCollision(restLenHV + radius*0.01) * constraintParams.correctionDumping;
 	
+	// Adjust the position with all the corrections
 	newPosition += distCorrection;
 	newPosition += selfCollCorrection;
 
+	// Adjust the velocity with all the corrections
 	newVelocity = (newPosition - position) / deltaTime;
+	
+	// Safety check to prevent the system from exploding if a positional constraint raise the velocity too much
 	float maxVelocity = 1500;
     newVelocity = (length(newVelocity) >= maxVelocity) ? newVelocity * 0.0001 : newVelocity;
 	
-	/*
-	
-	newVelocity = (length(newVelocity) >= maxVelocity) ? newVelocity * 0.0001 : newVelocity;
-	*/
-	//TODO: mettere questa friction nel cloth dopo i constraints
-	//newVelocity *= 0.999;
-
-	//COLLISION DETECTION
+	// Spheres collisions
 	for (int i = 0; i < sphereCount; i++)
 	{
 		//bool currSphereActive = sphereActive[i];
 		if (spheres[i].sphereActive)
 		{
-			//vec3 currSpherePos = sphereCenter[i].xyz;
-			//float currSphereRadius = sphereRadius[i];
-
 			vec3 sphereDist = newPosition - spheres[i].sphereCenter.xyz;
 
 			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * constraintParams.sphereRepulsionDistMult) 
@@ -314,10 +308,8 @@ void main()
 		}
 	}
 
-
-
+	// Load updated data in the output buffer
 	nodesOut[gl_GlobalInvocationID.x].oldPos = vec4(position, 1.0);
 	nodesOut[gl_GlobalInvocationID.x].pos = vec4(newPosition, 1.0);
 	nodesOut[gl_GlobalInvocationID.x].vel = vec4(newVelocity, 0.0);
-	
 }

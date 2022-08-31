@@ -1,8 +1,9 @@
 #version 460
 
-//Worksize
+//Size of the comppute workgroups
 layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 
+// Vertex params
 struct Vertex {
     vec4 pos;
 	vec4 vel;
@@ -12,6 +13,7 @@ struct Vertex {
 	vec4 pinned;
 };
 
+// Wind params
 struct WindInfo {
 	vec4 position;
 	vec4 forward;
@@ -22,46 +24,49 @@ struct WindInfo {
 	float attenuationRadius;
 	float referenceDistance;
 };
+uniform WindInfo wind;
 
+// Input buffer of the shader
 layout ( std430, binding = 0 ) buffer VertexBufferIn {
 	Vertex verticesIn[];
 };
+
+// Output buffer of the shader
 layout ( std430, binding = 1 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
 
+// Spring params
 uniform float elasticStiffness;
 uniform float drag;
-uniform float particleMass;
 uniform float constShearMult;
 uniform float constBendMult;
-uniform vec4 gravityAcceleration;
-
 uniform float restLenHV;
 uniform float restLenDiagonal;
-uniform float deltaTime;
-uniform vec4 gridDims;
-uniform WindInfo wind;
 
+// Cloth dimensions
+uniform vec4 gridDims;
+
+// Simulation params
+uniform float particleMass;
+uniform vec4 gravityAcceleration;
+uniform float deltaTime;
+
+// Calculate elastic force between the particles at the given positions
 vec3 ElasticForce (vec3 myPosition, vec3 otherPosition, float restLength) 
 {
 	vec3 vectorToOther = otherPosition - myPosition;
 	float maxDist = restLength * 1.1;
 	float minDist = restLength * 0.9;
 	float distance = length(vectorToOther);
-	
+
+	// Hooke's law	
 	vec3 force=elasticStiffness * (distance - restLength) * normalize(vectorToOther);
-	
-	/*
-	if(distance>maxDist || distance<minDist ){
-		//Deactivate string
-		force *= 0;
-	}
-	*/
 	
 	return force;
 }
 
+// Calculate the next position and velocity using the euler symplectic integrator
 void EulerIntegrator (uint idx, vec3 acceleration, vec3 velocity, vec3 position) 
 {
 	verticesOut[idx].oldPos = vec4(position, 1.0);
@@ -75,12 +80,14 @@ void EulerIntegrator (uint idx, vec3 acceleration, vec3 velocity, vec3 position)
 	verticesOut[idx].vel = vec4(newVelocity, 0.0);
 }
 
+// Calculate the next position and velocity using the verlet integrator
 void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosition) 
 {
 	vec3 deltaAcceleration = acceleration * deltaTime * deltaTime;
 
 	vec3 deltaPosition = (position - oldPosition) * drag;
 	
+	// Safety check to prevent system explosion in edge cases
 	if(length (deltaPosition) > 100) deltaPosition *= 0.0001;
 
 	vec3 nextPosition =	position + deltaPosition + deltaAcceleration;
@@ -90,15 +97,16 @@ void VerletIntegrator (uint idx, vec3 acceleration, vec3 position, vec3 oldPosit
 	verticesOut[idx].vel = vec4(((nextPosition - position) * deltaTime), 0.0);
 }
 
+// Tells if the particle of the corrisponding index is pinned
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
 }
 
+// Calculate the total elastic force with all the connected particles as if them are connected with springs
 vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx, vec3 position) 
 {
 	vec3 totalForce = vec3(0,0,0);
 
-	// STRUCTURE - Horizonal / Vertical
 	// Structure Spring - Up
 	totalForce = (globalIdx.y < particleGridDims.y - 1) ? 
 		totalForce + (ElasticForce(position, verticesIn[linearIdx + particleGridDims.x].pos.xyz, restLenHV)) :
@@ -116,7 +124,6 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 		totalForce + (ElasticForce(position, verticesIn[linearIdx + 1].pos.xyz, restLenHV)) :
 		totalForce;
 
-	// SHEAR - Diagonal
 	// Shear Spring - Upper-Left
 	totalForce = ((globalIdx.x > 0) && (globalIdx.y < particleGridDims.y - 1)) ?
 		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx + particleGridDims.x - 1].pos.xyz, restLenDiagonal)) :
@@ -134,7 +141,6 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 		totalForce + (constShearMult * ElasticForce(position, verticesIn[linearIdx - particleGridDims.x + 1].pos.xyz, restLenDiagonal)) :
 		totalForce;
 
-	// BEND - Distance 2  Horizonal / Vertical 
 	// Bend Spring - Up
 	totalForce = (globalIdx.y < particleGridDims.y - 2) ?
 		totalForce + (constBendMult * ElasticForce(position, verticesIn[linearIdx + 2 * particleGridDims.x].pos.xyz, restLenHV * 2)) :
@@ -158,6 +164,7 @@ vec3 ComputeElasticForce (uint linearIdx, uvec3 particleGridDims, uvec3 globalId
 	return totalForce;
 }
 
+// Calculate the wind force applied to the particle, if any
 vec3 ComputeWindForce(vec3 position) 
 {
 	vec3 vectorToVertex = position - wind.position.xyz;	
@@ -190,6 +197,8 @@ void main()
 {
 	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
 	uvec3 globalIdx = gl_GlobalInvocationID; 
+	
+	// Linear index of the particle
 	uint linearIdx = globalIdx.x + (globalIdx.y * particleGridDims.x);
 	
 	// Safety check
@@ -204,8 +213,6 @@ void main()
 		return;
 	}
 	
-	
-
 	vec3 position = verticesIn[linearIdx].pos.xyz;
 	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
 	vec3 velocity = verticesIn[linearIdx].vel.xyz;
@@ -213,6 +220,7 @@ void main()
 	vec3 gravity = gravityAcceleration.xyz;
 	vec3 gravityForce = gravity * particleMass;
 	
+	// Total force applied to the particle
 	vec3 totalForce = vec3(0,0,0.000000001);
 
 	// Gravity
@@ -224,12 +232,15 @@ void main()
 	// Springs
 	totalForce += ComputeElasticForce(linearIdx, particleGridDims, globalIdx, position);
 
-	// Air friction
+	// Stokes's law
 	totalForce -= velocity * drag;
 
+	// Compute acceleration due to total force to the particle
 	vec3 acceleration = totalForce / particleMass;
 
+	// Update the particles position and velocity
 	EulerIntegrator(linearIdx, acceleration, velocity, position);
 
+	// Update the particles position and velocity
 	//VerletIntegrator (linearIdx, acceleration, position, oldPosition); 
 }

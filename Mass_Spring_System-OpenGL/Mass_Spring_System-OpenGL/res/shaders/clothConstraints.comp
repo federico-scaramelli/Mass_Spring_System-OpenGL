@@ -1,10 +1,12 @@
 #version 460
 
+// Max number of spheres in the scene at the same time
 #define MAX_SPHERES 10
 
-//Worksize
+//Size of the comppute workgroups
 layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 
+// Vertex params
 struct Vertex {
     vec4 pos;
 	vec4 vel;
@@ -14,27 +16,38 @@ struct Vertex {
 	vec4 pinned;
 };
 
+// Input buffer of the shader
 layout ( std430, binding = 0 ) buffer VertexBufferIn {
 	Vertex verticesIn[];
 };
+
+// Output buffer of the shader
 layout ( std430, binding = 1 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
 
+// Spring params
 uniform float restLenHV;
 uniform float restLenDiagonal;
 
+// Cloth dimensions
 uniform vec4 gridDims;
+
+// Simulation params
 uniform float deltaTime;
 
+// Sphere params
 struct Sphere {
 	vec4 sphereCenter;
 	float sphereRadius;
 	bool sphereActive;
 };
-uniform uint sphereCount;
 uniform Sphere spheres[MAX_SPHERES];
 
+// Number of spheres in the scene
+uniform uint sphereCount;
+
+// Spring constraints params
 struct ConstraintParams {
 	float correctionDumping;
 	float constraintDistanceMult;
@@ -44,11 +57,12 @@ struct ConstraintParams {
 };
 uniform ConstraintParams constraintParams;
 
-
+// Tells if the particle of the corrisponding index is pinned
 bool IsPinned (uint linearIdx) {
 	return verticesIn[linearIdx].pinned.x >= 0.5;
 }
 
+// Apply positional constraint of the spring to the particle
 vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen) 
 {
 	vec3 position = verticesIn[myIndex].pos.xyz;
@@ -56,8 +70,7 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 
 	vec3 vectorToOther = otherPosition - position;
 	float distanceToOther = length(vectorToOther);
-
-	//float constraintDistanceMult = 1.1;
+	// Spring cannot elongate more then a certain % defined by constraintDistanceMult, usually 1.1
 	float maxDistance = restLen * constraintParams.constraintDistanceMult;
 
 	vec3 correction = vec3(0,0,0);
@@ -75,6 +88,7 @@ vec3 ApplyConstraints (uint myIndex, uint otherIndex, float restLen)
 	return correction;
 }
 
+// Calculate the total correction to respect the positional constraint with all the neighbour particles
 vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) 
 {
 	vec3 totalCorrection = vec3(0,0,0);
@@ -142,6 +156,7 @@ vec3 ComputeDistanceCorrection (uint linearIdx, uvec3 particleGridDims, uvec3 gl
 	return totalCorrection;
 }
 
+// Calculate the total correction to avoid collisions with other particles
 vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float radius) {
 	vec3 correction = vec3(0,0,0);
 	uint size = particleGridDims.x * particleGridDims.y;
@@ -174,6 +189,7 @@ vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float radius) 
 	return correction;
 }
 
+// Given 2 Edges calculate the normal from them, and wheigth the normal by the angle between the edges
 vec3 CalculateNormal(vec3 a, vec3 b) {
 	vec3 normal = vec3(0,0,0);
 	normal = cross(a,b);
@@ -185,6 +201,7 @@ vec3 CalculateNormal(vec3 a, vec3 b) {
 	return normal * wheight;
 }
 
+// For each couple of neighbour particles calculate the normal and then average them to calculate the vertex normal
 void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 	vec3 position = verticesIn[linearIdx].pos.xyz;
 
@@ -202,9 +219,7 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 			normal += CalculateNormal(a, b);
 			normal += CalculateNormal(b, c);
 
-			//normal += CalculateNormal(a, c);
-
-			sum+=1;
+			sum+=2;
 		}
 		if (globalIdx.x < particleGridDims.x - 1) {
 			a = verticesIn[linearIdx - particleGridDims.x].pos.xyz - position;		//Bottom
@@ -237,9 +252,7 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 			normal += CalculateNormal(a, b);
 			normal += CalculateNormal(b, c);
 
-			//normal += CalculateNormal(a, c);
-
-			sum+=1;
+			sum+=2;
 		}
 	}
 
@@ -248,6 +261,7 @@ void UpdateNormals(uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 	verticesOut[linearIdx].normal = vec4(normalize(normal), 0.0f);
 }
 
+// Load updated data in the output buffer and update the vertex normal  
 void UpdateData(vec3 position, vec3 oldPosition, vec3 velocity, 
 				uint linearIdx, uvec3 particleGridDims, uvec3 globalIdx) {
 	//Update pos on buffer
@@ -262,6 +276,8 @@ void main()
 {
 	uvec3 particleGridDims = uvec3(gridDims.x, gridDims.y, 1);
 	uvec3 globalIdx = gl_GlobalInvocationID; 
+	
+	// Linear index of the particle
 	uint linearIdx = globalIdx.x + (globalIdx.y * particleGridDims.x);
 	
 	// Safety check
@@ -280,38 +296,35 @@ void main()
 	vec3 oldPosition = verticesIn[linearIdx].oldPos.xyz;
 	vec3 velocity = verticesIn[linearIdx].vel.xyz;
 
+	// Position after the corrections
 	vec3 correctedPosition = position;
 	vec3 correctedVelocity = vec3(0,0,0);
 
 	// Distance constraints
-	//float correctionDamp = .25f;
 	vec3 distCorrection = vec3(0,0,0);
 	distCorrection = ComputeDistanceCorrection(linearIdx, particleGridDims, globalIdx) * constraintParams.correctionDumping;
 
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
-	//float selfCollisionDistMult = 0.8;
 	float selfCollisionDistance = restLenHV * constraintParams.selfCollisionDistanceMult;
 	selfCollCorrection = ComputeSelfCollision(linearIdx, particleGridDims, selfCollisionDistance);
 
+	// Adjust the position with all the corrections
 	correctedPosition += distCorrection;
 	correctedPosition += selfCollCorrection;
 	
+	// Adjust the velocity with all the corrections
 	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
+	
+	// Safety check to prevent the system from exploding if a positional constraint raise the velocity too much
 	float maxVelocity = 10000;
 	correctedVelocity = (length(correctedVelocity) >= maxVelocity) ? correctedVelocity * 0.0001 : correctedVelocity;
 
-	//METTERE QUA IL DUMPING DELLA VELOCITA'
-
-	//COLLISION DETECTION
+	// Spheres collisions
 	for (int i = 0; i < sphereCount; i++)
 	{
-		//bool currSphereActive = sphereActive[i];
 		if (spheres[i].sphereActive)
 		{
-			//vec3 currSpherePos = sphereCenter[i].xyz;
-			//float currSphereRadius = sphereRadius[i];
-
 			vec3 sphereDist = correctedPosition - spheres[i].sphereCenter.xyz;
 
 			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * constraintParams.sphereRepulsionDistMult) 
@@ -319,7 +332,7 @@ void main()
 				// If the particle is inside the sphere, push it to the outer radius
 				correctedPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
 									* (spheres[i].sphereRadius + restLenHV  * constraintParams.sphereRepulsionDistMult);
-				// Cancel out velocity
+				// Damp velocity with sphere friction 
 				correctedVelocity *= constraintParams.sphereRepulsionDamping;
 			}
 		}

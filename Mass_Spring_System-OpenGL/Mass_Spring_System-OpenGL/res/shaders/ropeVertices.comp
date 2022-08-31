@@ -1,10 +1,12 @@
 #version 460
 
+// Max number of spheres in the scene at the same time
 #define MAX_SPHERES 5
 
-//Worksize
+//Size of the comppute workgroups
 layout ( local_size_x = 16, local_size_y = 1, local_size_z = 1 ) in;
 
+// Node params
 struct Node {
 	vec4 pos;
 	vec4 vel;
@@ -13,6 +15,7 @@ struct Node {
 	vec4 currentUp;
 };
 
+// Vertex params
 struct Vertex {
     vec4 pos;
 	vec4 vel;
@@ -22,18 +25,22 @@ struct Vertex {
 	vec4 pinned;
 };
 
+// Input buffer of the shader
 layout ( std430, binding = 0 ) buffer NodesBufferIn {
 	Node nodesIn[];
 };
 
+// Output buffer of the shader used to copy the input node buffer into the output node buffer
 layout ( std430, binding = 1 ) buffer NodesBufferOut {
 	Node nodesOut[];
 };
 
+// Output buffer of the shader for the vertices positions
 layout ( std430, binding = 2 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
 };
 
+// Wheights used to calculate the positions of the vertex around the node, given that each node has 8 vertices around
 vec2[8] vertexPositionsWeigths =
 {
 	vec2(1.0,		0.0),		//0
@@ -46,27 +53,12 @@ vec2[8] vertexPositionsWeigths =
 	vec2(0.707,		-0.707)		//7
 };
 
-uniform uint ropeDim;		//Node num
-uniform uint verticesDim;  //Vertices num
+// Rope dimensions
+uniform uint ropeDim;		
+uniform uint verticesDim;   
 uniform float radius;
 
-void UpdateNormals() {
-	
-}
-
-vec3 CalculateVertexPosition(uint nodeIndex, uint nodeWheightsIndex, vec3 forward, vec3 worldUp){
-	vec3 right = normalize(cross(forward, worldUp));
-	vec3 up = normalize(cross(right, forward));
-
-	vec3 positionSide = right * vertexPositionsWeigths[nodeWheightsIndex].x * radius;
-	vec3 positionFront = up * vertexPositionsWeigths[nodeWheightsIndex].y * radius;
-	vec3 vertexPosition = positionSide + positionFront;
-	
-	vertexPosition += nodesIn[nodeIndex].pos.xyz;
-
-	return vertexPosition;
-}
-
+// Rotate a vector clockwise
 vec3 RotateClockwhise(vec3 vector){
 	return vec3(vector.y, -vector.x, vector.z); //(y, -x, z)
 }
@@ -82,15 +74,20 @@ void main()
 
 	vec3 nodePosition = nodesIn[nodeIndex].pos.xyz;
 
+	// Calculate next node position, if last node then double up the precedent 
 	vec3 nextNodePosition = (nodeIndex == ropeDim - 1) ?
 		nodePosition + (nodePosition - nodesIn[nodeIndex - 1].pos.xyz) : 
 		nodesIn[nodeIndex + 1].pos.xyz;
 
+	// Calculate precedent node position, if first node then double up the next 
 	vec3 precNodePosition = (nodeIndex == 0) ?
 		nodePosition + (nodePosition - nodesIn[nodeIndex + 1].pos.xyz) : 
 		nodesIn[nodeIndex - 1].pos.xyz;
 
+	// Global up direction (currently not used)
 	vec3 worldUp = vec3(0,1,0);
+
+	// Current node up direction (currently not used)
 	vec3 currentUp = nodesIn[nodeIndex].currentUp.xyz;
 
 	//Rope but tangles
@@ -114,27 +111,13 @@ void main()
 
 */
 
-	//NASTRO
-/*
-	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
-	vec3 forwardPrec = -normalize(precNodePosition - nodePosition);	
-	vec3 forwardFinal = normalize(forwardNext + forwardPrec);
-
-	vec3 vertexPosition = vec3(
-		forwardFinal.x * vertexPositionsWeigths[nodeWheightsIndex].x * radius,  
-		0.0, 
-		forwardFinal.y * vertexPositionsWeigths[nodeWheightsIndex].y * radius
-	);
-
-	vertexPosition += nodesIn[nodeIndex].pos.xyz;
-	vec3 upFinal = currentUp;
-*/
-
-	//Rope do not tangles
+	// Calculate the vertex position around the normal using an orthonormal base calculated from the direction towards the next/precedent node
 	vec3 forwardNext = normalize(nextNodePosition - nodePosition);
 	vec3 forwardPrec = -normalize(precNodePosition - nodePosition);	
 	
+	// Forward used is the average of the direction towards next node and precedent node
 	vec3 forwardFinal = normalize(forwardNext + forwardPrec);
+
 	vec3 origin = nodesIn[nodeIndex].pos.xyz;;
 	
 	float offsetX = vertexPositionsWeigths[nodeWheightsIndex].x * radius;
@@ -149,12 +132,8 @@ void main()
 	
 	vec3 vertexPosition = positionRight + positionUp;
 	vertexPosition += origin;
-	
-	
-/*
-*/
 
-	//If first vertex of node, copy node info
+	//If first vertex of node, copy node info to output node buffer
 	if(nodeWheightsIndex == 0) {
 		nodesOut[nodeIndex].pos = nodesIn[nodeIndex].pos;
 		nodesOut[nodeIndex].oldPos = nodesIn[nodeIndex].oldPos;
@@ -169,7 +148,6 @@ void main()
 
 	//Update vertex normal
 	vec3 normal;
-
 	normal = normalize(vertexPosition - origin);
 
 	normal = (nodeIndex == 0) ?
