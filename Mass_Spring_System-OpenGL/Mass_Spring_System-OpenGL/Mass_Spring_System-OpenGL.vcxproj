@@ -676,12 +676,11 @@
     <None Include="libraries\include\glm\gtx\vector_query.inl" />
     <None Include="libraries\include\glm\gtx\wrap.inl" />
     <None Include="res\shaders\clothConstraints.comp" />
-    <None Include="res\shaders\eulerConstraintsRopeShader.comp" />
+    <None Include="res\shaders\ropeSimulationsConstraints.comp" />
     <None Include="res\shaders\ropeVertices.comp" />
     <None Include="res\shaders\solidShader.frag" />
-    <None Include="res\shaders\verletClothShader.comp" />
     <None Include="res\shaders\blinnPhongShader.frag" />
-    <None Include="res\shaders\eulerClothShader.comp" />
+    <None Include="res\shaders\clothSimulations.comp" />
     <None Include="res\shaders\normalShader.frag" />
     <None Include="res\shaders\shader.vert" />
     <None Include="res\shaders\velocityShader.frag" />

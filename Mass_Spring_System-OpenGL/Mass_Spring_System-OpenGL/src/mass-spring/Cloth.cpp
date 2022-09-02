@@ -170,7 +170,7 @@ void Cloth::Reset ()
 void Cloth::SetComputeBuffers ()
 {
 	// Compute stage 1: compute new positions without constraints
-	simulationStageComputeShader.CreateProgram ({ "eulerClothShader.comp", ShaderType::COMPUTE });
+	simulationStageComputeShader.CreateProgram ({ "clothSimulations.comp", ShaderType::COMPUTE });
 	simulationStageComputeShader.SetWorkGroupSize ({ 16, 16, 1 });
 	simulationStageComputeShader.SetWorkGroupNum ({ GetClothSize(), 1 });
 

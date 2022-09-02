@@ -185,12 +185,12 @@ void Rope::CreateBackSurfaceIndices ()
 
 void Rope::SetComputeBuffers ()
 {
-	// Compute stage 1: compute new positions without constraints
-	simulationStageComputeShader.CreateProgram ({ "eulerConstraintsRopeShader.comp", ShaderType::COMPUTE });
+	// Compute stage 1: compute new positions and also apply constraints
+	simulationStageComputeShader.CreateProgram ({ "ropeSimulationsConstraints.comp", ShaderType::COMPUTE });
 	simulationStageComputeShader.SetWorkGroupSize ({ 16, 1, 1 });
 	simulationStageComputeShader.SetWorkGroupNum ({ m_Nodes.size(), 1, 1 });
 
-	// Compute stage 2: apply constraints
+	// Compute stage 2: compute new vertices positions around the nodes
 	constraintsStageComputeShader.CreateProgram ({ "ropeVertices.comp", ShaderType::COMPUTE });
 	constraintsStageComputeShader.SetWorkGroupSize ({ 16, 1, 1 });
 	constraintsStageComputeShader.SetWorkGroupNum ({ GetMesh().GetVertices().size(), 1, 1 });
