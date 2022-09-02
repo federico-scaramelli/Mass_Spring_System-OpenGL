@@ -1,6 +1,7 @@
 #pragma once
 #include "../engine/GameObjectUI.h"
 
+// Custom UI for Mass Spring objects
 class MassSpringUI : public GameObjectUI
 {
 public:

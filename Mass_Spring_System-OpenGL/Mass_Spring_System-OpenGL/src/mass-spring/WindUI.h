@@ -1,6 +1,7 @@
 #pragma once
 #include "../engine/GameObjectUI.h"
 
+// Custom UI for wind object presenting the parameters to control wind
 class WindUI : public GameObjectUI
 {
 public:

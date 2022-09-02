@@ -22,7 +22,6 @@ void VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer, const Vertex
 	 * We can choose the bindingPoint freely.
 	 * It must be only < GL_MAX_VERTEX_ATTRIB_BINDINGS.
 	 * It's suggested to set it equal to the attribute index. */
-	// TODO: check if it's needed to handle it != 0
 	GLuint bindingPoint = 0;
 
 	/* Specifies the ( binding-point <-> buffer ) correspondance.
@@ -38,11 +37,10 @@ void VertexArray::AddVertexBuffer(const VertexBuffer& vertexBuffer, const Vertex
 	{
 		const auto& element = elements[attribIdx];
 
-		/* We could use glEnableVertexArrayAttrib(m_vaoID, i);
+		/* We use glEnableVertexArrayAttrib(m_vaoID, i);
 		 * exploiting the Direct State Access features of OpenGL 4.
 		 * In that case there is no need to bind the vao,
 		 * we access it directly specifying its ID. */
-		//glEnableVertexAttribArray(attribIdx);
 		glEnableVertexArrayAttrib(m_vaoID, attribIdx);
 		/* Defines the format of an attribute in attribIdx on the VAO. */
 		glVertexArrayAttribFormat(m_vaoID, attribIdx, element.count, GL_FLOAT, GL_FALSE, offset);

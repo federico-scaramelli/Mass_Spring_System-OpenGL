@@ -21,7 +21,6 @@ public:
 	void UpdateData(const void* data, GLsizei size);
 
 	void BindToVao(GLuint vaoID, GLuint bindingPoint, GLsizei stride) const; 
-	void Unbind(GLuint vaoID, GLuint bindingPoint) const;
 
 	GLuint GetID() { return m_vboID; }
 	GLsizei GetSize() { return m_vboSize; }

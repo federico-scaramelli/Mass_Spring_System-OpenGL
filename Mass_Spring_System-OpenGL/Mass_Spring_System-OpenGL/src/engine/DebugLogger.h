@@ -3,6 +3,8 @@
 #include <string>
 #include "glad/glad.h"
 
+// Support class for debugging and logging
+
 #define ASSERT(x) if (!(x)) __debugbreak();
 
 #define GLCall(x) GLClearError();					\

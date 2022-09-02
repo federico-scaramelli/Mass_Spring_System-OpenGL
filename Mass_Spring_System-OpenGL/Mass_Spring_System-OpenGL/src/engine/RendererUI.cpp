@@ -12,6 +12,7 @@
 
 void RendererUI::DrawUI ()
 {
+	// Scene frame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -50,12 +51,13 @@ void RendererUI::DrawUI ()
 
 
 
-	// Primitives UI
+	// Sphere colliders UI
 	ImGui::Begin ("Scene Objects");
 	ImGui::PushItemWidth (200);
 	AddSphereUI();
 	ImGui::Dummy ({ 0, 20 });
-	// GameObjects UI
+
+	// GameObjects UI - It contains the list of created colliding spheres currently on the scene
 	auto m = Scene::GetInstance()->GetGameObjects();
 	for (auto it = m.cbegin(), next_it = it;
 	     it != m.cend();
@@ -63,6 +65,8 @@ void RendererUI::DrawUI ()
 	{
 		++next_it;
 		GameObject* gameObject = it->second;
+
+		// Delete button
 		std::string label = "X##";
 		label.append (gameObject->name);
 		if (ImGui::Button (label.c_str(), { 20, 20 }))
@@ -72,6 +76,7 @@ void RendererUI::DrawUI ()
 		else
 		{
 			ImGui::SameLine();
+			// Active checkbox
 			ImGui::Checkbox (gameObject->name.c_str(), &gameObject->m_IsActive);
 			if (gameObject->m_IsActive)
 			{
@@ -90,11 +95,13 @@ void RendererUI::DrawUI ()
 	ImGui::Text ("Select active mass spring");
 	if (!Scene::GetInstance()->GetMassSprings().empty())
 	{
+		// ListBox to select the active mass spring
 		ImGui::ListBox ("##SelectMassSpring",
 		                &MassSpringUI::selectedMassSpring,
 		                MassSpringUI::massSpringsList,
 		                Scene::GetInstance()->GetMassSprings().size());
 		ImGui::SameLine();
+		// Reset mass spring button
 		if (ImGui::Button ("Reset", {80, 20}))
 		{
 			Scene::GetInstance()->ResetMassSpring();
@@ -109,6 +116,7 @@ void RendererUI::DrawUI ()
 	ImGui_ImplOpenGL3_RenderDrawData (ImGui::GetDrawData());
 }
 
+// Present the radius selector, the creation button and check the limit of the sphere count
 void RendererUI::AddSphereUI ()
 {
 	auto colliders = Scene::GetInstance()->GetColliders();

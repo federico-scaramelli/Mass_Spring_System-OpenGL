@@ -1,6 +1,7 @@
 #pragma once
 #include "Primitive.h"
 
+// Spherical primitive trated as a spherical mesh with collider
 class CollidingSphere : public Primitive
 {
 public:

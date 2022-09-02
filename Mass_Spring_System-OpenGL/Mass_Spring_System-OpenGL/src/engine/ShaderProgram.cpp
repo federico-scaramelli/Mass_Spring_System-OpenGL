@@ -154,6 +154,8 @@ void ShaderProgram::BindAttributeLocation(GLuint location, const char* name)
 	glBindAttribLocation(ID, location, name);
 }
 
+
+// Uniforms setters as template functions
 #pragma region Uniforms
 
 template<typename T>
@@ -296,12 +298,14 @@ void ShaderProgram::PrintActiveUniforms()
 
 #pragma endregion
 
+// Set the projection matrix as uniform
 void ShaderProgram::Setup ()
 {
 	Use();
 	SetUniform<glm::mat4>
 		("projectionMatrix", Scene::GetInstance()->GetCamera()->GetProjectionMatrix());
 }
+
 
 void ShaderProgram::DetachAndDeleteShaderObjects()
 {

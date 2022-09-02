@@ -26,6 +26,8 @@ struct VertexBufferElement
 	}
 };
 
+// Absatraction of the vertex data structure on the buffers.
+// Specify a layout for the VBO (stride, offset, number of attributes)
 class VertexBufferLayout
 {
 private:

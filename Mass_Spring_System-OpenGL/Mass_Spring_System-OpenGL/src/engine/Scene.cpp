@@ -13,6 +13,7 @@
 #include "../mass-spring/MassSpringUI.h"
 #include "Utils.h"
 
+// Cleanup of the dynamically allocated objects
 Scene::~Scene ()
 {
 	delete instance;
@@ -42,8 +43,11 @@ void Scene::AddCamera (Camera* camera)
 
 void Scene::AddGameObject (GameObject* gameObject)
 {
+	// Custom create method of specific type of GameObject
 	gameObject->Create();
 
+	// Different behavior based on the class of the GameObject.
+	// Mainly to maintain dedicated data structures for each type.
 	if (dynamic_cast<CollidingSphere*>(gameObject) != nullptr)
 	{
 		m_Primitives.insert ({gameObject->name, dynamic_cast<CollidingSphere*>(gameObject)});
@@ -74,6 +78,7 @@ void Scene::RemoveGameObject (const std::string& name)
 	delete gameObject;
 }
 
+// Convenient method to reset the current selected Mass Spring object
 void Scene::ResetMassSpring ()
 {
 	std::string selectedName = MassSpringUI::massSpringsList[MassSpringUI::selectedMassSpring];
@@ -81,6 +86,7 @@ void Scene::ResetMassSpring ()
 	oldObj->Reset();
 }
 
+// Convenient method to delete the selected Collider object
 void Scene::EraseCollider (const std::string& name)
 {
 	m_Colliders.erase (name);
@@ -110,13 +116,10 @@ void Scene::UpdateGameObjects ()
 		DrawGameObject (primitive);
 	}
 	
-	// Update mass springs
+	// Update selected Mass Spring
 	if (!m_MassSprings.empty())
 	{
 		std::string selectedName = MassSpringUI::massSpringsList[MassSpringUI::selectedMassSpring];
-		/*auto it = m_MassSprings.begin();
-		std::advance (it, MassSpringUI::selectedMassSpring);
-		auto massSpring = it->second;*/
 		auto massSpring = m_MassSprings.at (selectedName);
 		massSpring->Update();
 		UpdateTransform (massSpring);
@@ -141,14 +144,17 @@ void Scene::UpdateGameObjects ()
 
 void Scene::UpdateTransform (GameObject* gameObject)
 {
-	glm::mat4 viewMatrix = m_Camera->GetUpdatedViewMatrix();
-	glm::mat4 modelViewMatrix = glm::mat4 (1.f);
-
+	// Update material and all the values related to the UI
 	gameObject->GetMaterial().Update();
 	gameObject->UpdateWithUI();
 
+	// Compute transform matrices and set the model view to the uniform
+	glm::mat4 viewMatrix = m_Camera->GetUpdatedViewMatrix();
+	glm::mat4 modelViewMatrix = glm::mat4 (1.f);
 	modelViewMatrix = viewMatrix * gameObject->GetTransform().GetUpdatedModelMatrix();
 	gameObject->GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
+
+	// Set the normalMatrix uniform only for shaders that use it
 	if (gameObject->GetMaterial().fragShader == BlinnPhong || gameObject->GetMaterial().fragShader == Normal)
 	{
 		gameObject->GetShader().SetUniform<glm::mat3> ("normalMatrix",
@@ -158,6 +164,7 @@ void Scene::UpdateTransform (GameObject* gameObject)
 
 void Scene::DrawGameObject (GameObject* gameObject)
 {
+	// Draw the gameobject using its vao, index buffer and shader program
 	Renderer::GetInstance()->Draw (gameObject->GetMesh().m_vao,
 	                  gameObject->GetMesh().m_indexBuffer,
 	                  gameObject->GetShader());

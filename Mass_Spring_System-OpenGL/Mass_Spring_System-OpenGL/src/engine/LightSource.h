@@ -5,15 +5,18 @@
 class LightSource : public Primitive
 {
 private:
+	// Both diffuse and specular color
 	glm::vec3 m_LightIntensity {1, 1, .5f};
 	glm::vec3 m_LightAmbient {0, 0, 0};
 
 public:
+	// Create a light representing it as a Solid Sphere on the scene
 	LightSource(const GLfloat size = 5, glm::vec3 lightIntensity = {1,1,1}, glm::vec3 lightAmbient = {1,1,1})
 	  : Primitive ("Light", PrimitiveType::SPHERE, size),
 		m_LightIntensity (lightIntensity), m_LightAmbient (lightAmbient)
 	{
 		delete m_GameObjectUI;
+		// Instantiate the custom UI
 		m_GameObjectUI = new LightUI(name);
 	}
 
@@ -27,6 +30,8 @@ public:
 		SetupGraphicsShader (Solid);
 		GenerateUI();
 	}
+
+	// No custom update behavior
 	void Update() override {}
 
 	void UpdateWithUI() override

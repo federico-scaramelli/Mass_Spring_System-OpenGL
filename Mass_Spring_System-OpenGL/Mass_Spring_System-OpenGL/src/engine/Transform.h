@@ -4,6 +4,7 @@
 
 class TransformUI;
 
+// Straightforward class representing the transform component of a scene object
 class Transform
 {
 private:

@@ -4,7 +4,7 @@
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 
-Camera::Camera(GLfloat aspect) //: m_TransformUI ("Camera")
+Camera::Camera(GLfloat aspect) 
 {
 	SetPerspectiveProjection(FOV, aspect, NEAR_PLANE, FAR_PLANE);
 	m_Transform = {"Camera"};
@@ -23,15 +23,15 @@ void Camera::SetPerspectiveProjection(const GLfloat fovy, const GLfloat aspect, 
 
 void Camera::UpdateViewMatrix()
 {
-	glm::mat4 rotM = glm::mat4(1.0f);
-	glm::mat4 transM = glm::mat4(1.0f);
+	glm::mat4 rotMatrix = glm::mat4(1.0f);
+	glm::mat4 transMatrix = glm::mat4(1.0f);
 	
-	rotM = glm::rotate(rotM, glm::radians(GetTransform().GetPitch()), GetTransform().GetRightDirection());
-	rotM = glm::rotate(rotM, glm::radians(GetTransform().GetYaw()), GetTransform().GetUpDirection());
-	rotM = glm::rotate(rotM, glm::radians(GetTransform().GetRoll()), GetTransform().GetForwardDirection());
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(GetTransform().GetPitch()), GetTransform().GetRightDirection());
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(GetTransform().GetYaw()), GetTransform().GetUpDirection());
+	rotMatrix = glm::rotate(rotMatrix, glm::radians(GetTransform().GetRoll()), GetTransform().GetForwardDirection());
 	
 	glm::vec3 translation = -1.f * GetTransform().GetPosition();
-	transM = glm::translate(transM, translation);
+	transMatrix = glm::translate(transMatrix, translation);
 	
-	m_ViewMatrix = rotM * transM;
+	m_ViewMatrix = rotMatrix * transMatrix;
 }

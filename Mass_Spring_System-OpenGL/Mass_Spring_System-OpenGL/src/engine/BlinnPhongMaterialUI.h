@@ -2,6 +2,7 @@
 #include "MaterialUI.h"
 #include "glm/vec3.hpp"
 
+// Custom Material UI for BlinnPhong shader
 class BlinnPhongMaterialUI : public MaterialUI
 {
 public:

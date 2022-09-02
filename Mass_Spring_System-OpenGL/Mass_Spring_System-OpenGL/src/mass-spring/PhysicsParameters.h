@@ -1,5 +1,7 @@
 #pragma once
 
+// Static class containing the physics paramters
+
 #define TARGET_FPS 60.0
 #define FIXED_DELTAT (1.0 / TARGET_FPS)
 

@@ -57,6 +57,8 @@ public:
 		return m_Vertices.size();
 	}
 
+	// Set the vertices to the vbo and indices to the index buffer.
+	// Add the vbo to the vao
 	void SetBuffers (const VertexBufferLayout& layout)
 	{
 		//Vertex buffer
@@ -69,6 +71,7 @@ public:
 		m_indexBuffer.SetData (m_Indices.data(), indicesSize);
 	}
 
+	// Update vbo data
 	void UpdateBuffers ()
 	{
 		GLsizei verticesSize = m_Vertices.size() * sizeof (Vertex);

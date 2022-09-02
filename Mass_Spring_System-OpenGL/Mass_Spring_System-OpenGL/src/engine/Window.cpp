@@ -19,7 +19,7 @@ Window::Window()
 
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, NULL, NULL);
 
-	if (window == NULL) 
+	if (window == nullptr) 
 	{
 		throw std::runtime_error("Failed to create GLFW window!");
 	}

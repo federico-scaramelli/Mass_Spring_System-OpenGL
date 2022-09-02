@@ -2,6 +2,7 @@
 
 #include "glm/ext/scalar_constants.hpp"
 
+// Create a cube mesh vertices and setup indices
 void BuildCubeMesh(Mesh& mesh, GLfloat size)
 {
 	auto& vertices = mesh.GetVertices();
@@ -48,7 +49,8 @@ void BuildCubeMesh(Mesh& mesh, GLfloat size)
 	};
 }
 
-void Primitive::BuildSphereMesh(Mesh& mesh, GLfloat radius)
+// Create a sphere mesh vertices and setup indices
+void BuildSphereMesh(Mesh& mesh, GLfloat radius)
 {
 	auto& vertices = mesh.GetVertices();
 	vertices.clear();
@@ -120,6 +122,7 @@ void Primitive::BuildSphereMesh(Mesh& mesh, GLfloat radius)
 	}
 }
 
+// Create a cone mesh vertices and setup indices
 void BuildConeMesh (Mesh& mesh, GLuint resolution, GLfloat radius, GLfloat height)
 {
 	// Vertices
@@ -158,6 +161,7 @@ void BuildConeMesh (Mesh& mesh, GLuint resolution, GLfloat radius, GLfloat heigh
 	// TODO: add polygonal base triangles
 }
 
+// Constructor for sphere and cube primitives
 Primitive::Primitive (const char* name, PrimitiveType type, GLuint size) : GameObject (name)
 {
 	m_GameObjectUI = new GameObjectUI(name);
@@ -175,6 +179,7 @@ Primitive::Primitive (const char* name, PrimitiveType type, GLuint size) : GameO
 	}
 }
 
+// Constructor for cone primitives
 Primitive::Primitive (const char* name, PrimitiveType type, 
 					  GLuint resolution, GLfloat radius, GLfloat height) : GameObject (name)
 {
@@ -190,7 +195,11 @@ Primitive::Primitive (const char* name, PrimitiveType type,
 
 void Primitive::Create()
 {
+	// Default shader: BlinnPhong
 	SetupGraphicsShader (BlinnPhong);
+	// Standard Transform and Material UIs
 	GenerateUI();
 }
+
+// No custom update behavior
 void Primitive::Update() {}

@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObjectUI.h"
 
+// Custom UI for light object with light intensity and ambient colors
 class LightUI : public GameObjectUI
 {
 public:

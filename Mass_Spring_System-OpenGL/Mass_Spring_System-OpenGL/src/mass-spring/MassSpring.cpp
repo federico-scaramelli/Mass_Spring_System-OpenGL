@@ -75,13 +75,13 @@ void MassSpring::Update ()
 
     glm::mat4 rotationMatrix = glm::mat4 (1.0f);
     rotationMatrix = glm::rotate (rotationMatrix,
-                                  glm::radians (wind->alternativeRotation.x),
+                                  glm::radians (wind->tiltedRotation.x),
                                   wind->GetTransform().GetRightDirection());
     rotationMatrix = glm::rotate (rotationMatrix,
-                                  glm::radians (wind->alternativeRotation.y),
+                                  glm::radians (wind->tiltedRotation.y),
                                   wind->GetTransform().GetUpDirection());
     rotationMatrix = glm::rotate (rotationMatrix,
-                                  glm::radians (wind->alternativeRotation.z),
+                                  glm::radians (wind->tiltedRotation.z),
                                   wind->GetTransform().GetForwardDirection());
 
     //World forward of wind

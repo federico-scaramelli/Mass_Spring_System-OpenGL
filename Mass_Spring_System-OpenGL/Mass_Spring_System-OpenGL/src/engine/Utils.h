@@ -8,7 +8,6 @@
 #include <iostream>
 #include <random>
 
-//TODO: check NDEBUG path with shaders
 #ifndef ENGINE_DIR
   #ifdef NDEBUG
 	  #define ENGINE_DIR "../../../Mass_Spring_System-OpenGL/src/"
@@ -21,6 +20,7 @@
 
 namespace Utils
 {
+	// Uniform random generator
 	static std::random_device rd;
 	static std::mt19937 generator(rd());
 	static std::uniform_real_distribution<float> unif{ 0, 1.0 };
@@ -28,6 +28,7 @@ namespace Utils
     template <class... E>
 	constexpr bool falseTemplate = false;
 
+	// Read a file
 	inline std::string readFile(const std::string& filepath) {
 		std::string content;
 
@@ -50,6 +51,7 @@ namespace Utils
 		return stream.str();
 	}
 
+	// Methods to safely destory vectors and maps of dynamically allocated objects
 	template<typename T>
 	void destroyVector(std::vector<T*> &v)
 	{

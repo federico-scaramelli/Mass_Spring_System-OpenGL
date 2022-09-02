@@ -4,6 +4,7 @@
 #include "MassSpring.h"
 #include "Cloth.h"
 
+// Class containing all the cloths presets
 class ClothPreset
 {
 public:
@@ -58,7 +59,7 @@ public:
 		50, 50,
 		5,
 		{0, 0, 0},
-		{0, 180, 30},
+		{0, 180, 0},
 		{0.15, 0.51, 0.74},
 		{0.15, 0.25, 0.59},
 		{0, 0, 0},

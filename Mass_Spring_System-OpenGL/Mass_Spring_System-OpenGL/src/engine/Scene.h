@@ -11,6 +11,7 @@ class LightSource;
 class Camera;
 class GameObject;
 
+// Scene Singleton. Keeps objects into data structures. Update objects on each cycle of the main loop.
 class Scene
 {
 public:
@@ -21,12 +22,12 @@ public:
 
 	void AddCamera (Camera* camera);
 	void AddGameObject (GameObject* gameObject);
-	void RemoveGameObject (const std::string& name);
+
 	void EraseCollider (const std::string& name);
 	void ResetMassSpring ();
+	void RemoveGameObject (const std::string& name);
 	
 	[[nodiscard]] size_t GetGameObjectCount () const { return m_Primitives.size(); }
-	
 	std::map<std::string, GameObject*>& GetGameObjects () { return m_Primitives; }
 
 	[[nodiscard]] Camera* GetCamera () const { return m_Camera; }
@@ -52,9 +53,7 @@ private:
 	std::map<std::string, CollidingSphere*> m_Colliders;
 	
 	void UpdateGameObjects ();
-
 	void UpdateCamera ();
-
 	void UpdateTransform (GameObject* gameObject);
 	void DrawGameObject (GameObject* gameObject);
 

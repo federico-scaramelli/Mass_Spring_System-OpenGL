@@ -17,26 +17,27 @@ Wind::Wind (GLfloat fullForceRadius, GLfloat attenuationRadius, GLfloat forceMul
 }
 
 void Wind::GenerateUI () { Primitive::GenerateUI(); }
+
 void Wind::Create ()
-{ 
+{
+	// Default shader: Solid. Mesh: Cone
     SetupGraphicsShader (Solid);
 	GenerateUI();
 }
 
 void Wind::Update()
 {
-	//Update the alternative rotation
+	//Update the tilted rotation based on the tilt parameter
 	glm::vec3 offset = {
 		(Utils::unif(Utils::generator) * 2) - 1,
 		(Utils::unif(Utils::generator) * 2) - 1,
 		(Utils::unif(Utils::generator) * 2) - 1
 	};
-	offset *= m_OffsetMaxValue;
-
-	alternativeRotation = GetTransform().GetRotation() + offset;
+	offset *= m_TiltFactor;
+	tiltedRotation = GetTransform().GetRotation() + offset;
 
 	glm::mat4 viewMatrix = Scene::GetInstance()->GetCamera()->GetUpdatedViewMatrix();
-	auto modelViewMatrix = viewMatrix * GetTransform().GetUpdatedCustomRotationModelMatrix(alternativeRotation);
+	auto modelViewMatrix = viewMatrix * GetTransform().GetUpdatedCustomRotationModelMatrix(tiltedRotation);
 	GetShader().SetUniform<glm::mat4> ("modelViewMatrix", modelViewMatrix);
 }
 
@@ -49,7 +50,7 @@ void Wind::UpdateWithUI ()
 	m_AttenuationRadius = windUI->m_AttenuationRadiusData;
 	m_ForceMultiplier = windUI->m_ForceData;
 
-	m_OffsetMaxValue = windUI->m_OffsetMaxValueData;
+	m_TiltFactor = windUI->m_OffsetMaxValueData;
 	m_ReferenceDistance = windUI->m_refDistanceData;
 }
 

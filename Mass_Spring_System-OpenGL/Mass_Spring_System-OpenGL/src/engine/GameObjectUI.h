@@ -2,6 +2,7 @@
 #include "MaterialUI.h"
 #include "TransformUI.h"
 
+// Default GameObject UI with Transform and Material UIs
 class GameObjectUI 
 {
 public:

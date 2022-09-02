@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include "Utils.h"
 
+// Window settings
 #define OPENGL_MAJOR_VERSION 4
 #define OPENGL_MINOR_VERSION 6
 #define WINDOW_WIDTH 1920
@@ -19,11 +20,11 @@ public:
 
 	GLFWwindow* GetGLFWWindow() { return window; }
 
-	GLfloat GetAspectRatio() const
+	[[nodiscard]] GLfloat GetAspectRatio() const
 	{
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
-		return static_cast<GLfloat>(width) / height;
+		return static_cast<GLfloat>(width) / static_cast<GLfloat>(height);
 	}
 
 private:

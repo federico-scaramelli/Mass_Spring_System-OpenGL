@@ -1,14 +1,12 @@
 #pragma once
 
-#include "ShaderProgramCompute.h"
-
 #include <string>
 #include <vector>
-
+#include "glm/vec3.hpp"
+#include "ShaderProgramCompute.h"
 #include "BlinnPhongMaterialUI.h"
 #include "GameObjectUI.h"
 #include "SolidMaterialUI.h"
-#include "glm/vec3.hpp"
 
 class GameObject;
 class SolidMaterialUI;
@@ -16,6 +14,7 @@ class BlinnPhongMaterialUI;
 class MaterialUI;
 class ShaderProgram;
 
+// Fragment shader presets enum
 enum FragmentShader
 {
 	BlinnPhong,

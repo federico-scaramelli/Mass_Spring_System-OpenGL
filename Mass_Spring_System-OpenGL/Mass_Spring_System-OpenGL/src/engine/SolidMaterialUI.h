@@ -1,6 +1,7 @@
 #pragma once
 #include "MaterialUI.h"
 
+// Custom Material UI for Solid shader
 class SolidMaterialUI : public MaterialUI
 {
 public:

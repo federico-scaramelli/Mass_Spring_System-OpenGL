@@ -1,12 +1,11 @@
 #pragma once
 #include "Transform.h"
 #include "glad/glad.h"
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
-
 #include "TransformUI.h"
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define FOV 45.0f
 #define NEAR_PLANE 0.1f
 #define FAR_PLANE 5000.f
@@ -28,9 +27,9 @@ public:
 
 	void UpdateViewMatrix();
 
-	const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
+	[[nodiscard]] const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 
-	const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+	[[nodiscard]] const glm::mat4& GetProjectionMatrix() const { return m_ProjectionMatrix; }
 
 	glm::mat4& GetUpdatedViewMatrix()
 	{

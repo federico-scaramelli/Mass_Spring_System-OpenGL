@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
+// Primitive presets
 enum PrimitiveType
 {
 	CUBE,
@@ -10,14 +11,10 @@ enum PrimitiveType
 
 class Primitive : public GameObject
 {
-public:
-	//float size = 1;
-	
+public:	
 	Primitive(const char* name, PrimitiveType type, GLuint size);
 	Primitive(const char* name, PrimitiveType type, GLuint resolution, GLfloat radius, GLfloat height);
 
 	void Create() override;
 	void Update() override;
-
-	void BuildSphereMesh(Mesh& mesh, GLfloat radius);
 };

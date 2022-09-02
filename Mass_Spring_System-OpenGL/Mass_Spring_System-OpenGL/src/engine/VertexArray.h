@@ -8,7 +8,6 @@ class VertexArray
 {
 private:
 	GLuint m_vaoID;
-	// uint16_t vboCount = 0;
 public:
 	VertexArray();
 	~VertexArray();

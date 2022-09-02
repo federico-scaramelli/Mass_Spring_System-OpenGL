@@ -7,6 +7,7 @@
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
 
+// Singleton
 Renderer* Renderer::GetInstance ()
 {
 	if (instance == nullptr)
@@ -16,6 +17,7 @@ Renderer* Renderer::GetInstance ()
 	return instance;
 }
 
+// Draw. Based on VAO, IndexBuffer and ShaderProgram
 void Renderer::Draw(const VertexArray& vao, const IndexBuffer& indexBuffer, const ShaderProgram& shader) const
 {
 	shader.Use();
@@ -47,11 +49,12 @@ void Renderer::Draw(const VertexArray& vao, const IndexBuffer& indexBuffer, cons
 
 void Renderer::Clear() const
 {
-	//Clear the color buffer
+	//Clear the color and depth buffers
 	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+// Call the RendererUI
 void Renderer::DrawUI()
 {
 	UI.DrawUI();

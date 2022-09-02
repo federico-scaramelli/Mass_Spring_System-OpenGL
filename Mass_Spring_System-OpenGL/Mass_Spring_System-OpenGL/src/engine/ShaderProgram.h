@@ -38,9 +38,6 @@ protected:
 public:
 	ShaderProgram();
 	~ShaderProgram();
-	
-	// ShaderProgram(const ShaderProgram&) = delete;
-	// ShaderProgram& operator=(const ShaderProgram&) = delete;
 
 	void Setup();
 
@@ -55,7 +52,6 @@ public:
 	GLboolean IsLinked();
 
 	void BindAttributeLocation(GLuint location, const char* name);
-	// void BindFragDataLocation(GLuint location, const char* name);
 
 	template<typename T>
 	void SetUniform(const char* name, T value);

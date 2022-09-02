@@ -12,6 +12,7 @@ Material::~Material ()
 	delete materialParams;
 }
 
+// Setup the material with a fragment shader preset
 void Material::Setup (FragmentShader fragmentPreset)
 {
 	fragShader = fragmentPreset;
@@ -31,6 +32,7 @@ void Material::Setup (FragmentShader fragmentPreset)
 	}
 }
 
+// Update the shader uniforms
 void Material::Update ()
 {
 	Scene* scene = Scene::GetInstance();
@@ -64,6 +66,7 @@ void Material::Update ()
 	
 }
 
+// Create, link, validate, and compile shader program with a sequence of glsl files
 void Material::CreateShaderProgram (std::vector<std::pair<std::string, ShaderType>> pairList)
 {
 	for (auto& element : pairList) { m_Shader.CompileShader (element.first, element.second); }
@@ -73,6 +76,7 @@ void Material::CreateShaderProgram (std::vector<std::pair<std::string, ShaderTyp
 	m_Shader.Setup();
 }
 
+// Generate the UI dedicated to the material in base of the fragment shader
 void Material::GenerateUI (GameObject* gameObject)
 {
 	switch (fragShader)

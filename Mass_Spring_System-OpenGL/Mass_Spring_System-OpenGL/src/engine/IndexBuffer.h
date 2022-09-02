@@ -18,6 +18,6 @@ public:
 	void Bind() const;
 	void Unbind() const;
 
-	inline GLuint GetCount() const { return m_Size; }
+	[[nodiscard]] inline GLuint GetCount() const { return m_Size; }
 };
 
