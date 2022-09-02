@@ -4,6 +4,7 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
+// Shader program specific for compute shaders
 class ShaderProgramCompute : public ShaderProgram {
 private:
 	//Number of invocations per group = 100 invoc. per group

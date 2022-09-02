@@ -3,6 +3,7 @@
 
 class ClothPreset;
 
+// Struct to contain all the parameters useful for a mass spring object
 struct MassSpringParameters
 {
 	MassSpringParameters(const GLfloat dT, const uint16_t subSteps, 

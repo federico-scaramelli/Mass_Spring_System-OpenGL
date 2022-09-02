@@ -9,6 +9,7 @@
 #include "../engine/Scene.h"
 #include "ClothPresets.h"
 
+// Standard constructor
 Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight, float restLenghtHV, MassSpringParameters parameters) :
 	MassSpring (name, parameters),
 	m_PointsByWidth (pointsByWidth), m_PointsByHeight (pointsByHeight),
@@ -20,6 +21,7 @@ Cloth::Cloth (const char* name, uint16_t pointsByWidth, uint16_t pointsByHeight,
 	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
 }
 
+// Preset constructor
 Cloth::Cloth (const char* name, ClothPreset* preset): MassSpring (name, preset)
 {
 	m_PointsByWidth = preset->pointsByWidth;
@@ -30,6 +32,7 @@ Cloth::Cloth (const char* name, ClothPreset* preset): MassSpring (name, preset)
 	m_RestLengthDiagonal = static_cast<GLfloat> (sqrt (pow (m_RestLengthHV, 2) * 2));
 }
 
+// Create vertices procedurally
 void Cloth::InitializeVertices ()
 {
 	auto& vertices = m_Mesh.GetVertices();
@@ -56,33 +59,12 @@ void Cloth::InitializeVertices ()
 	}
 }
 
+// Indicize vertices procedurally
 void Cloth::InitializeIndices ()
 {
 	auto& indices = m_Mesh.GetIndices();
 
 	indices.clear();
-
-	// //Riga
-	// for (auto x = 0; x < m_PointsByHeight - 1; x++)
-	// {
-	// 	//Colonna
-	// 	for (auto y = 1; y < m_PointsByWidth; y++)
-	// 	{
-	// 		int v = LinearIndex (x, y, m_PointsByWidth);
-	// 		int vLeft = v - 1;
-	// 		int vUp = v + m_PointsByWidth;
-	// 		int vUpLeft = vUp - 1;
-	//
-	// 		indices.push_back (vLeft);
-	// 		indices.push_back (v);
-	// 		indices.push_back (vUp);
-	//
-	// 		indices.push_back (vUp);
-	// 		indices.push_back (vUpLeft);
-	// 		indices.push_back (vLeft);
-	// 	}
-	// }
-
 
 	for(int h = 0; h < m_PointsByHeight - 1; ++h){
 	    for(int w = 0; w < m_PointsByWidth - 1; ++w) {
@@ -101,6 +83,7 @@ void Cloth::InitializeIndices ()
 
 }
 
+// Set all the starting uniforms
 void Cloth::Create ()
 {
 	MassSpring::Create();
@@ -136,9 +119,10 @@ void Cloth::Update ()
 {
 	MassSpring::Update();
 
+	// Fixed delta time check
 	if (Physics::deltaTime >= 1.0)
 	{
-		
+		// Execute N substeps to reduce the simulation deltatime 
 		for (int i = 0; i < m_Parameters.subSteps; i++)
 		{
 			simulationStageComputeShader.Use();
@@ -159,6 +143,7 @@ void Cloth::Update ()
 		Physics::deltaTime--;
 	}
 
+	// Update uniforms
 	simulationStageComputeShader.Use();
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration", glm::inverse(GetTransform().GetUpdatedModelMatrix()) * m_Parameters.gravityAccel);
 	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
@@ -197,6 +182,7 @@ void Cloth::SetComputeBuffers ()
 	glGenBuffers (1, &m_ComputeTempVertexBuffer);
 
 	simulationStageComputeShader.Use();
+
 	//In
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_Mesh.m_vbo.GetID());
 	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
@@ -211,6 +197,9 @@ void Cloth::BindComputeBuffers (int vboBind, int tempBind)
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, vboBind, m_Mesh.m_vbo.GetID());
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, tempBind, m_ComputeTempVertexBuffer);
 }
+
+
+// Various pin edges presets
 
 void Cloth::PinAllEdges ()
 {

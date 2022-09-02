@@ -7,6 +7,8 @@
 #include <utility>
 #include "MassSpring.h"
 
+// Represent a particle of the rope.
+// Not an actual vertex of the mesh!
 struct Node {
 	glm::vec4 position;
 	glm::vec4 velocity;
@@ -26,6 +28,7 @@ private:
 	GLuint m_ComputeNodesInBuffer;
 	GLuint m_ComputeNodesOutBuffer;
 
+	// To generate the cylindric mesh
 	std::array<glm::vec2, 8> vertexPositionsWeigths = {
 		{
 			{1.f,	  0.f},
