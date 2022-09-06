@@ -3,7 +3,7 @@
 // Max number of spheres in the scene at the same time
 #define MAX_SPHERES 10
 
-//Size of the comppute workgroups
+//Size of the compute workgroups
 layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 
 // Vertex params
@@ -189,7 +189,7 @@ vec3 ComputeSelfCollision(uint linearIdx, uvec3 particleGridDims, float radius) 
 	return correction;
 }
 
-// Given 2 Edges calculate the normal from them, and wheigth the normal by the angle between the edges
+// Given two edges calculate, the normal from them and wheigth it by the angle between them
 vec3 CalculateNormal(vec3 a, vec3 b) {
 	vec3 normal = vec3(0,0,0);
 	normal = cross(a,b);
@@ -316,7 +316,7 @@ void main()
 	// Adjust the velocity with all the corrections
 	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
 	
-	// Safety check to prevent the system from exploding if a positional constraint raise the velocity too much
+	// Safety check to prevent the system from exploding if a positional constraint raises the velocity too much
 	float maxVelocity = 10000;
 	correctedVelocity = (length(correctedVelocity) >= maxVelocity) ? correctedVelocity * 0.0001 : correctedVelocity;
 

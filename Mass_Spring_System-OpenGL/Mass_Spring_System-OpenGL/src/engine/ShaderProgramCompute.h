@@ -7,8 +7,7 @@
 // Shader program specific for compute shaders
 class ShaderProgramCompute : public ShaderProgram {
 private:
-	//Number of invocations per group = 100 invoc. per group
-	glm::ivec3 workGroupSize{10, 10, 1}; //Fixed in comp shader
+	glm::ivec3 workGroupSize{16, 16, 1};
 	glm::ivec3 workGroupNum{1,1,1};
 
 public:

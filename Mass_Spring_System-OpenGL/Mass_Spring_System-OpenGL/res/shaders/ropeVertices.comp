@@ -3,7 +3,7 @@
 // Max number of spheres in the scene at the same time
 #define MAX_SPHERES 5
 
-//Size of the comppute workgroups
+//Size of the compute workgroups
 layout ( local_size_x = 16, local_size_y = 1, local_size_z = 1 ) in;
 
 // Node params

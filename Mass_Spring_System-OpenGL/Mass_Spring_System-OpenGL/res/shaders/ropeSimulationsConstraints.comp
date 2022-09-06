@@ -1,6 +1,6 @@
 #version 460
 
-//Size of the comppute workgroups
+//Size of the compute workgroups
 layout ( local_size_x = 16, local_size_y = 1, local_size_z = 1 ) in;
 
 // Max number of spheres in the scene at the same time
@@ -98,6 +98,7 @@ vec3 ComputeElasticForce (vec3 position)
 	totalForce = (gl_GlobalInvocationID.x > 0) ?
 		totalForce + constShearMult * ElasticForce(position, nodesIn[gl_GlobalInvocationID.x - 1].pos.xyz, restLenHV) :
 		totalForce;
+
 	// Structure Spring - Right
 	totalForce = (gl_GlobalInvocationID.x < ropeDim - 1) ?
 		totalForce + constShearMult * ElasticForce(position, nodesIn[gl_GlobalInvocationID.x + 1].pos.xyz, restLenHV) :
@@ -260,7 +261,7 @@ void main()
 	// Springs
 	totalForce += ComputeElasticForce(position);
 
-	// Stokes's law
+	// Stokes' law
 	totalForce -= velocity * drag;
 
 	// Compute acceleration due to total force to the particle
@@ -292,7 +293,6 @@ void main()
 	// Spheres collisions
 	for (int i = 0; i < sphereCount; i++)
 	{
-		//bool currSphereActive = sphereActive[i];
 		if (spheres[i].sphereActive)
 		{
 			vec3 sphereDist = newPosition - spheres[i].sphereCenter.xyz;

@@ -1,6 +1,6 @@
 #version 460
 
-//Size of the comppute workgroups
+//Size of the compute workgroups
 layout ( local_size_x = 16, local_size_y = 16, local_size_z = 1 ) in;
 
 // Vertex params
@@ -169,7 +169,7 @@ vec3 ComputeWindForce(vec3 position)
 {
 	vec3 vectorToVertex = position - wind.position.xyz;	
 
-	vec3 windDir = length(wind.forward) > 0 ? wind.forward.xyz : vec3(0,0,0);
+	vec3 windDir = wind.forward.xyz;
 
 	float dotWindZ = dot (windDir, normalize(vectorToVertex));
 	float windMult = wind.forceMult;
