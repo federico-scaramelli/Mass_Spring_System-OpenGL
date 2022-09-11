@@ -27,11 +27,6 @@ layout ( std430, binding = 0 ) buffer NodesBufferIn {
 	Node nodesIn[];
 };
 
-// Output buffer of the shader used to copy the input node buffer into the output node buffer
-layout ( std430, binding = 1 ) buffer NodesBufferOut {
-	Node nodesOut[];
-};
-
 // Output buffer of the shader for the vertices positions
 layout ( std430, binding = 2 ) buffer VertexBufferOut {
 	Vertex verticesOut[];
@@ -130,18 +125,8 @@ void main()
 	vec3 vertexPosition = positionRight + positionUp;
 	vertexPosition += origin;
 
-	//If first vertex of node, copy node info to output node buffer
-	if(nodeWheightsIndex == 0) {
-		nodesOut[nodeIndex].pos = nodesIn[nodeIndex].pos;
-		nodesOut[nodeIndex].oldPos = nodesIn[nodeIndex].oldPos;
-		nodesOut[nodeIndex].vel = nodesIn[nodeIndex].vel;
-		
-		nodesOut[nodeIndex].currentUp = vec4(upFinal, 0.0);
-	}
-
 	//Update vertex position
 	verticesOut[gl_GlobalInvocationID.x].pos = vec4(vertexPosition ,1.0);
-
 
 	//Update vertex normal
 	vec3 normal;

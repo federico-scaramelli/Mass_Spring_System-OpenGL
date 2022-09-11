@@ -1534,6 +1534,7 @@
     <None Include="res\shaders\velocityShader.frag" />
     <None Include="res\shaders\ropeSimulationsConstraints.comp" />
     <None Include="res\shaders\ropeVertices.comp" />
+    <None Include="res\shaders\ropeConstraints.comp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="libraries\include\glm\CMakeLists.txt" />

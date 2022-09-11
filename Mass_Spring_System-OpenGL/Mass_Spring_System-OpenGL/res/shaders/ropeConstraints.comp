@@ -1,0 +1,213 @@
+#version 460
+
+//Size of the compute workgroups
+layout ( local_size_x = 16, local_size_y = 1, local_size_z = 1 ) in;
+
+// Max number of spheres in the scene at the same time
+#define MAX_SPHERES 10
+
+// Node params
+struct Node {
+	vec4 pos;
+	vec4 vel;
+	vec4 oldPos;
+	vec4 pinned;
+	vec4 currentUp;
+};
+
+// Input buffer of the shader
+layout ( std430, binding = 0 ) buffer NodesBufferIn {
+	Node nodesIn[];
+};
+
+// Output buffer of the shader
+layout ( std430, binding = 1 ) buffer NodesBufferOut {
+	Node nodesOut[];
+};
+
+// Sphere params
+struct Sphere {
+	vec4 sphereCenter;
+	float sphereRadius;
+	bool sphereActive;
+};
+uniform Sphere spheres[MAX_SPHERES];
+
+// Number of spheres in the scene
+uniform uint sphereCount;
+
+// Simulation params
+uniform float deltaTime;
+
+
+// Spring constraints params
+struct ConstraintParams {
+	float correctionDamping;
+	float constraintDistanceMult;
+	float selfCollisionDistanceMult;
+	float sphereRepulsionDistMult;
+	float sphereRepulsionDamping;
+};
+uniform ConstraintParams constraintParams;
+
+// Spring params
+uniform float restLenHV;
+
+// Rope dimensions
+uniform uint ropeDim;
+uniform float radius;
+
+
+// Tells if the particle is pinned
+bool IsPinned () {
+	return nodesIn[gl_GlobalInvocationID.x].pinned.x >= 0.5;
+}
+
+// Apply positional constraint of the spring to the particle
+vec3 ApplyConstraints (uint otherIndex, float restLen) 
+{
+	vec3 position = nodesIn[gl_GlobalInvocationID.x].pos.xyz;
+	vec3 otherPosition = nodesIn[otherIndex].pos.xyz;
+
+	vec3 vectorToOther = otherPosition - position;
+	float distanceToOther = length(vectorToOther);
+
+	float maxDistance = restLen * constraintParams.constraintDistanceMult;
+
+	vec3 correction = vec3(0,0,0);
+	float diff = distanceToOther - maxDistance;
+
+	if (diff > 0) 
+	{
+		correction = normalize(vectorToOther) * diff * 0.5;
+
+		correction = (nodesIn[otherIndex].pinned.x > 0.5) ? 
+			correction * 2 :
+			correction;		
+	}
+
+	return correction;
+}
+
+// Calculate the total correction to respect the positional constraint with all the neighbour particles
+vec3 ComputeDistanceCorrection () 
+{
+	vec3 totalCorrection = vec3(0,0,0);
+
+	// Bend Spring - Left
+	totalCorrection = (gl_GlobalInvocationID.x > 1) ?
+		totalCorrection + ApplyConstraints(gl_GlobalInvocationID.x - 2, restLenHV * 2) :
+		totalCorrection;
+
+	// Bend Spring - Right
+	totalCorrection = (gl_GlobalInvocationID.x < ropeDim - 2) ?
+		totalCorrection + ApplyConstraints(gl_GlobalInvocationID.x + 2, restLenHV * 2) :
+		totalCorrection;
+
+	// Structure Spring - Left
+	totalCorrection = (gl_GlobalInvocationID.x > 0) ?
+		totalCorrection + ApplyConstraints(gl_GlobalInvocationID.x - 1, restLenHV) :
+		totalCorrection;
+
+	// Structure Spring - Right
+	totalCorrection = (gl_GlobalInvocationID.x < ropeDim - 1) ?
+		totalCorrection + (ApplyConstraints(gl_GlobalInvocationID.x + 1, restLenHV)) :
+		totalCorrection;
+
+	return totalCorrection;
+}
+
+// Calculate the total correction to avoid collisions with other particles
+vec3 ComputeSelfCollision(float restLength) {
+	vec3 correction = vec3(0,0,0);
+
+	float epsilon = restLength * constraintParams.selfCollisionDistanceMult;
+
+	for (int i = 0; i < ropeDim; i++) 
+	{
+		if (i == gl_GlobalInvocationID.x) {
+			continue;
+		}
+
+		vec3 dir = nodesIn[i].pos.xyz - nodesIn[gl_GlobalInvocationID.x].pos.xyz;
+		float dist = length(dir);
+		vec3 norm = -normalize(dir);
+		float correctionMult;
+		vec3 currentCorrection = vec3(0,0,0);
+		correctionMult = (nodesIn[i].pinned.x > 0.5) ? 
+							1 :
+							0.5;
+		currentCorrection = (dist < epsilon && i != gl_GlobalInvocationID.x) ?
+								currentCorrection + norm * (epsilon - dist) * correctionMult :
+								currentCorrection; 
+
+		correction += currentCorrection;
+	}
+
+	return correction;
+}
+
+void main() 
+{
+	// Safety check
+	if (gl_GlobalInvocationID.x >= ropeDim) 
+		return;
+
+	// Keep pinned particles fixed
+	if (IsPinned()) {
+		nodesOut[gl_GlobalInvocationID.x].pos = nodesIn[gl_GlobalInvocationID.x].pos;
+		nodesOut[gl_GlobalInvocationID.x].oldPos = nodesIn[gl_GlobalInvocationID.x].oldPos;
+		nodesOut[gl_GlobalInvocationID.x].vel = vec4(0.0);
+		return;
+	}
+	
+
+	vec3 position = nodesIn[gl_GlobalInvocationID.x].pos.xyz;
+	vec3 oldPosition = nodesIn[gl_GlobalInvocationID.x].oldPos.xyz;
+	vec3 velocity = nodesIn[gl_GlobalInvocationID.x].vel.xyz;
+
+	vec3 correctedPosition = position;
+	vec3 correctedVelocity = velocity;
+
+	// Distance constraints
+	vec3 distCorrection = vec3(0,0,0);
+	distCorrection = ComputeDistanceCorrection() * constraintParams.correctionDamping;
+	
+	// Self collisions
+	vec3 selfCollCorrection = vec3(0,0,0);
+	selfCollCorrection = ComputeSelfCollision(restLenHV + radius*0.01) * constraintParams.correctionDamping;
+	
+	// Adjust the position with all the corrections
+	correctedPosition += distCorrection;
+	correctedPosition += selfCollCorrection;
+
+	// Adjust the velocity with all the corrections
+	correctedVelocity = (correctedPosition - oldPosition) / deltaTime;
+	
+	// Safety check to prevent the system from exploding if a positional constraint raise the velocity too much
+	float maxVelocity = 1500;
+    correctedVelocity = (length(correctedVelocity) >= maxVelocity) ? correctedVelocity * 0.0001 : correctedVelocity;
+	
+	// Spheres collisions
+	for (int i = 0; i < sphereCount; i++)
+	{
+		if (spheres[i].sphereActive)
+		{
+			vec3 sphereDist = correctedPosition - spheres[i].sphereCenter.xyz;
+
+			if (length(sphereDist) < spheres[i].sphereRadius + restLenHV * constraintParams.sphereRepulsionDistMult) 
+			{
+				// If the particle is inside the sphere, push it to the outer radius
+				correctedPosition = spheres[i].sphereCenter.xyz + normalize(sphereDist) 
+									* (spheres[i].sphereRadius + restLenHV  * constraintParams.sphereRepulsionDistMult);
+				// Damp velocity with sphere friction 
+				correctedVelocity *= constraintParams.sphereRepulsionDamping;
+			}
+		}
+	}
+
+	// Load updated data in the output buffer
+	nodesOut[gl_GlobalInvocationID.x].oldPos = vec4(position, 1.0);
+	nodesOut[gl_GlobalInvocationID.x].pos = vec4(correctedPosition, 1.0);
+	nodesOut[gl_GlobalInvocationID.x].vel = vec4(correctedVelocity, 0.0);
+}

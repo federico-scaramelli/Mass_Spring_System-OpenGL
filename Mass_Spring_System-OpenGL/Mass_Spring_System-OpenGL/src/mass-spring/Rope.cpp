@@ -16,6 +16,7 @@ Rope::Rope (std::string name, GLuint pointsByLength, GLfloat restLenght, GLfloat
 	m_RestLength (restLenght), m_PointsByLength (pointsByLength),
 	m_Radius (radius)
 {
+	
 	InitializeNodes();
 	InitializeVertices();
 	InitializeIndices();
@@ -191,9 +192,14 @@ void Rope::SetComputeBuffers ()
 	simulationStageComputeShader.SetWorkGroupNum ({ m_Nodes.size(), 1, 1 });
 
 	// Compute stage 2: compute new vertices positions around the nodes
-	constraintsStageComputeShader.CreateProgram ({ "ropeVertices.comp", ShaderType::COMPUTE });
+	constraintsStageComputeShader.CreateProgram ({ "ropeConstraints.comp", ShaderType::COMPUTE });
 	constraintsStageComputeShader.SetWorkGroupSize ({ 16, 1, 1 });
 	constraintsStageComputeShader.SetWorkGroupNum ({ GetMesh().GetVertices().size(), 1, 1 });
+
+	// Compute stage 3: compute new vertices positions around the nodes
+	verticesComputeShader.CreateProgram ({ "ropeVertices.comp", ShaderType::COMPUTE });
+	verticesComputeShader.SetWorkGroupSize ({ 16, 1, 1 });
+	verticesComputeShader.SetWorkGroupNum ({ GetMesh().GetVertices().size(), 1, 1 });
 
 	glGenBuffers (1, &m_ComputeNodesInBuffer);
 	glGenBuffers (1, &m_ComputeNodesOutBuffer);
@@ -210,7 +216,7 @@ void Rope::SetComputeBuffers ()
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesOutBuffer);
 	glBufferData (GL_SHADER_STORAGE_BUFFER, size, m_Nodes.data(), GL_DYNAMIC_DRAW);
 
-	constraintsStageComputeShader.Use();
+	verticesComputeShader.Use();
 
 	glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_Mesh.m_vbo.GetID());
 	glBufferData (GL_SHADER_STORAGE_BUFFER, m_Mesh.m_vbo.GetSize(), m_Mesh.GetVertices().data(), GL_DYNAMIC_DRAW);
@@ -223,7 +229,6 @@ void Rope::Create ()
 
 	simulationStageComputeShader.Use();
 	simulationStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
-	simulationStageComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
 	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
 	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
@@ -234,21 +239,30 @@ void Rope::Create ()
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration",
 	                                                    glm::inverse (GetTransform().GetUpdatedModelMatrix()) *
 	                                                    m_Parameters.gravityAccel);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
-	                                                  m_Parameters.constraintDistanceDumping);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
-	                                                  m_Parameters.constraintDistanceMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.selfCollisionDistanceMult",
-	                                                  m_Parameters.selfCollisionDistanceMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDistMult",
-	                                                  m_Parameters.sphereRepulsionDistMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDamping",
-	                                                  m_Parameters.sphereRepulsionDamping);
 
 	constraintsStageComputeShader.Use();
-	constraintsStageComputeShader.SetUniform<GLuint> ("verticesDim", m_Mesh.GetVertices().size());
-	constraintsStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
 	constraintsStageComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
+	constraintsStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
+	                                                  m_Parameters.constraintDistanceDumping);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
+	                                                  m_Parameters.constraintDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.selfCollisionDistanceMult",
+	                                                  m_Parameters.selfCollisionDistanceMult);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDistMult",
+	                                                  m_Parameters.sphereRepulsionDistMult);
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDamping",
+	                                                  m_Parameters.sphereRepulsionDamping);
+
+	verticesComputeShader.Use();
+	verticesComputeShader.SetUniform<GLuint> ("verticesDim", m_Mesh.GetVertices().size());
+	verticesComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
+	verticesComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
 }
 
 void Rope::Update ()
@@ -264,69 +278,63 @@ void Rope::Update ()
 		for (int i = 0; i < m_Parameters.subSteps; i++)
 		{
 			simulationStageComputeShader.Use();
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, readBuf, m_ComputeNodesInBuffer);
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1 - readBuf, m_ComputeNodesOutBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesInBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesOutBuffer);
 			simulationStageComputeShader.Compute();
 			simulationStageComputeShader.Wait();
 
 			constraintsStageComputeShader.Use();
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1 - readBuf, m_ComputeNodesInBuffer);
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, readBuf, m_ComputeNodesOutBuffer);
-			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_Mesh.m_vbo.GetID());
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 1, m_ComputeNodesInBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesOutBuffer);
 			constraintsStageComputeShader.Compute();
 			constraintsStageComputeShader.Wait();
 
-			readBuf = 1 - readBuf;
+			verticesComputeShader.Use();
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 0, m_ComputeNodesInBuffer);
+			glBindBufferBase (GL_SHADER_STORAGE_BUFFER, 2, m_Mesh.m_vbo.GetID());
+			verticesComputeShader.Compute();
+			verticesComputeShader.Wait();
 		}
 
 		Physics::deltaTime--;
 	}
 
+	auto inverseModel = glm::inverse (GetTransform().GetModelMatrix());
 
 	// Update uniforms
 	simulationStageComputeShader.Use();
-
-	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration",
-	                                                    glm::inverse (GetTransform().GetUpdatedModelMatrix()) *
-	                                                    m_Parameters.gravityAccel);
-
+	simulationStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
+	simulationStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
+	simulationStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
 	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
 	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
-	                                                  m_Parameters.constraintDistanceDumping);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
-	                                                  m_Parameters.constraintDistanceMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.selfCollisionDistanceMult",
-	                                                  m_Parameters.selfCollisionDistanceMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDistMult",
-	                                                  m_Parameters.sphereRepulsionDistMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDamping",
-	                                                  m_Parameters.sphereRepulsionDamping);
-
-	auto inverseModel = glm::inverse (GetTransform().GetModelMatrix());
-
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration",
 	                                                    glm::inverse (GetTransform().GetUpdatedModelMatrix()) *
 	                                                    m_Parameters.gravityAccel);
 
-	simulationStageComputeShader.SetUniform<GLfloat> ("drag", m_Parameters.drag);
-	simulationStageComputeShader.SetUniform<GLfloat> ("elasticStiffness", m_Parameters.stiffness);
-	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
+	constraintsStageComputeShader.Use();
+	constraintsStageComputeShader.SetUniform<GLfloat> ("radius", m_Radius);
+	constraintsStageComputeShader.SetUniform<GLuint> ("ropeDim", m_PointsByLength);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("restLenHV", m_RestLength);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("deltaTime", m_Parameters.subStepDt);
+
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
 	                                                  m_Parameters.constraintDistanceDumping);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
 	                                                  m_Parameters.constraintDistanceMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.selfCollisionDistanceMult",
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.selfCollisionDistanceMult",
 	                                                  m_Parameters.selfCollisionDistanceMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDistMult",
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDistMult",
 	                                                  m_Parameters.sphereRepulsionDistMult);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDamping",
+	constraintsStageComputeShader.SetUniform<GLfloat> ("constraintParams.sphereRepulsionDamping",
 	                                                  m_Parameters.sphereRepulsionDamping);
+
+
 
 	// Rope is different from the cloth and need a full custom update.
 	// The following behaviors are found in MassSpring.cpp for cloth
@@ -379,11 +387,11 @@ void Rope::Update ()
 	auto colliders = Scene::GetInstance()->GetColliders();
 	if (!colliders.empty())
 	{
-		simulationStageComputeShader.Use();
+		constraintsStageComputeShader.Use();
 
 		for (auto it = colliders.begin(); it != colliders.end();)
 		{
-			simulationStageComputeShader.SetUniformArray<GLuint> ("sphereCount", colliders.size());
+			constraintsStageComputeShader.SetUniformArray<GLuint> ("sphereCount", colliders.size());
 
 			auto collider = it->second;
 			int i = std::distance (colliders.begin(), it);
@@ -394,22 +402,22 @@ void Rope::Update ()
 				auto spherePos =
 					inverseModel * glm::vec4 (collider->GetTransform().GetPosition(), 1);
 
-				simulationStageComputeShader.SetUniformArray<glm::vec4>
+				constraintsStageComputeShader.SetUniformArray<glm::vec4>
 					(("spheres[" + std::to_string (i) + "].sphereCenter").c_str(), spherePos);
-				simulationStageComputeShader.SetUniformArray<GLfloat>
+				constraintsStageComputeShader.SetUniformArray<GLfloat>
 					(("spheres[" + std::to_string (i) + "].sphereRadius").c_str(), collider->radius);
-				simulationStageComputeShader.SetUniformArray<GLuint>
+				constraintsStageComputeShader.SetUniformArray<GLuint>
 					(("spheres[" + std::to_string (i) + "].sphereActive").c_str(), collider->m_IsActive);
 
 				++it;
 			}
 			else
 			{
-				simulationStageComputeShader.SetUniformArray<glm::vec4>
+				constraintsStageComputeShader.SetUniformArray<glm::vec4>
 					(("spheres[" + std::to_string (i) + "].sphereCenter").c_str(), { 0, 0, 0, 0 });
-				simulationStageComputeShader.SetUniformArray<GLfloat>
+				constraintsStageComputeShader.SetUniformArray<GLfloat>
 					(("spheres[" + std::to_string (i) + "].sphereRadius").c_str(), 0);
-				simulationStageComputeShader.SetUniformArray<GLuint>
+				constraintsStageComputeShader.SetUniformArray<GLuint>
 					(("spheres[" + std::to_string (i) + "].sphereActive").c_str(), 0);
 				Scene::GetInstance()->EraseCollider (it->first);
 				return;

@@ -43,6 +43,8 @@ private:
 	};
 
 public:
+	ShaderProgramCompute verticesComputeShader {};
+
 	Rope(std::string name, GLuint pointsByLength, GLfloat restLenght, GLfloat radius, MassSpringParameters parameters);
 
 	void InitializeNodes();
