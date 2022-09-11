@@ -75,8 +75,8 @@ void Rope::InitializeVertices ()
 
 			glm::vec3 normal = glm::normalize (position - nodePos);
 
-			Vertex vertex{ { position.x, position.y, position.z, 0.0f } };
-
+			Vertex vertex{ { position.x - m_RestLength * m_PointsByLength/2, position.y - m_RestLength * m_PointsByLength/2, position.z - m_RestLength * m_PointsByLength/2, 0.0f } };
+			
 			if (i == 0)
 			{
 				auto dirToNext = glm::normalize (glm::vec3 (m_Nodes[i + 1].position) - nodePos);
@@ -234,7 +234,7 @@ void Rope::Create ()
 	simulationStageComputeShader.SetUniform<glm::vec4> ("gravityAcceleration",
 	                                                    glm::inverse (GetTransform().GetUpdatedModelMatrix()) *
 	                                                    m_Parameters.gravityAccel);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDumping",
+	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
 	                                                  m_Parameters.constraintDistanceDumping);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
 	                                                  m_Parameters.constraintDistanceMult);
@@ -295,7 +295,7 @@ void Rope::Update ()
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDumping",
+	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
 	                                                  m_Parameters.constraintDistanceDumping);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
 	                                                  m_Parameters.constraintDistanceMult);
@@ -317,7 +317,7 @@ void Rope::Update ()
 	simulationStageComputeShader.SetUniform<GLfloat> ("particleMass", m_Parameters.particleMass);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constShearMult", m_Parameters.kSheering);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constBendMult", m_Parameters.kBending);
-	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDumping",
+	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.correctionDamping",
 	                                                  m_Parameters.constraintDistanceDumping);
 	simulationStageComputeShader.SetUniform<GLfloat> ("constraintParams.constraintDistanceMult",
 	                                                  m_Parameters.constraintDistanceMult);

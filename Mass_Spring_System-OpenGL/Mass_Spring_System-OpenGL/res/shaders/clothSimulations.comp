@@ -17,8 +17,6 @@ struct Vertex {
 struct WindInfo {
 	vec4 position;
 	vec4 forward;
-	vec4 right;
-	vec4 up;
 	float forceMult;
 	float fullForceRadius;
 	float attenuationRadius;

@@ -49,7 +49,7 @@ uniform uint sphereCount;
 
 // Spring constraints params
 struct ConstraintParams {
-	float correctionDumping;
+	float correctionDamping;
 	float constraintDistanceMult;
 	float selfCollisionDistanceMult;
 	float sphereRepulsionDistMult;
@@ -302,7 +302,7 @@ void main()
 
 	// Distance constraints
 	vec3 distCorrection = vec3(0,0,0);
-	distCorrection = ComputeDistanceCorrection(linearIdx, particleGridDims, globalIdx) * constraintParams.correctionDumping;
+	distCorrection = ComputeDistanceCorrection(linearIdx, particleGridDims, globalIdx) * constraintParams.correctionDamping;
 
 	// Self collisions
 	vec3 selfCollCorrection = vec3(0,0,0);
